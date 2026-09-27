@@ -82,7 +82,8 @@ export const UNITS = [
     label: 'Membaca kata sederhana dengan suara',
     tuntutan: 'Anak membaca kata-kata sederhana (pola KV, KVK, KVKV) dengan suara nyaring. Rekaman suara dikumpulkan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
-    catatan_batas: 'Kefasihan tidak dapat diputuskan dari rekaman tanpa transkripsi atau penilaian manusia. Sistem hanya mengumpulkan bukti dengan status TERTUNDA.',
+    catatan_batas: 'Kefasihan tidak dapat diputuskan dari rekaman tanpa transkripsi atau penilaian manusia. Sistem hanya mengumpulkan bukti.',
+    rubrik_orang_tua: 'Dengarkan rekaman. Apakah anak mengucapkan setiap kata dengan cukup jelas sehingga Anda bisa mengenalinya, meski belum sempurna?',
     prerequisite: [],
   },
   {
@@ -112,7 +113,8 @@ export const UNITS = [
     label: 'Mengajukan pertanyaan lisan',
     tuntutan: 'Anak mengajukan pertanyaan secara lisan berdasarkan stimulus (gambar atau situasi). Rekaman suara dikumpulkan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
-    catatan_batas: 'Kesantunan dan relevansi pertanyaan tidak dapat dinilai otomatis. Status: TERTUNDA.',
+    catatan_batas: 'Kesantunan dan relevansi pertanyaan tidak dapat dinilai otomatis.',
+    rubrik_orang_tua: 'Dengarkan rekaman. Apakah anak mengajukan pertanyaan yang berkaitan dengan gambar atau situasi yang diberikan?',
     prerequisite: [],
   },
   {
@@ -122,6 +124,7 @@ export const UNITS = [
     tuntutan: 'Anak menjawab pertanyaan lisan yang dibacakan atau diputar. Rekaman suara dikumpulkan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
     catatan_batas: 'Isi dan kejelasan jawaban tidak dapat dinilai otomatis.',
+    rubrik_orang_tua: 'Dengarkan rekaman. Apakah anak menjawab dengan kalimat yang bisa dipahami dan berkaitan dengan pertanyaan?',
     prerequisite: [],
   },
   {
@@ -131,6 +134,7 @@ export const UNITS = [
     tuntutan: 'Anak menanggapi komentar atau pendapat yang diputar atau dibacakan. Rekaman suara dikumpulkan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
     catatan_batas: 'Kesantunan tidak dapat diputuskan dari transkripsi saja.',
+    rubrik_orang_tua: 'Dengarkan rekaman. Apakah anak menanggapi dengan kalimat yang sopan dan relevan dengan komentar yang diberikan?',
     prerequisite: [],
   },
   {
@@ -140,6 +144,7 @@ export const UNITS = [
     tuntutan: 'Anak mengungkapkan perasaan terkait situasi atau gambar yang diberikan. Rekaman suara dikumpulkan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
     catatan_batas: 'Kesesuaian perasaan dengan konteks tidak dapat diputuskan otomatis.',
+    rubrik_orang_tua: 'Dengarkan rekaman. Apakah anak menyebutkan perasaan yang sesuai dengan situasi, menggunakan kata perasaan (senang, sedih, takut, dll)?',
     prerequisite: [],
   },
   {
@@ -149,6 +154,7 @@ export const UNITS = [
     tuntutan: 'Anak mengungkapkan gagasan atau pendapat terkait topik sederhana. Rekaman suara dikumpulkan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
     catatan_batas: 'Kejelasan gagasan tidak dapat diputuskan otomatis.',
+    rubrik_orang_tua: 'Dengarkan rekaman. Apakah anak menyampaikan pendapat atau gagasan yang berkaitan dengan topik, dalam kalimat yang bisa dipahami?',
     prerequisite: [],
   },
   {
@@ -158,6 +164,7 @@ export const UNITS = [
     tuntutan: 'Anak membaca teks pendek, kemudian menceritakan kembali isinya secara lisan. Rekaman suara dikumpulkan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
     catatan_batas: 'Kelengkapan dan akurasi retelling tidak dapat dinilai otomatis.',
+    rubrik_orang_tua: 'Dengarkan rekaman. Apakah anak menyebutkan setidaknya satu informasi utama dari bacaan (siapa, apa yang terjadi, atau di mana)?',
     prerequisite: ['BI-A-R02'],
   },
   {
@@ -166,7 +173,8 @@ export const UNITS = [
     label: 'Menceritakan kembali rangkaian visual',
     tuntutan: 'Anak mengamati rangkaian gambar, kemudian menceritakan peristiwanya secara lisan. Rekaman suara dikumpulkan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
-    catatan_batas: 'Status: TERTUNDA.',
+    catatan_batas: 'Kelengkapan retelling tidak dapat dinilai otomatis.',
+    rubrik_orang_tua: 'Dengarkan rekaman. Apakah anak menceritakan urutan kejadian dalam gambar, setidaknya menyebut awal dan akhir cerita?',
     prerequisite: ['BI-A-R03'],
   },
   {
@@ -176,6 +184,7 @@ export const UNITS = [
     tuntutan: 'Anak mendengar cerita pendek yang diputar, kemudian menceritakan kembali isinya secara lisan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
     catatan_batas: 'Audio harus berhasil terputar. Retelling tidak dapat dinilai otomatis.',
+    rubrik_orang_tua: 'Dengarkan rekaman. Apakah anak menyebutkan setidaknya satu isi cerita yang baru didengar (tokoh, kejadian, atau pesan)?',
     prerequisite: ['BI-A-L02'],
   },
 
@@ -184,9 +193,10 @@ export const UNITS = [
     id: 'BI-A-W01',
     elemen: 'MENULIS',
     label: 'Menulis permulaan',
-    tuntutan: 'Anak menulis huruf, suku kata, atau kata sederhana pada area kanvas atau dengan alat tulis. Gambar/foto tulisan dikumpulkan.',
+    tuntutan: 'Anak menulis huruf, suku kata, atau kata sederhana di area teks. Teks atau foto tulisan dikumpulkan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
-    catatan_batas: 'Bentuk huruf tidak dapat dinilai dari jumlah goresan atau panjang stroke. Perkembangan tulisan tangan memerlukan contoh pada waktu berbeda.',
+    catatan_batas: 'Bentuk huruf tidak dapat dinilai dari teks digital. Perkembangan tulisan tangan memerlukan contoh pada waktu berbeda.',
+    rubrik_orang_tua: 'Lihat hasil tulisan anak. Apakah semua huruf yang diminta ada dan bisa dibaca, meski bentuknya belum sempurna?',
     prerequisite: [],
   },
   {
@@ -195,16 +205,18 @@ export const UNITS = [
     label: 'Mengumpulkan contoh tulisan tangan',
     tuntutan: 'Orang tua atau anak mengunggah foto tulisan tangan anak (kata atau kalimat pendek) sebagai bukti perkembangan.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
-    catatan_batas: 'Sistem hanya menyimpan file foto. Tidak ada penilaian otomatis. Perbandingan antar waktu memerlukan review manusia.',
+    catatan_batas: 'Sistem hanya menyimpan file foto. Perbandingan antar waktu memerlukan review manusia.',
+    rubrik_orang_tua: 'Lihat foto tulisan tangan. Apakah tulisan bisa dibaca, dan apakah ada kemajuan dari tulisan sebelumnya (jika ada)?',
     prerequisite: ['BI-A-W01'],
   },
   {
     id: 'BI-A-W03',
     elemen: 'MENULIS',
     label: 'Menulis teks sederhana dalam beberapa kalimat',
-    tuntutan: 'Anak menulis 2–3 kalimat bertema bebas di area teks. Sistem memeriksa: teks tidak kosong, panjang minimal terpenuhi.',
+    tuntutan: 'Anak menulis 2–3 kalimat bertema bebas di area teks. Sistem memeriksa panjang minimal.',
     evidence_mode: EVIDENCE_MODE.COLLECT,
-    catatan_batas: 'Kebenaran ejaan, tanda baca, dan isi tidak dapat dinilai otomatis secara andal untuk kelas 1. Sistem hanya memeriksa keberadaan teks. Skor sejati memerlukan review manusia.',
+    catatan_batas: 'Ejaan, tanda baca, dan isi tidak dapat dinilai otomatis untuk kelas 1. Sistem hanya memeriksa keberadaan teks.',
+    rubrik_orang_tua: 'Baca teks yang ditulis anak. Apakah terdapat minimal 2 kalimat yang bisa dipahami maksudnya, meski ejaan belum sempurna?',
     prerequisite: ['BI-A-W01'],
   },
 ];

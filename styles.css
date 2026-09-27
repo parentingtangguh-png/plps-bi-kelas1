@@ -313,3 +313,111 @@ button { cursor: pointer; font: inherit; border: none; }
 
 /* ── Record section ── */
 .record-section { margin-bottom: 12px; }
+
+/* ── Unit card states (tambahan) ── */
+.unit-card--pending { border-color: var(--color-warn); background: var(--color-warn-light); }
+.map-header-actions { display: flex; gap: 8px; align-items: center; }
+.btn-parent-review {
+  padding: 8px 14px; background: var(--color-warn); color: #fff;
+  border-radius: var(--radius); font-size: .825rem; font-weight: 600;
+}
+.btn-secondary {
+  display: block; width: 100%; padding: 12px 20px;
+  background: var(--color-primary-light); color: var(--color-primary);
+  border-radius: var(--radius); font-size: .95rem; font-weight: 600;
+  margin-top: 12px; text-align: center; border: 1.5px solid var(--color-primary);
+}
+
+/* ── Cek awal result branches ── */
+.cek-awal-berhasil, .cek-awal-perlu-latihan {
+  background: var(--color-surface); border: 1.5px solid var(--color-border);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 4px;
+}
+.cek-awal-berhasil { border-color: var(--color-accent); background: var(--color-accent-light); }
+.cek-awal-berhasil p:first-child { font-weight: 700; color: #15803d; }
+.hint { font-size: .875rem; color: var(--color-text-muted); margin-top: 4px; }
+.collect-note { background: var(--color-primary-light); border-radius: var(--radius); padding: 12px; font-size: .9rem; margin-bottom: 16px; }
+
+/* ── Upload section ── */
+.upload-section { margin-bottom: 12px; }
+.upload-label {
+  display: block; padding: 14px; background: var(--color-primary-light);
+  border: 1.5px dashed var(--color-primary); border-radius: var(--radius);
+  text-align: center; font-size: .95rem; cursor: pointer;
+}
+.upload-label input[type="file"] { display: none; }
+.photo-preview { margin-top: 8px; }
+
+/* ── Parent dashboard ── */
+.view-parent { padding-top: 16px; }
+.parent-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+.parent-desc { color: var(--color-text-muted); font-size: .9rem; margin-bottom: 24px; line-height: 1.6; }
+.parent-empty {
+  text-align: center; padding: 32px 16px;
+  background: var(--color-surface); border: 1.5px solid var(--color-border);
+  border-radius: var(--radius); color: var(--color-text-muted);
+}
+.parent-empty-icon { font-size: 2rem; margin-bottom: 8px; }
+.parent-section-title {
+  font-size: .75rem; font-weight: 700; text-transform: uppercase;
+  color: var(--color-text-muted); letter-spacing: .05em;
+  margin: 20px 0 10px;
+}
+.parent-section-title--done { color: var(--color-accent); }
+
+/* ── Parent review card ── */
+.parent-review-card {
+  background: var(--color-surface); border: 1.5px solid var(--color-warn);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+}
+.parent-review-card--done { border-color: var(--color-border); }
+.prc-id { font-size: .7rem; font-family: monospace; color: var(--color-text-muted); }
+.prc-label { font-size: 1rem; font-weight: 700; margin: 4px 0 10px; }
+.prc-rubrik {
+  background: var(--color-primary-light); border-radius: 8px;
+  padding: 10px 14px; font-size: .875rem; margin-bottom: 12px;
+  line-height: 1.6;
+}
+.prc-evidence { margin-bottom: 12px; }
+.prc-text {
+  background: #f9fafb; border: 1px solid var(--color-border);
+  border-radius: 8px; padding: 10px; font-size: .9rem;
+  margin-top: 6px; white-space: pre-wrap; line-height: 1.6;
+}
+.prc-skipped { color: var(--color-text-muted); font-size: .875rem; }
+.btn-play-evidence {
+  display: inline-block; padding: 8px 16px;
+  background: var(--color-warn); color: #fff;
+  border-radius: 8px; font-size: .875rem; font-weight: 600;
+  margin-top: 6px;
+}
+.media-container { margin-top: 4px; }
+.prc-actions { display: flex; gap: 10px; margin-top: 12px; }
+.btn-verdict-bisa {
+  flex: 1; padding: 12px;
+  background: var(--color-accent); color: #fff;
+  border-radius: var(--radius); font-size: .95rem; font-weight: 600;
+}
+.btn-verdict-latihan {
+  flex: 1; padding: 12px;
+  background: var(--color-surface); color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius); font-size: .95rem; font-weight: 600;
+}
+.prc-verdict {
+  padding: 10px 14px; border-radius: 8px; font-size: .9rem; font-weight: 600;
+  margin-top: 10px;
+}
+.prc-verdict--bisa { background: var(--color-accent-light); color: #15803d; }
+.prc-verdict--perlu_latihan { background: var(--color-warn-light); color: #92400e; }
+.prc-verdict-date { font-size: .78rem; font-weight: 400; margin-left: 8px; }
+
+/* ── Mastery disclaimer ── */
+.mastery-disclaimer {
+  font-size: .78rem; color: var(--color-text-muted);
+  margin-top: 8px; line-height: 1.6; font-style: italic;
+}
+
+/* ── Outcome colors tambahan ── */
+.outcome-dinilai_orang_tua_bisa { background: var(--color-accent-light); color: #15803d; }
+.outcome-dinilai_orang_tua_perlu_latihan { background: var(--color-warn-light); color: #92400e; }
