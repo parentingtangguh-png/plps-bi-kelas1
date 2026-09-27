@@ -1,0 +1,10 @@
+{
+  "name": "plps-bi-kelas1",
+  "version": "0.1.0",
+  "description": "PLPS Bahasa Indonesia Kelas 1 — MVP 2",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve . --port 3000 --cors",
+    "start": "npx serve . --port 3000 --cors"
+  }
+}
