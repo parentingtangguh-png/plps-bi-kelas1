@@ -262,6 +262,10 @@ export function getAllUnitOutcomes() {
   for (const [unitId, us] of Object.entries(s.units)) {
     if (us.masteryDecision?.masteryProven) {
       result[unitId] = 'TERLIHAT_BISA';
+    } else if (us.masteryDecision && !us.masteryDecision.masteryProven) {
+      // Cek ulang sudah ada dan gagal — sinyal ini lebih baru dari cek awal,
+      // sehingga menggantikan outcome cek awal untuk keperluan prasyarat.
+      result[unitId] = 'MASIH_BELAJAR';
     } else if (us.cekAwal?.outcome) {
       result[unitId] = us.cekAwal.outcome;
     } else {
