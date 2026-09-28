@@ -670,6 +670,68 @@ function renderPostVerdict1(unit, us) {
   `;
 }
 
+// Fix A: blokir latihan jika tidak ada karya sama sekali
+function renderLatihanBlokirTanpaKarya(unit) {
+  app.innerHTML = `
+    <div class="view-result">
+      <header class="check-header">
+        <button class="btn-back" onclick="navigate('#map')">← Peta</button>
+        <div class="check-badge">Untuk anak · Latihan</div>
+      </header>
+      <h1 class="result-title">${esc(unit.label)}</h1>
+      <div class="collect-skipped-warning">
+        ⚠ Latihan perlu diselesaikan dengan karya nyata (rekaman, foto, atau tulisan) agar bisa lanjut ke cek ulang.
+        Lewati tugas hanya jika ada halangan teknis, bukan karena ingin melompat.
+      </div>
+      <button class="btn-primary" onclick="startCollectLatihan('${unit.id}')">Coba lagi latihan →</button>
+      <button class="btn-ghost" onclick="navigate('#map')">Nanti saja</button>
+    </div>
+  `;
+}
+
+// Fix B: setelah latihan selesai dengan karya, orang tua konfirmasi sebelum cek ulang
+function renderLatihanKonfirmasiOrangTua(unit) {
+  const us = getUnitState(unit.id);
+  const s = getState();
+  const jenis = us.parentVerdict?.verdict === 'BISA' ? 'pendalaman' : 'penguatan';
+  app.innerHTML = `
+    <div class="view-result">
+      <header class="check-header">
+        <button class="btn-back" onclick="navigate('#map')">← Peta</button>
+        <div class="check-badge">Untuk orang tua · Konfirmasi latihan</div>
+      </header>
+      <h1 class="result-title">${esc(unit.label)}</h1>
+
+      <div class="journey-steps">
+        <div class="journey-step journey-step--done">① Kumpulkan bukti cek awal ✓</div>
+        <div class="journey-step journey-step--done">② Orang tua nilai cek awal ✓</div>
+        <div class="journey-step journey-step--done">③ Latihan ${jenis} ✓ — menunggu konfirmasi</div>
+        <div class="journey-step journey-step--pending">④ Kumpulkan bukti cek ulang</div>
+        <div class="journey-step journey-step--pending">⑤ Orang tua nilai cek ulang</div>
+      </div>
+
+      <p class="check-desc">
+        ${esc(s.childName)} sudah menyelesaikan latihan ${jenis}.
+        Sebelum lanjut ke cek ulang, orang tua perlu mengamati apakah latihan tadi berjalan dengan baik.
+      </p>
+
+      <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 16px;margin:12px 0;">
+        <strong>Panduan orang tua:</strong><br>
+        ${jenis === 'penguatan'
+          ? 'Apakah anak mengikuti latihan dengan sungguh-sungguh? Jika sudah, konfirmasi agar lanjut ke cek ulang dengan bahan baru.'
+          : 'Apakah anak menyelesaikan tantangan pendalaman? Jika sudah, konfirmasi agar lanjut ke cek ulang dengan bahan baru.'
+        }
+      </div>
+
+      <button class="btn-primary" onclick="startCollectCekUlang('${unit.id}')">
+        Konfirmasi dan mulai cek ulang →
+      </button>
+      <button class="btn-secondary" onclick="startCollectLatihan('${unit.id}')">Ulangi latihan</button>
+      <button class="btn-ghost" onclick="navigate('#map')">Nanti saja</button>
+    </div>
+  `;
+}
+
 // Setelah latihan: pengalihan ke cek ulang ditampilkan di sini
 // (latihan selesai → saveLatihanResponses kosong → renderUnit → renderPostLatihanCollect)
 function renderPostLatihanCollect(unit, us) {
@@ -743,9 +805,16 @@ function renderCollectTask(unit, tasks, taskIdx, phase) {
       // cek_ulang selesai → tandai di state sebagai done dengan dummy cekAwal jika belum ada
       renderUnit(unit.id);
     } else if (phase === 'latihan') {
-      // latihan selesai → tandai sebagai done, lanjut ke cek ulang
-      saveLatihanResponses(unit.id, []);
-      renderUnit(unit.id);
+      // Fix A: blokir jika tidak ada satu pun karya nyata
+      const done = window._collectState?.latihanTasksDone ?? 0;
+      if (done === 0) {
+        renderLatihanBlokirTanpaKarya(unit);
+        return;
+      }
+      // latihan selesai dengan karya → simpan jumlah karya, lanjut ke konfirmasi orang tua (Fix B)
+      saveLatihanResponses(unit.id, [{ tasksDone: done }]);
+      renderLatihanKonfirmasiOrangTua(unit);
+      return;
     } else {
       // cek_awal selesai
       if (!getUnitState(unit.id).cekAwal) {
@@ -839,6 +908,9 @@ function renderCollectTask(unit, tasks, taskIdx, phase) {
   window._collectState = {
     unit, tasks, taskIdx, phase,
     recording: null, recorded: false, recordingBlob: null, photoBlob: null,
+    // Fix A: lacak jumlah task latihan yang benar-benar dikerjakan (bukan dilewati)
+    // Reset di task pertama; pertahankan saat navigasi antar task dalam satu sesi
+    latihanTasksDone: (taskIdx === 0) ? 0 : (window._collectState?.latihanTasksDone ?? 0),
   };
 
   const photoInput = document.getElementById('photoInput');
@@ -927,20 +999,33 @@ window.collectNext = async function(unitId, taskIdx, phase) {
       return;
     }
     if (saveEv) saveEv(unitId, { taskId: task.id, type: 'text', payload: text });
+    if (phase === 'latihan') cs.latihanTasksDone = (cs.latihanTasksDone ?? 0) + 1;
 
   } else if (task.needsPhoto) {
     if (cs.photoBlob) {
       const mediaId = `${unitId}_${task.id}_${phase}_${Date.now()}`;
-      await saveMediaBlob(mediaId, cs.photoBlob);
+      // Fix C: jika IndexedDB gagal, blokir — jangan catat sebagai bukti bermedia
+      const savedId = await saveMediaBlob(mediaId, cs.photoBlob);
+      if (!savedId) {
+        alert('Foto gagal disimpan (IndexedDB tidak tersedia). Coba lagi atau gunakan browser lain.');
+        return;
+      }
       if (saveEv) saveEv(unitId, { taskId: task.id, type: 'photo', mediaId, payload: { size: cs.photoBlob.size } });
+      if (phase === 'latihan') cs.latihanTasksDone = (cs.latihanTasksDone ?? 0) + 1;
     } else if (saveEv) {
       saveEv(unitId, { taskId: task.id, type: 'skipped', payload: null });
     }
 
   } else if (cs.recorded && cs.recordingBlob) {
     const mediaId = `${unitId}_${task.id}_${phase}_${Date.now()}`;
-    await saveMediaBlob(mediaId, cs.recordingBlob);
+    // Fix C: jika IndexedDB gagal, blokir — jangan catat sebagai bukti bermedia
+    const savedId = await saveMediaBlob(mediaId, cs.recordingBlob);
+    if (!savedId) {
+      alert('Rekaman gagal disimpan (IndexedDB tidak tersedia). Coba lagi atau gunakan browser lain.');
+      return;
+    }
     if (saveEv) saveEv(unitId, { taskId: task.id, type: 'audio', mediaId, payload: { size: cs.recordingBlob.size } });
+    if (phase === 'latihan') cs.latihanTasksDone = (cs.latihanTasksDone ?? 0) + 1;
 
   } else if (saveEv) {
     saveEv(unitId, { taskId: task.id, type: 'skipped', payload: null });
