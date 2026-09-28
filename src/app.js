@@ -691,7 +691,7 @@ function renderLatihanBlokirTanpaKarya(unit) {
   `;
 }
 
-// Fix B: setelah latihan selesai dengan karya, orang tua lihat karya + rubrik lalu konfirmasi
+// Fix B: setelah latihan selesai, orang tua lihat karya + wajib jawab rubrik jalur-spesifik
 async function renderLatihanKonfirmasiOrangTua(unit, us) {
   const s = getState();
   const jenis = us.parentVerdict?.verdict === 'BISA' ? 'pendalaman' : 'penguatan';
@@ -699,22 +699,26 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
   const phases = COLLECT_PHASES[unit.id];
   const latihanTasks = phases?.latihan ?? [];
 
+  // Lacak media yang hilang untuk blokir konfirmasi
+  const missingMedia = [];
+
   // Bangun HTML karya per task
-  const karya = await Promise.all(evidence.map(async (ev) => {
+  const karya = await Promise.all(evidence.map(async (ev, evIdx) => {
     const task = latihanTasks.find(t => t.id === ev.taskId);
-    const rubrik = task?.rubrik_orang_tua ?? [];
-    const rubrikHtml = rubrik.length
-      ? `<ul class="rubrik-list">${rubrik.map(r => `<li>${esc(r)}</li>`).join('')}</ul>`
-      : '';
+    // Pilih rubrik sesuai jalur
+    const rubrikArr = (task?.rubrik_orang_tua?.[jenis]) ?? (task?.rubrik_orang_tua ?? []);
 
     let mediaHtml = '';
+    let mediaMissing = false;
     if (ev.type === 'audio' && ev.mediaId) {
       const blob = await getMediaBlob(ev.mediaId);
       if (blob) {
         const url = URL.createObjectURL(blob);
         mediaHtml = `<audio controls src="${url}" style="width:100%;margin:8px 0;"></audio>`;
       } else {
-        mediaHtml = `<p class="collect-skipped-warning">⚠ Rekaman tidak ditemukan di perangkat ini.</p>`;
+        mediaMissing = true;
+        missingMedia.push(ev.taskId);
+        mediaHtml = `<p class="collect-skipped-warning" data-missing="1">⚠ Rekaman tidak ditemukan di perangkat ini. Tidak dapat dikonfirmasi — ulangi latihan.</p>`;
       }
     } else if (ev.type === 'photo' && ev.mediaId) {
       const blob = await getMediaBlob(ev.mediaId);
@@ -722,7 +726,9 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
         const url = URL.createObjectURL(blob);
         mediaHtml = `<img src="${url}" style="max-width:100%;border-radius:8px;margin:8px 0;" />`;
       } else {
-        mediaHtml = `<p class="collect-skipped-warning">⚠ Foto tidak ditemukan di perangkat ini.</p>`;
+        mediaMissing = true;
+        missingMedia.push(ev.taskId);
+        mediaHtml = `<p class="collect-skipped-warning" data-missing="1">⚠ Foto tidak ditemukan di perangkat ini. Tidak dapat dikonfirmasi — ulangi latihan.</p>`;
       }
     } else if (ev.type === 'text') {
       mediaHtml = `<div class="stimulus-box" style="white-space:pre-wrap;">${esc(ev.payload ?? '')}</div>`;
@@ -730,13 +736,39 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
       mediaHtml = `<p style="color:#9ca3af;font-size:0.9rem;">— tugas dilewati —</p>`;
     }
 
+    // Rubrik sebagai radio wajib; tiap nama unik per butir
+    const rubrikHtml = rubrikArr.length && !mediaMissing ? `
+      <div style="margin-top:10px;">
+        <strong style="font-size:0.85rem;">Yang perlu diamati:</strong>
+        ${rubrikArr.map((r, rIdx) => `
+          <div class="rubrik-item" style="margin:8px 0;">
+            <p style="margin:0 0 4px;font-size:0.9rem;">${esc(r)}</p>
+            <label style="margin-right:12px;">
+              <input type="radio" name="rubrik_${evIdx}_${rIdx}" value="ok" onchange="checkKonfirmasiReady('${unit.id}')">
+              ✓ Sesuai panduan
+            </label>
+            <label>
+              <input type="radio" name="rubrik_${evIdx}_${rIdx}" value="retry" onchange="checkKonfirmasiReady('${unit.id}')">
+              ✗ Perlu mencoba lagi
+            </label>
+          </div>`).join('')}
+      </div>` : '';
+
     return `
-      <div style="border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;margin:10px 0;">
+      <div class="task-review-card" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;margin:10px 0;">
         <div style="font-size:0.85rem;color:#6b7280;margin-bottom:6px;">${esc(task?.instruksi ?? ev.taskId)}</div>
         ${mediaHtml}
-        ${rubrikHtml ? `<div style="margin-top:8px;"><strong style="font-size:0.85rem;">Yang perlu diamati:</strong>${rubrikHtml}</div>` : ''}
+        ${rubrikHtml}
       </div>`;
   }));
+
+  // Hitung total butir rubrik yang perlu dijawab
+  const totalRubrik = evidence.reduce((acc, ev, evIdx) => {
+    const task = latihanTasks.find(t => t.id === ev.taskId);
+    const arr = (task?.rubrik_orang_tua?.[jenis]) ?? (task?.rubrik_orang_tua ?? []);
+    const missing = missingMedia.includes(ev.taskId);
+    return acc + (missing ? 0 : arr.length);
+  }, 0);
 
   app.innerHTML = `
     <div class="view-result">
@@ -755,19 +787,71 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
       </div>
 
       <p class="check-desc">
-        ${esc(s.childName)} sudah menyelesaikan latihan ${jenis}. Lihat karya di bawah, periksa poin yang perlu diamati, lalu konfirmasi.
+        ${esc(s.childName)} sudah menyelesaikan latihan ${jenis}. Lihat karya, jawab setiap poin, lalu konfirmasi.
       </p>
 
       ${karya.join('')}
 
-      <button class="btn-primary" onclick="konfirmasiLatihanSelesai('${unit.id}')">
+      <div id="konfirmasiStatus" style="margin:12px 0;font-size:0.9rem;color:#6b7280;">
+        ${missingMedia.length
+          ? '⚠ Ada karya yang tidak ditemukan. Ulangi latihan agar semua karya tersedia.'
+          : totalRubrik > 0
+            ? 'Jawab semua poin pengamatan di atas untuk melanjutkan.'
+            : ''}
+      </div>
+
+      <button id="btnKonfirmasi" class="btn-primary" disabled onclick="konfirmasiLatihanSelesai('${unit.id}')">
         Konfirmasi — lanjut ke cek ulang →
       </button>
-      <button class="btn-secondary" onclick="startCollectLatihan('${unit.id}')">Ulangi latihan</button>
+      <button id="btnUlangLatihan" class="btn-secondary" style="display:none" onclick="startCollectLatihan('${unit.id}')">Ulangi latihan</button>
       <button class="btn-ghost" onclick="navigate('#map')">Nanti saja</button>
     </div>
   `;
+
+  // Simpan konteks untuk checkKonfirmasiReady
+  window._konfirmasiCtx = { unitId: unit.id, totalRubrik, hasMissingMedia: missingMedia.length > 0 };
+
+  // Jika tidak ada rubrik dan tidak ada media hilang (mis. semua dilewati), aktifkan langsung
+  if (totalRubrik === 0 && missingMedia.length === 0) {
+    document.getElementById('btnKonfirmasi').disabled = false;
+    document.getElementById('konfirmasiStatus').textContent = '';
+  }
 }
+
+window.checkKonfirmasiReady = function(unitId) {
+  const ctx = window._konfirmasiCtx;
+  if (!ctx || ctx.unitId !== unitId) return;
+
+  const form = document.querySelectorAll('input[type=radio]');
+  const groups = {};
+  form.forEach(r => { groups[r.name] = groups[r.name] || []; groups[r.name].push(r); });
+
+  const answeredCount = Object.values(groups).filter(g => g.some(r => r.checked)).length;
+  const anyRetry = Object.values(groups).some(g => g.find(r => r.value === 'retry' && r.checked));
+  const allAnswered = answeredCount === ctx.totalRubrik;
+
+  const btnK = document.getElementById('btnKonfirmasi');
+  const btnU = document.getElementById('btnUlangLatihan');
+  const status = document.getElementById('konfirmasiStatus');
+
+  if (ctx.hasMissingMedia) {
+    btnK.disabled = true;
+    btnU.style.display = '';
+    status.textContent = '⚠ Ada karya yang tidak ditemukan. Ulangi latihan.';
+  } else if (anyRetry) {
+    btnK.disabled = true;
+    btnU.style.display = '';
+    status.textContent = '○ Ada poin yang perlu diperbaiki. Ulangi latihan atau lanjutkan jika sudah cukup.';
+  } else if (allAnswered) {
+    btnK.disabled = false;
+    btnU.style.display = 'none';
+    status.textContent = '✓ Semua poin sesuai panduan. Siap lanjut ke cek ulang.';
+  } else {
+    btnK.disabled = true;
+    btnU.style.display = 'none';
+    status.textContent = `Jawab semua poin pengamatan (${answeredCount}/${ctx.totalRubrik} dijawab).`;
+  }
+};
 
 window.konfirmasiLatihanSelesai = function(unitId) {
   saveLatihanKonfirmasi(unitId);
