@@ -1283,7 +1283,10 @@ function renderParentReviewCard(unit, us, verdikPhase, isDone) {
           ${verdict.verdict === 'BISA' ? '✓ Dinilai: Sudah bisa' : '○ Dinilai: Perlu latihan lagi'}
           <span class="prc-verdict-date">${formatDate(verdict.verdictAt)}</span>
         </div>
-        <button class="btn-ghost btn-small" onclick="undoParentVerdict('${unit.id}', '${verdikPhase}')">Ubah penilaian</button>
+        <div class="prc-done-actions">
+          <button class="btn-primary btn-small" onclick="navigate('#unit/${unit.id}')">Lanjutkan: ${esc(unit.id)} →</button>
+          <button class="btn-ghost btn-small" onclick="undoParentVerdict('${unit.id}', '${verdikPhase}')">Ubah penilaian</button>
+        </div>
       ` : allSkipped ? `
         <div class="prc-warning">
           ⚠ Tidak ada karya anak yang tersimpan. Tugas perlu diulang sebelum dapat dinilai.
