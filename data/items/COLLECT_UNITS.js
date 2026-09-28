@@ -1,177 +1,344 @@
 /**
- * Stub item bank untuk unit-unit berbasis COLLECT
- * R01, S01-S08, W01-W03
+ * Unit COLLECT — tiga fase per unit:
+ *   cek_awal  : kumpulkan bukti awal → verdik orang tua (1)
+ *   latihan   : latihan dengan panduan → lanjut ke cek ulang
+ *   cek_ulang : bahan baru → verdik orang tua (2) → keputusan mastery
  *
- * Setiap unit hanya mengumpulkan bukti — tidak ada penilaian otomatis.
- * Struktur per unit: satu atau beberapa task dengan instruksi dan media.
+ * Tipe task per unit:
+ *   audio    → needsRecording = true (S01–S08, R01)
+ *   photo    → needsPhoto = true (W01, W02)
+ *   text     → needsText = true (W03)
  */
 
-// ─────────────────────────────────────────────────────
-// BI-A-R01 — Membaca kata sederhana dengan suara
-// ─────────────────────────────────────────────────────
-export const R01_TASKS = [
-  {
-    id: 'R01-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Baca kata-kata ini dengan suara nyaring. Tekan tombol rekam, lalu baca satu per satu.',
-    kata: ['buku', 'meja', 'pintu', 'kursi', 'jalan', 'malam', 'bulan', 'sekolah', 'bermain', 'membaca'],
-    catatan_batas: 'Rekaman dikumpulkan. Penilaian kefasihan tidak dapat dilakukan otomatis.',
-  },
-  {
-    id: 'R01-CU-1',
-    phase: 'cek_ulang',
-    instruksi: 'Baca kata-kata baru ini dengan suara nyaring.',
-    kata: ['pohon', 'sungai', 'hujan', 'angin', 'lumpur', 'kucing', 'burung', 'terbang', 'berlari', 'melompat'],
-    catatan_batas: 'Bahan berbeda dari cek awal. Rekaman dikumpulkan.',
-  },
-];
+export const COLLECT_PHASES = {
 
-// ─────────────────────────────────────────────────────
-// BI-A-S01 — Mengajukan pertanyaan lisan
-// ─────────────────────────────────────────────────────
-export const S01_TASKS = [
-  {
-    id: 'S01-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Lihat gambar ini. Ajukan satu pertanyaan tentang gambar kepada orang lain di dekatmu.',
-    stimulus_emoji: '🐶🎾',
-    stimulus_label: 'Seekor anjing bermain bola di taman',
-    catatan_batas: 'Relevansi dan kesantunan pertanyaan tidak dapat dinilai otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-R01 — Membaca kata sederhana dengan suara
+  // ─────────────────────────────────────────────────────
+  'BI-A-R01': {
+    cek_awal: [{
+      id: 'R01-CA-1',
+      instruksi: 'Baca kata-kata ini dengan suara nyaring. Tekan tombol rekam, lalu baca satu per satu.',
+      kata: ['buku', 'meja', 'pintu', 'kursi', 'jalan', 'malam', 'bulan', 'sekolah'],
+      needsRecording: true,
+    }],
+    latihan: [{
+      id: 'R01-LAT-1',
+      instruksi: 'Baca kata-kata ini dengan perlahan. Pisahkan tiap suku kata dulu, lalu gabungkan.',
+      panduan: '💡 Coba baca per suku kata dulu: "bu-ku", "me-ja", baru gabungkan: "buku", "meja".',
+      kata: ['pohon', 'sungai', 'hujan', 'angin', 'kucing'],
+      needsRecording: true,
+    }],
+    cek_ulang: [{
+      id: 'R01-CU-1',
+      instruksi: 'Baca kata-kata baru ini dengan suara nyaring, satu per satu.',
+      kata: ['burung', 'terbang', 'berlari', 'melompat', 'bermain', 'tertawa', 'lumpur', 'bintang'],
+      needsRecording: true,
+    }],
   },
-];
 
-// ─────────────────────────────────────────────────────
-// BI-A-S02 — Menjawab pertanyaan secara lisan
-// ─────────────────────────────────────────────────────
-export const S02_TASKS = [
-  {
-    id: 'S02-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Dengarkan pertanyaan ini, lalu jawab dengan suara nyaring.',
-    audio_script: 'Apa yang kamu lakukan setelah pulang sekolah?',
-    audio_label: 'Pertanyaan untuk dijawab',
-    catatan_batas: 'Isi jawaban tidak dapat dinilai otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-S01 — Mengajukan pertanyaan lisan
+  // ─────────────────────────────────────────────────────
+  'BI-A-S01': {
+    cek_awal: [{
+      id: 'S01-CA-1',
+      instruksi: 'Lihat gambar ini. Ajukan satu pertanyaan tentang gambar dengan suara nyaring.',
+      stimulus_emoji: '🐶🎾',
+      stimulus_label: 'Seekor anjing bermain bola di taman',
+      needsRecording: true,
+    }],
+    latihan: [{
+      id: 'S01-LAT-1',
+      instruksi: 'Lihat gambar ini. Coba ajukan pertanyaan tentang gambar.',
+      panduan: '💡 Gunakan kata tanya: "Apa", "Di mana", "Mengapa", "Siapa", atau "Bagaimana".',
+      stimulus_emoji: '🐱😴',
+      stimulus_label: 'Seekor kucing tidur di atas bantal',
+      needsRecording: true,
+    }],
+    cek_ulang: [{
+      id: 'S01-CU-1',
+      instruksi: 'Lihat gambar ini. Ajukan satu pertanyaan tentang gambar.',
+      stimulus_emoji: '👧🍦',
+      stimulus_label: 'Anak perempuan makan es krim di bawah pohon',
+      needsRecording: true,
+    }],
   },
-];
 
-// ─────────────────────────────────────────────────────
-// BI-A-S03 — Menanggapi komentar secara lisan
-// ─────────────────────────────────────────────────────
-export const S03_TASKS = [
-  {
-    id: 'S03-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Dengarkan komentar ini, lalu tanggapi dengan santun.',
-    audio_script: 'Kamu pintar sekali menggambar! Gambarmu sangat bagus.',
-    audio_label: 'Komentar untuk ditanggapi',
-    catatan_batas: 'Kesantunan tidak dapat dinilai otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-S02 — Menjawab pertanyaan secara lisan
+  // ─────────────────────────────────────────────────────
+  'BI-A-S02': {
+    cek_awal: [{
+      id: 'S02-CA-1',
+      instruksi: 'Dengarkan pertanyaan ini, lalu jawab dengan suara nyaring.',
+      audio_script: 'Apa yang kamu lakukan setelah pulang sekolah?',
+      audio_label: 'Pertanyaan untuk dijawab',
+      needsRecording: true,
+    }],
+    latihan: [{
+      id: 'S02-LAT-1',
+      instruksi: 'Dengarkan pertanyaan ini, lalu jawab dengan kalimat lengkap.',
+      panduan: '💡 Jawab dengan kalimat penuh, bukan hanya satu kata. Contoh: "Saya suka makan nasi goreng."',
+      audio_script: 'Makanan apa yang paling kamu suka?',
+      audio_label: 'Pertanyaan untuk dijawab',
+      needsRecording: true,
+    }],
+    cek_ulang: [{
+      id: 'S02-CU-1',
+      instruksi: 'Dengarkan pertanyaan ini, lalu jawab dengan suara nyaring.',
+      audio_script: 'Siapa teman baikmu di sekolah dan mengapa kamu menyukainya?',
+      audio_label: 'Pertanyaan untuk dijawab',
+      needsRecording: true,
+    }],
   },
-];
 
-// ─────────────────────────────────────────────────────
-// BI-A-S04 — Mengungkapkan perasaan secara lisan
-// ─────────────────────────────────────────────────────
-export const S04_TASKS = [
-  {
-    id: 'S04-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Lihat gambar ini. Ungkapkan perasaanmu tentang situasi dalam gambar.',
-    stimulus_emoji: '🎂🎉',
-    stimulus_label: 'Pesta ulang tahun yang meriah',
-    catatan_batas: 'Kesesuaian perasaan tidak dapat dinilai otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-S03 — Menanggapi komentar secara lisan
+  // ─────────────────────────────────────────────────────
+  'BI-A-S03': {
+    cek_awal: [{
+      id: 'S03-CA-1',
+      instruksi: 'Dengarkan komentar ini, lalu tanggapi dengan santun.',
+      audio_script: 'Kamu pintar sekali menggambar! Gambarmu sangat bagus.',
+      audio_label: 'Komentar untuk ditanggapi',
+      needsRecording: true,
+    }],
+    latihan: [{
+      id: 'S03-LAT-1',
+      instruksi: 'Dengarkan komentar ini, lalu tanggapi dengan sopan.',
+      panduan: '💡 Mulai dengan "Terima kasih" atau "Iya, benar sekali". Lalu tambahkan satu kalimat tanggapan.',
+      audio_script: 'Wah, kamu sangat rajin belajar! Nilaimu pasti bagus.',
+      audio_label: 'Komentar untuk ditanggapi',
+      needsRecording: true,
+    }],
+    cek_ulang: [{
+      id: 'S03-CU-1',
+      instruksi: 'Dengarkan komentar ini, lalu tanggapi dengan santun.',
+      audio_script: 'Sepertinya kamu sedang sedih hari ini. Apakah ada yang bisa saya bantu?',
+      audio_label: 'Komentar untuk ditanggapi',
+      needsRecording: true,
+    }],
   },
-];
 
-// ─────────────────────────────────────────────────────
-// BI-A-S05 — Mengungkapkan gagasan secara lisan
-// ─────────────────────────────────────────────────────
-export const S05_TASKS = [
-  {
-    id: 'S05-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Ungkapkan gagasanmu: apa yang ingin kamu lakukan jika libur sekolah?',
-    catatan_batas: 'Kejelasan gagasan tidak dapat dinilai otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-S04 — Mengungkapkan perasaan secara lisan
+  // ─────────────────────────────────────────────────────
+  'BI-A-S04': {
+    cek_awal: [{
+      id: 'S04-CA-1',
+      instruksi: 'Lihat gambar ini. Ungkapkan perasaanmu tentang situasi dalam gambar.',
+      stimulus_emoji: '🎂🎉',
+      stimulus_label: 'Pesta ulang tahun yang meriah',
+      needsRecording: true,
+    }],
+    latihan: [{
+      id: 'S04-LAT-1',
+      instruksi: 'Lihat gambar ini. Ungkapkan perasaanmu dan jelaskan mengapa.',
+      panduan: '💡 Gunakan kata perasaan: senang, sedih, takut, marah, kaget, atau bangga. Lalu jelaskan alasannya.',
+      stimulus_emoji: '🐶🏠',
+      stimulus_label: 'Anak menemukan anak anjing tersesat di depan rumah',
+      needsRecording: true,
+    }],
+    cek_ulang: [{
+      id: 'S04-CU-1',
+      instruksi: 'Lihat gambar ini. Ungkapkan perasaanmu tentang situasi dalam gambar.',
+      stimulus_emoji: '🎒📚',
+      stimulus_label: 'Hari pertama masuk sekolah baru',
+      needsRecording: true,
+    }],
   },
-];
 
-// ─────────────────────────────────────────────────────
-// BI-A-S06 — Menceritakan kembali bacaan
-// ─────────────────────────────────────────────────────
-export const S06_TASKS = [
-  {
-    id: 'S06-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Baca cerita ini, lalu ceritakan kembali isinya dengan kata-katamu sendiri.',
-    stimulus_teks: 'Soni dan adiknya pergi ke pantai. Mereka bermain pasir dan berenang. Soni menemukan kerang yang indah. Ia membawa kerang itu pulang untuk ibunya.',
-    catatan_batas: 'Kelengkapan retelling tidak dapat dinilai otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-S05 — Mengungkapkan gagasan secara lisan
+  // ─────────────────────────────────────────────────────
+  'BI-A-S05': {
+    cek_awal: [{
+      id: 'S05-CA-1',
+      instruksi: 'Ungkapkan gagasanmu: apa yang ingin kamu lakukan jika libur sekolah?',
+      needsRecording: true,
+    }],
+    latihan: [{
+      id: 'S05-LAT-1',
+      instruksi: 'Ungkapkan gagasanmu tentang topik ini.',
+      panduan: '💡 Mulai dengan "Saya ingin..." atau "Menurut saya...". Berikan alasan atau contohnya.',
+      stimulus_label: 'Binatang apa yang paling ingin kamu pelihara, dan mengapa?',
+      needsRecording: true,
+    }],
+    cek_ulang: [{
+      id: 'S05-CU-1',
+      instruksi: 'Ungkapkan gagasanmu tentang topik ini dengan jelas.',
+      stimulus_label: 'Makanan sehat apa yang menurutmu enak dan baik untuk dimakan setiap hari?',
+      needsRecording: true,
+    }],
   },
-];
 
-// ─────────────────────────────────────────────────────
-// BI-A-S07 — Menceritakan kembali rangkaian visual
-// ─────────────────────────────────────────────────────
-export const S07_TASKS = [
-  {
-    id: 'S07-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Lihat rangkaian gambar ini. Ceritakan apa yang terjadi dari gambar pertama sampai terakhir.',
-    panels: [
-      { emoji: '☁️🌧️', deskripsi: 'Mendung dan hujan' },
-      { emoji: '🌈', deskripsi: 'Pelangi setelah hujan' },
-      { emoji: '👧😊', deskripsi: 'Anak senang melihat pelangi' },
-    ],
-    catatan_batas: 'Akurasi retelling tidak dapat dinilai otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-S06 — Menceritakan kembali bacaan
+  // ─────────────────────────────────────────────────────
+  'BI-A-S06': {
+    cek_awal: [{
+      id: 'S06-CA-1',
+      instruksi: 'Baca cerita ini, lalu ceritakan kembali isinya dengan kata-katamu sendiri.',
+      stimulus_teks: 'Soni dan adiknya pergi ke pantai. Mereka bermain pasir dan berenang. Soni menemukan kerang yang indah. Ia membawa kerang itu pulang untuk ibunya.',
+      needsRecording: true,
+    }],
+    latihan: [{
+      id: 'S06-LAT-1',
+      instruksi: 'Baca cerita ini, lalu ceritakan kembali isinya.',
+      panduan: '💡 Ceritakan: siapa tokohnya, apa yang terjadi, dan bagaimana akhirnya.',
+      stimulus_teks: 'Rina suka sekali membaca buku. Suatu hari ia meminjam buku di perpustakaan. Buku itu berisi cerita tentang naga yang baik hati. Rina membaca buku itu sampai selesai sebelum tidur.',
+      needsRecording: true,
+    }],
+    cek_ulang: [{
+      id: 'S06-CU-1',
+      instruksi: 'Baca cerita ini, lalu ceritakan kembali isinya dengan kata-katamu sendiri.',
+      stimulus_teks: 'Tono senang bermain hujan-hujanan di halaman. Ibunya memanggil Tono masuk ke rumah. Tono mandi dan berganti baju kering. Setelah itu Tono minum susu hangat.',
+      needsRecording: true,
+    }],
   },
-];
 
-// ─────────────────────────────────────────────────────
-// BI-A-S08 — Menceritakan kembali cerita yang didengar
-// ─────────────────────────────────────────────────────
-export const S08_TASKS = [
-  {
-    id: 'S08-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Dengarkan cerita ini. Setelah selesai, ceritakan kembali dengan kata-katamu sendiri.',
-    audio_script: 'Eko menemukan anak kucing di depan rumahnya. Anak kucing itu sangat kecil dan lapar. Eko memberinya susu. Sejak itu, kucing kecil itu selalu ikut Eko ke mana-mana.',
-    audio_label: 'Cerita: Eko dan Kucing Kecil',
-    catatan_batas: 'Audio harus terputar. Akurasi retelling tidak dapat dinilai otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-S07 — Menceritakan kembali rangkaian visual
+  // ─────────────────────────────────────────────────────
+  'BI-A-S07': {
+    cek_awal: [{
+      id: 'S07-CA-1',
+      instruksi: 'Lihat rangkaian gambar ini. Ceritakan apa yang terjadi dari gambar pertama sampai terakhir.',
+      panels: [
+        { emoji: '☁️🌧️', deskripsi: 'Mendung dan hujan deras' },
+        { emoji: '🌈', deskripsi: 'Pelangi muncul setelah hujan' },
+        { emoji: '👧😊', deskripsi: 'Anak senang melihat pelangi' },
+      ],
+      needsRecording: true,
+    }],
+    latihan: [{
+      id: 'S07-LAT-1',
+      instruksi: 'Lihat rangkaian gambar ini. Ceritakan urutannya.',
+      panduan: '💡 Gunakan kata urutan: "pertama", "kemudian", "lalu", "akhirnya".',
+      panels: [
+        { emoji: '🌱', deskripsi: 'Benih ditanam di tanah' },
+        { emoji: '💧🌱', deskripsi: 'Tanaman disiram setiap hari' },
+        { emoji: '🌸', deskripsi: 'Tanaman tumbuh berbunga' },
+      ],
+      needsRecording: true,
+    }],
+    cek_ulang: [{
+      id: 'S07-CU-1',
+      instruksi: 'Lihat rangkaian gambar ini. Ceritakan apa yang terjadi dari awal sampai akhir.',
+      panels: [
+        { emoji: '🧒🥚', deskripsi: 'Anak menemukan telur burung yang jatuh' },
+        { emoji: '🪺🐥', deskripsi: 'Anak meletakkan telur kembali ke sarang' },
+        { emoji: '🐥💛', deskripsi: 'Anak burung menetas dan sehat' },
+      ],
+      needsRecording: true,
+    }],
   },
-];
 
-// ─────────────────────────────────────────────────────
-// BI-A-W01 — Menulis permulaan
-// ─────────────────────────────────────────────────────
-export const W01_TASKS = [
-  {
-    id: 'W01-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Tulis kata-kata berikut ini menggunakan tangan di kertas. Minta orang tua memotret hasilnya.',
-    kata_target: ['mama', 'buku', 'meja', 'sekolah', 'bermain'],
-    catatan_batas: 'Sistem hanya menyimpan foto. Bentuk huruf tidak dapat dinilai otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-S08 — Menceritakan kembali cerita yang didengar
+  // ─────────────────────────────────────────────────────
+  'BI-A-S08': {
+    cek_awal: [{
+      id: 'S08-CA-1',
+      instruksi: 'Dengarkan cerita ini. Setelah selesai, ceritakan kembali dengan kata-katamu sendiri.',
+      audio_script: 'Eko menemukan anak kucing di depan rumahnya. Anak kucing itu sangat kecil dan lapar. Eko memberinya susu. Sejak itu, kucing kecil itu selalu ikut Eko ke mana-mana.',
+      audio_label: 'Cerita: Eko dan Kucing Kecil',
+      needsRecording: true,
+    }],
+    latihan: [{
+      id: 'S08-LAT-1',
+      instruksi: 'Dengarkan cerita ini. Setelah selesai, ceritakan kembali isinya.',
+      panduan: '💡 Ceritakan: siapa tokohnya, apa masalahnya, dan bagaimana penyelesaiannya.',
+      audio_script: 'Maya kehilangan pensil kesayangannya. Ia mencarinya di seluruh tas dan kotak pensil. Ternyata pensilnya jatuh ke bawah meja. Maya sangat lega dan berjanji akan lebih hati-hati.',
+      audio_label: 'Cerita: Maya dan Pensilnya',
+      needsRecording: true,
+    }],
+    cek_ulang: [{
+      id: 'S08-CU-1',
+      instruksi: 'Dengarkan cerita ini. Setelah selesai, ceritakan kembali dengan kata-katamu sendiri.',
+      audio_script: 'Budi ingin membeli hadiah untuk ulang tahun ibunya. Ia menabung uang jajannya selama seminggu. Akhirnya Budi bisa membeli bunga merah kesukaan ibunya. Ibu sangat terharu dan memeluk Budi erat-erat.',
+      audio_label: 'Cerita: Hadiah untuk Ibu',
+      needsRecording: true,
+    }],
   },
-];
 
-// ─────────────────────────────────────────────────────
-// BI-A-W02 — Mengumpulkan contoh tulisan tangan
-// ─────────────────────────────────────────────────────
-export const W02_TASKS = [
-  {
-    id: 'W02-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Minta orang tua memotret contoh tulisan tangan anaknya (buku latihan atau kertas). Unggah fotonya di sini.',
-    catatan_batas: 'Sistem menyimpan file foto. Tidak ada penilaian otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-W01 — Menulis permulaan (FOTO tulisan tangan)
+  // ─────────────────────────────────────────────────────
+  'BI-A-W01': {
+    cek_awal: [{
+      id: 'W01-CA-1',
+      instruksi: 'Minta anak menulis kata-kata ini di kertas dengan tangan. Setelah selesai, foto hasilnya dan unggah di sini.',
+      kata_target: ['mama', 'buku', 'meja', 'sekolah', 'bermain'],
+      needsPhoto: true,
+    }],
+    latihan: [{
+      id: 'W01-LAT-1',
+      instruksi: 'Minta anak menulis kata-kata ini di kertas. Perhatikan bentuk hurufnya. Foto hasilnya.',
+      panduan: '💡 Perhatikan cara memegang pensil. Tulis perlahan dan pastikan setiap huruf bisa terbaca.',
+      kata_target: ['pintu', 'kursi', 'jalan', 'malam'],
+      needsPhoto: true,
+    }],
+    cek_ulang: [{
+      id: 'W01-CU-1',
+      instruksi: 'Minta anak menulis kata-kata baru ini di kertas. Foto hasilnya.',
+      kata_target: ['pohon', 'burung', 'angin', 'terbang', 'berlari'],
+      needsPhoto: true,
+    }],
   },
-];
 
-// ─────────────────────────────────────────────────────
-// BI-A-W03 — Menulis teks sederhana dalam beberapa kalimat
-// ─────────────────────────────────────────────────────
-export const W03_TASKS = [
-  {
-    id: 'W03-CA-1',
-    phase: 'cek_awal',
-    instruksi: 'Tulis 2 sampai 3 kalimat tentang hari ini atau kegiatanmu.',
-    min_panjang: 20,
-    catatan_batas: 'Sistem memeriksa: teks tidak kosong dan panjang minimal terpenuhi. Ejaan dan isi tidak dapat dinilai otomatis.',
+  // ─────────────────────────────────────────────────────
+  // BI-A-W02 — Mengumpulkan contoh tulisan tangan
+  // ─────────────────────────────────────────────────────
+  'BI-A-W02': {
+    cek_awal: [{
+      id: 'W02-CA-1',
+      instruksi: 'Foto contoh tulisan tangan anak dari buku latihan atau kertas. Unggah fotonya di sini.',
+      needsPhoto: true,
+    }],
+    latihan: [{
+      id: 'W02-LAT-1',
+      instruksi: 'Minta anak menyalin kalimat ini di kertas. Perhatikan kerapiannya. Foto hasilnya.',
+      panduan: '💡 Latihan menyalin membantu anak mengenal bentuk huruf dan spasi antar kata.',
+      stimulus_teks: 'Saya suka membaca buku.',
+      needsPhoto: true,
+    }],
+    cek_ulang: [{
+      id: 'W02-CU-1',
+      instruksi: 'Minta anak menulis kalimat pendek ini tanpa melihat contoh. Foto hasilnya.',
+      stimulus_teks: 'Ibu memasak nasi goreng.',
+      needsPhoto: true,
+    }],
   },
-];
+
+  // ─────────────────────────────────────────────────────
+  // BI-A-W03 — Menulis teks sederhana dalam beberapa kalimat
+  // ─────────────────────────────────────────────────────
+  'BI-A-W03': {
+    cek_awal: [{
+      id: 'W03-CA-1',
+      instruksi: 'Tulis 2 sampai 3 kalimat tentang hari ini atau kegiatanmu.',
+      min_panjang: 20,
+      needsText: true,
+    }],
+    latihan: [{
+      id: 'W03-LAT-1',
+      instruksi: 'Tulis 2 sampai 3 kalimat tentang makanan kesukaanmu.',
+      panduan: '💡 Mulai dengan siapa/apa, lalu apa yang terjadi. Gunakan tanda titik di akhir kalimat.',
+      min_panjang: 20,
+      needsText: true,
+    }],
+    cek_ulang: [{
+      id: 'W03-CU-1',
+      instruksi: 'Tulis 2 sampai 3 kalimat tentang hewan yang kamu suka.',
+      min_panjang: 20,
+      needsText: true,
+    }],
+  },
+};
+
+// Backward compat: helper untuk mengambil tasks per unit per fase
+export function getCollectTasks(unitId, phase) {
+  return COLLECT_PHASES[unitId]?.[phase] ?? [];
+}

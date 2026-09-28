@@ -15,18 +15,15 @@ import { ITEMS as R02_ITEMS, getItemsByPhase as R02ByPhase } from '../data/items
 import { ITEMS as R03_ITEMS, getItemsByPhase as R03ByPhase } from '../data/items/R03.js';
 import { ITEMS as L01_ITEMS, getItemsByPhase as L01ByPhase } from '../data/items/L01.js';
 import { ITEMS as L02_ITEMS, getItemsByPhase as L02ByPhase } from '../data/items/L02.js';
-import {
-  R01_TASKS, S01_TASKS, S02_TASKS, S03_TASKS, S04_TASKS,
-  S05_TASKS, S06_TASKS, S07_TASKS, S08_TASKS,
-  W01_TASKS, W02_TASKS, W03_TASKS,
-} from '../data/items/COLLECT_UNITS.js';
+import { COLLECT_PHASES } from '../data/items/COLLECT_UNITS.js';
 import {
   scoreSession, decideMastery, findRootGap, getOutcomeLabel, OUTCOME,
 } from './scoring.js';
 import {
   getState, saveProfile, getUnitState, saveCekAwal, saveLatihanResponses,
-  saveCekUlang, saveMasteryDecision, saveCollectEvidence, closeVisit,
-  getAllUnitOutcomes, saveParentVerdict, getPendingParentReviews,
+  saveCekUlang, saveMasteryDecision, saveCollectEvidence, saveCollectCekUlangEvidence,
+  saveParentVerdict, saveParentVerdictCekUlang, closeVisit,
+  getAllUnitOutcomes, getPendingVerdict1, getPendingVerdict2, getPendingParentReviews,
   saveMediaBlob, getMediaBlob,
 } from './state.js';
 
@@ -40,12 +37,7 @@ const ITEM_BANKS = {
   'BI-A-R03': { all: R03_ITEMS, byPhase: R03ByPhase },
 };
 
-const COLLECT_TASKS = {
-  'BI-A-R01': R01_TASKS, 'BI-A-S01': S01_TASKS, 'BI-A-S02': S02_TASKS,
-  'BI-A-S03': S03_TASKS, 'BI-A-S04': S04_TASKS, 'BI-A-S05': S05_TASKS,
-  'BI-A-S06': S06_TASKS, 'BI-A-S07': S07_TASKS, 'BI-A-S08': S08_TASKS,
-  'BI-A-W01': W01_TASKS, 'BI-A-W02': W02_TASKS, 'BI-A-W03': W03_TASKS,
-};
+function isCollectUnit(unitId) { return !!COLLECT_PHASES[unitId]; }
 
 // ─────────────────────────────────────────────────────
 // Router
@@ -219,16 +211,21 @@ function renderUnitCard(unit, outcome, rootGap) {
 
 function getUnitStatusInfo(unit, outcome, us) {
   if (us.masteryDecision?.masteryProven) {
-    return { label: 'Berhasil pada cek ✓', cssClass: 'unit-card--mastered', canStart: true, actionLabel: 'Lihat laporan' };
+    return { label: 'Berhasil terbukti ✓', cssClass: 'unit-card--mastered', canStart: true, actionLabel: 'Lihat laporan' };
   }
-  if (us.parentVerdict?.verdict === 'BISA') {
-    return { label: 'Dinilai orang tua: Bisa ✓', cssClass: 'unit-card--mastered', canStart: true, actionLabel: 'Lihat laporan' };
+  if (us.masteryDecision && !us.masteryDecision.masteryProven) {
+    return { label: 'Perlu latihan lanjutan', cssClass: 'unit-card--active', canStart: true, actionLabel: 'Lanjutkan' };
   }
-  if (us.parentVerdict?.verdict === 'PERLU_LATIHAN') {
-    return { label: 'Dinilai orang tua: Perlu latihan', cssClass: 'unit-card--active', canStart: true, actionLabel: 'Ulangi' };
-  }
-  if (us.collectEvidence && us.collectEvidence.length > 0 && !us.parentVerdict) {
-    return { label: 'Menunggu penilaian orang tua', cssClass: 'unit-card--pending', canStart: true, actionLabel: 'Lihat bukti' };
+  if (isCollectUnit(unit.id)) {
+    if (us.collectCekUlangEvidence?.length > 0) {
+      return { label: 'Menunggu penilaian cek ulang', cssClass: 'unit-card--pending', canStart: true, actionLabel: 'Lihat di dashboard' };
+    }
+    if (us.parentVerdict) {
+      return { label: `Verdik cek awal: ${us.parentVerdict.verdict === 'BISA' ? 'Bisa' : 'Perlu latihan'}`, cssClass: 'unit-card--active', canStart: true, actionLabel: 'Lanjutkan' };
+    }
+    if (us.collectEvidence?.length > 0) {
+      return { label: 'Menunggu penilaian cek awal', cssClass: 'unit-card--pending', canStart: true, actionLabel: 'Lihat di dashboard' };
+    }
   }
   if (us.visitClosed) {
     return { label: 'Kunjungan ditutup', cssClass: 'unit-card--closed', canStart: true, actionLabel: 'Kunjungi lagi' };
@@ -237,7 +234,7 @@ function getUnitStatusInfo(unit, outcome, us) {
     return { label: 'Sedang dijalani', cssClass: 'unit-card--active', canStart: true, actionLabel: 'Lanjutkan' };
   }
   const unitOutcomes = getAllUnitOutcomes();
-  const prereqOk = unit.prerequisite.every(id => unitOutcomes[id] === OUTCOME.TERLIHAT_BISA || unitOutcomes[id] === OUTCOME.DINILAI_ORANG_TUA_BISA);
+  const prereqOk = unit.prerequisite.every(id => unitOutcomes[id] === OUTCOME.TERLIHAT_BISA);
   if (!prereqOk && unit.prerequisite.length > 0) {
     return { label: 'Prasyarat belum terpenuhi', cssClass: 'unit-card--locked', canStart: false, actionLabel: 'Selesaikan prasyarat dulu' };
   }
@@ -245,7 +242,7 @@ function getUnitStatusInfo(unit, outcome, us) {
 }
 
 // ─────────────────────────────────────────────────────
-// View: Unit Journey
+// View: Unit Journey — dispatcher
 // ─────────────────────────────────────────────────────
 function renderUnit(unitId) {
   const unit = UNITS_BY_ID[unitId];
@@ -254,18 +251,33 @@ function renderUnit(unitId) {
   if (!s.childName) { navigate('#home'); return; }
   const us = getUnitState(unitId);
 
-  if (us.masteryDecision || us.parentVerdict) { renderUnitReport(unitId); return; }
+  if (isCollectUnit(unitId)) {
+    renderCollectUnit(unit, us);
+  } else {
+    renderAutoUnit(unit, us);
+  }
+}
+
+function renderAutoUnit(unit, us) {
+  if (us.masteryDecision) { renderUnitReport(unit.id); return; }
   if (us.cekUlang && !us.masteryDecision) { renderCekUlangResult(unit, us); return; }
   if (us.latihan && !us.cekUlang) { renderCekUlangIntro(unit, us); return; }
   if (us.cekAwal && !us.latihan) { renderCekAwalResult(unit, us); return; }
   renderCekAwalIntro(unit);
 }
 
+function renderCollectUnit(unit, us) {
+  if (us.masteryDecision) { renderUnitReport(unit.id); return; }
+  if (us.collectCekUlangEvidence?.length > 0) { renderCollectCekUlangWaiting(unit, us); return; }
+  if (us.parentVerdict) { renderPostVerdict1(unit, us); return; }
+  if (us.cekAwal) { renderCekAwalResultCollect(unit, us); return; }
+  renderCekAwalIntro(unit);
+}
+
 // ─── Cek Awal Intro ──────────────────────────────────
 
 function renderCekAwalIntro(unit) {
-  const bank = ITEM_BANKS[unit.id];
-  const isCollect = !bank;
+  const isCollect = isCollectUnit(unit.id);
 
   app.innerHTML = `
     <div class="view-check">
@@ -303,12 +315,24 @@ window.startCekAwal = function(unitId) {
 };
 
 window.startCollect = function(unitId) {
-  const tasks = COLLECT_TASKS[unitId];
-  if (!tasks || tasks.length === 0) { navigate('#map'); return; }
-  renderCollectTask(UNITS_BY_ID[unitId], tasks, 0);
+  const phases = COLLECT_PHASES[unitId];
+  if (!phases?.cek_awal?.length) { navigate('#map'); return; }
+  renderCollectTask(UNITS_BY_ID[unitId], phases.cek_awal, 0, 'cek_awal');
 };
 
-// ─── Sesi Item ───────────────────────────────────────
+window.startCollectLatihan = function(unitId) {
+  const phases = COLLECT_PHASES[unitId];
+  if (!phases?.latihan?.length) { navigate('#map'); return; }
+  renderCollectTask(UNITS_BY_ID[unitId], phases.latihan, 0, 'latihan');
+};
+
+window.startCollectCekUlang = function(unitId) {
+  const phases = COLLECT_PHASES[unitId];
+  if (!phases?.cek_ulang?.length) { navigate('#map'); return; }
+  renderCollectTask(UNITS_BY_ID[unitId], phases.cek_ulang, 0, 'cek_ulang');
+};
+
+// ─── Sesi Item (AUTO) ─────────────────────────────────
 
 function renderItemSession(unit, items, phase, responsesAcc, onDone) {
   if (items.length === 0 || responsesAcc.length >= items.length) {
@@ -436,16 +460,13 @@ window.selectOption = function(btn, unitId, itemIdx, selectedId, kunci, itemId, 
   }, isLatihan ? 1800 : 800);
 };
 
-// ─── Hasil Cek Awal ──────────────────────────────────
+// ─── Hasil Cek Awal (AUTO) ───────────────────────────
 
 function renderCekAwalResult(unit, us) {
   const result = us.cekAwal;
   const s = getState();
-
-  // Cabang berdasarkan hasil cek awal
   const isBerhasil = result.outcome === OUTCOME.TERLIHAT_BISA;
   const isFailed = result.outcome === OUTCOME.TUGAS_GAGAL_BERJALAN;
-  const isCollect = result.outcome === OUTCOME.BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS;
 
   app.innerHTML = `
     <div class="view-result">
@@ -472,13 +493,6 @@ function renderCekAwalResult(unit, us) {
       ${isFailed ? `
         <div class="error-note">Audio tidak berhasil diputar. Sesi dihentikan tanpa skor.</div>
         <button class="btn-primary" onclick="navigate('#map')">Kembali ke peta</button>
-      ` : isCollect ? `
-        <div class="collect-note">
-          Bukti sudah dikumpulkan dan menunggu penilaian orang tua.<br/>
-          Buka <strong>Dashboard Orang Tua</strong> untuk menilai.
-        </div>
-        <button class="btn-primary" onclick="navigate('#parent')">Buka Dashboard Orang Tua</button>
-        <button class="btn-ghost" onclick="navigate('#map')">Kembali ke peta</button>
       ` : isBerhasil ? `
         <div class="cek-awal-berhasil">
           <p>✓ ${esc(s.childName)} berhasil pada cek awal.</p>
@@ -518,7 +532,6 @@ window.startLatihanPendalaman = function(unitId) {
   const unit = UNITS_BY_ID[unitId];
   const bank = ITEM_BANKS[unitId];
   if (!bank) return;
-  // Pendalaman: gunakan item latihan mandiri saja (soal tanpa scaffolding)
   const mandiriItems = bank.byPhase('latihan_mandiri');
   renderItemSession(unit, mandiriItems, 'latihan_pendalaman', [], (mr) => {
     saveLatihanResponses(unitId, mr);
@@ -531,7 +544,7 @@ window.skipToReport = function(unitId) {
   renderUnit(unitId);
 };
 
-// ─── Cek Ulang ───────────────────────────────────────
+// ─── Cek Ulang (AUTO) ─────────────────────────────────
 
 function renderCekUlangIntro(unit, us) {
   const s = getState();
@@ -568,17 +581,172 @@ function renderCekUlangResult(unit, us) {
   renderUnit(unit.id);
 }
 
+// ─────────────────────────────────────────────────────
+// COLLECT unit — alur lengkap
+// ─────────────────────────────────────────────────────
+
+// Setelah cek_awal selesai: tampilkan link ke dashboard
+function renderCekAwalResultCollect(unit, us) {
+  const s = getState();
+  const allSkipped = us.collectEvidence?.every(e => e.type === 'skipped');
+
+  app.innerHTML = `
+    <div class="view-result">
+      <header class="check-header">
+        <button class="btn-back" onclick="navigate('#map')">← Peta</button>
+        <div class="check-badge">Untuk orang tua · Bukti cek awal</div>
+      </header>
+      <h1 class="result-title">${esc(unit.label)}</h1>
+
+      ${allSkipped ? `
+        <div class="collect-skipped-warning">
+          ⚠ Semua tugas dilewati tanpa bukti. ${esc(s.childName)} perlu mengulangi tugas ini agar orang tua bisa menilai.
+        </div>
+        <button class="btn-primary" onclick="startCollect('${unit.id}')">Ulangi pengumpulan bukti</button>
+      ` : `
+        <div class="collect-note">
+          Bukti cek awal sudah dikumpulkan dan menunggu penilaian orang tua.
+        </div>
+        <div class="journey-steps">
+          <div class="journey-step journey-step--done">① Kumpulkan bukti cek awal ✓</div>
+          <div class="journey-step journey-step--active">② Orang tua nilai cek awal ← sekarang</div>
+          <div class="journey-step journey-step--pending">③ Latihan</div>
+          <div class="journey-step journey-step--pending">④ Kumpulkan bukti cek ulang</div>
+          <div class="journey-step journey-step--pending">⑤ Orang tua nilai cek ulang</div>
+        </div>
+        <button class="btn-primary" onclick="navigate('#parent')">Buka Dashboard Orang Tua</button>
+      `}
+      <button class="btn-ghost" onclick="navigate('#map')">Kembali ke peta</button>
+    </div>
+  `;
+}
+
+// Setelah verdik pertama: tampilkan pilihan lanjutan
+function renderPostVerdict1(unit, us) {
+  const s = getState();
+  const verdict1 = us.parentVerdict;
+
+  app.innerHTML = `
+    <div class="view-result">
+      <header class="check-header">
+        <button class="btn-back" onclick="navigate('#map')">← Peta</button>
+        <div class="check-badge">Untuk orang tua · Setelah penilaian cek awal</div>
+      </header>
+      <h1 class="result-title">${esc(unit.label)}</h1>
+
+      <div class="prc-verdict prc-verdict--${verdict1.verdict.toLowerCase()} result-verdict-summary">
+        ${verdict1.verdict === 'BISA' ? '✓ Orang tua menilai: Sudah bisa (cek awal)' : '○ Orang tua menilai: Perlu latihan (cek awal)'}
+      </div>
+
+      <div class="journey-steps">
+        <div class="journey-step journey-step--done">① Kumpulkan bukti cek awal ✓</div>
+        <div class="journey-step journey-step--done">② Orang tua nilai cek awal ✓</div>
+        <div class="journey-step journey-step--active">③ Latihan ← sekarang</div>
+        <div class="journey-step journey-step--pending">④ Kumpulkan bukti cek ulang</div>
+        <div class="journey-step journey-step--pending">⑤ Orang tua nilai cek ulang</div>
+      </div>
+
+      <p class="check-desc">
+        ${verdict1.verdict === 'BISA'
+          ? `${esc(s.childName)} menunjukkan kemampuan pada cek awal. Lanjutkan ke latihan pendalaman, lalu buktikan lagi dengan cek ulang berbahan baru.`
+          : `${esc(s.childName)} perlu latihan penguatan. Setelah latihan, lakukan cek ulang dengan bahan baru untuk konfirmasi.`
+        }
+      </p>
+
+      <button class="btn-primary" onclick="startCollectLatihan('${unit.id}')">
+        ${verdict1.verdict === 'BISA' ? 'Mulai latihan pendalaman →' : 'Mulai latihan penguatan →'}
+      </button>
+      <button class="btn-ghost" onclick="navigate('#map')">Nanti saja</button>
+    </div>
+  `;
+}
+
+// Setelah latihan: pengalihan ke cek ulang ditampilkan di sini
+// (latihan selesai → saveLatihanResponses kosong → renderUnit → renderPostLatihanCollect)
+function renderPostLatihanCollect(unit, us) {
+  const s = getState();
+  app.innerHTML = `
+    <div class="view-result">
+      <header class="check-header">
+        <button class="btn-back" onclick="navigate('#map')">← Peta</button>
+        <div class="check-badge">Untuk anak · Siap cek ulang</div>
+      </header>
+      <h1 class="result-title">${esc(unit.label)}</h1>
+
+      <div class="journey-steps">
+        <div class="journey-step journey-step--done">① Kumpulkan bukti cek awal ✓</div>
+        <div class="journey-step journey-step--done">② Orang tua nilai cek awal ✓</div>
+        <div class="journey-step journey-step--done">③ Latihan ✓</div>
+        <div class="journey-step journey-step--active">④ Kumpulkan bukti cek ulang ← sekarang</div>
+        <div class="journey-step journey-step--pending">⑤ Orang tua nilai cek ulang</div>
+      </div>
+
+      <p class="check-desc">
+        Bagus! ${esc(s.childName)} sudah berlatih. Sekarang waktunya kumpulkan bukti dengan bahan baru untuk cek ulang.
+      </p>
+      <button class="btn-primary" onclick="startCollectCekUlang('${unit.id}')">Mulai cek ulang →</button>
+      <button class="btn-ghost" onclick="navigate('#map')">Nanti saja</button>
+    </div>
+  `;
+}
+
+// Setelah cek_ulang: tunggu verdik kedua
+function renderCollectCekUlangWaiting(unit, us) {
+  const allSkipped = us.collectCekUlangEvidence?.every(e => e.type === 'skipped');
+  const s = getState();
+
+  app.innerHTML = `
+    <div class="view-result">
+      <header class="check-header">
+        <button class="btn-back" onclick="navigate('#map')">← Peta</button>
+        <div class="check-badge">Untuk orang tua · Bukti cek ulang</div>
+      </header>
+      <h1 class="result-title">${esc(unit.label)}</h1>
+
+      ${allSkipped ? `
+        <div class="collect-skipped-warning">
+          ⚠ Semua tugas cek ulang dilewati tanpa bukti. Perlu diulang agar orang tua bisa menilai.
+        </div>
+        <button class="btn-primary" onclick="startCollectCekUlang('${unit.id}')">Ulangi cek ulang</button>
+      ` : `
+        <div class="collect-note">
+          Bukti cek ulang sudah dikumpulkan dan menunggu penilaian orang tua.
+        </div>
+        <div class="journey-steps">
+          <div class="journey-step journey-step--done">① Kumpulkan bukti cek awal ✓</div>
+          <div class="journey-step journey-step--done">② Orang tua nilai cek awal ✓</div>
+          <div class="journey-step journey-step--done">③ Latihan ✓</div>
+          <div class="journey-step journey-step--done">④ Kumpulkan bukti cek ulang ✓</div>
+          <div class="journey-step journey-step--active">⑤ Orang tua nilai cek ulang ← sekarang</div>
+        </div>
+        <button class="btn-primary" onclick="navigate('#parent')">Buka Dashboard Orang Tua</button>
+      `}
+      <button class="btn-ghost" onclick="navigate('#map')">Kembali ke peta</button>
+    </div>
+  `;
+}
+
 // ─── Collect Task ─────────────────────────────────────
 
-function renderCollectTask(unit, tasks, taskIdx) {
+function renderCollectTask(unit, tasks, taskIdx, phase) {
   if (taskIdx >= tasks.length) {
-    if (!getUnitState(unit.id).cekAwal) {
-      saveCekAwal(unit.id, {
-        outcome: OUTCOME.BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS,
-        totalItems: 0, correctItems: 0, ratio: null,
-      });
+    if (phase === 'cek_ulang') {
+      // cek_ulang selesai → tandai di state sebagai done dengan dummy cekAwal jika belum ada
+      renderUnit(unit.id);
+    } else if (phase === 'latihan') {
+      // latihan selesai → tandai sebagai done, lanjut ke cek ulang
+      saveLatihanResponses(unit.id, []);
+      renderUnit(unit.id);
+    } else {
+      // cek_awal selesai
+      if (!getUnitState(unit.id).cekAwal) {
+        saveCekAwal(unit.id, {
+          outcome: OUTCOME.BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS,
+          totalItems: 0, correctItems: 0, ratio: null,
+        });
+      }
+      renderUnit(unit.id);
     }
-    renderUnit(unit.id);
     return;
   }
 
@@ -586,15 +754,19 @@ function renderCollectTask(unit, tasks, taskIdx) {
   const hasAudio = !!task.audio_script;
   const hasPanels = !!task.panels;
   const hasKata = !!task.kata || !!task.kata_target;
-  const s = getState();
+  const hasPhoto = !!task.needsPhoto;
+  const hasText = !!task.needsText;
+  const phaseLabel = { cek_awal: 'Cek awal', latihan: 'Latihan', cek_ulang: 'Cek ulang' }[phase] ?? phase;
 
   app.innerHTML = `
     <div class="view-check">
       <header class="check-header">
         <button class="btn-back" onclick="navigate('#map')">← Peta</button>
-        <div class="check-badge">Untuk anak · Mengumpulkan bukti · ${taskIdx + 1} dari ${tasks.length}</div>
+        <div class="check-badge">Untuk anak · ${phaseLabel} · ${taskIdx + 1} dari ${tasks.length}</div>
       </header>
       <h1 class="check-title">${esc(unit.label)}</h1>
+
+      ${task.panduan ? `<div class="collect-panduan">${task.panduan}</div>` : ''}
 
       ${task.instruksi ? `<p class="check-desc">${esc(task.instruksi)}</p>` : ''}
 
@@ -621,49 +793,45 @@ function renderCollectTask(unit, tasks, taskIdx) {
       ` : ''}
 
       ${task.stimulus_teks ? `<div class="stimulus-box">${esc(task.stimulus_teks)}</div>` : ''}
+      ${task.stimulus_label && !task.stimulus_emoji && !hasPanels && !hasAudio ? `<div class="stimulus-box">${esc(task.stimulus_label)}</div>` : ''}
 
-      ${task.kata ? `
-        <div class="kata-list">${task.kata.map(k => `<span class="kata-chip">${esc(k)}</span>`).join('')}</div>
-      ` : ''}
-      ${task.kata_target ? `
-        <div class="kata-list">${task.kata_target.map(k => `<span class="kata-chip">${esc(k)}</span>`).join('')}</div>
+      ${hasKata ? `
+        <div class="kata-list">${(task.kata || task.kata_target).map(k => `<span class="kata-chip">${esc(k)}</span>`).join('')}</div>
       ` : ''}
 
-      ${unit.id === 'BI-A-W03' ? `
+      ${hasText ? `
         <textarea id="writingInput" class="writing-input" placeholder="Tulis di sini..." rows="5"></textarea>
       ` : ''}
 
-      ${unit.id === 'BI-A-W01' ? `
-        <textarea id="writingInput" class="writing-input" placeholder="Tulis kata-kata di sini..." rows="3"></textarea>
-      ` : ''}
-
-      ${unit.id === 'BI-A-W02' ? `
+      ${hasPhoto ? `
         <div class="upload-section">
           <label class="upload-label">
             <input type="file" id="photoInput" accept="image/*" capture="environment" />
-            📷 Ambil foto tulisan tangan
+            📷 Ambil foto atau pilih gambar
           </label>
           <div id="photoPreview" class="photo-preview"></div>
         </div>
       ` : ''}
 
       <div class="record-section" id="recordSection">
-        ${needsRecording(unit.id) ? `
+        ${task.needsRecording ? `
           <button id="recBtn" class="btn-record" onclick="toggleRecording('${unit.id}', ${taskIdx})">🎤 Mulai rekam suara</button>
           <div id="recStatus" class="rec-status">Rekaman suara tersimpan di perangkat ini.</div>
         ` : ''}
       </div>
 
-      <button class="btn-primary" id="collectNextBtn" onclick="collectNext('${unit.id}', ${taskIdx})">
+      <button class="btn-primary" id="collectNextBtn" onclick="collectNext('${unit.id}', ${taskIdx}, '${phase}')">
         ${taskIdx + 1 < tasks.length ? 'Lanjut →' : 'Selesai'}
       </button>
       <button class="btn-ghost" onclick="navigate('#map')">Kembali ke peta</button>
     </div>
   `;
 
-  window._collectState = { unit, tasks, taskIdx, recording: null, recorded: false, recordingBlob: null, photoBlob: null };
+  window._collectState = {
+    unit, tasks, taskIdx, phase,
+    recording: null, recorded: false, recordingBlob: null, photoBlob: null,
+  };
 
-  // Setup photo input listener
   const photoInput = document.getElementById('photoInput');
   if (photoInput) {
     photoInput.addEventListener('change', e => {
@@ -674,11 +842,6 @@ function renderCollectTask(unit, tasks, taskIdx) {
       document.getElementById('photoPreview').innerHTML = `<img src="${url}" style="max-width:100%;border-radius:8px;margin-top:8px;" />`;
     });
   }
-}
-
-function needsRecording(unitId) {
-  return ['BI-A-R01','BI-A-S01','BI-A-S02','BI-A-S03','BI-A-S04',
-          'BI-A-S05','BI-A-S06','BI-A-S07','BI-A-S08'].includes(unitId);
 }
 
 window.playCollectAudio = function(unitId, taskIdx) {
@@ -738,39 +901,40 @@ window.toggleRecording = function(unitId, taskIdx) {
   }).catch(() => { status.textContent = 'Izin mikrofon ditolak.'; });
 };
 
-window.collectNext = async function(unitId, taskIdx) {
+window.collectNext = async function(unitId, taskIdx, phase) {
   const cs = window._collectState;
   const task = cs.tasks[taskIdx];
+  const saveEv = phase === 'cek_ulang' ? saveCollectCekUlangEvidence : saveCollectEvidence;
 
-  if (unitId === 'BI-A-W03' || unitId === 'BI-A-W01') {
+  if (task.needsText) {
     const input = document.getElementById('writingInput');
     const text = input?.value?.trim() ?? '';
-    const minLen = task.min_panjang ?? (unitId === 'BI-A-W03' ? 20 : 3);
+    const minLen = task.min_panjang ?? 20;
     if (text.length < minLen) {
       alert(`Tulis paling sedikit ${minLen} karakter terlebih dahulu.`);
       return;
     }
-    saveCollectEvidence(unitId, { taskId: task.id, type: 'text', payload: text });
+    saveEv(unitId, { taskId: task.id, type: 'text', payload: text });
 
-  } else if (unitId === 'BI-A-W02') {
+  } else if (task.needsPhoto) {
     if (cs.photoBlob) {
-      const mediaId = `${unitId}_${task.id}_${Date.now()}`;
+      const mediaId = `${unitId}_${task.id}_${phase}_${Date.now()}`;
       await saveMediaBlob(mediaId, cs.photoBlob);
-      saveCollectEvidence(unitId, { taskId: task.id, type: 'photo', mediaId, payload: { size: cs.photoBlob.size } });
+      saveEv(unitId, { taskId: task.id, type: 'photo', mediaId, payload: { size: cs.photoBlob.size } });
     } else {
-      saveCollectEvidence(unitId, { taskId: task.id, type: 'skipped', payload: null });
+      saveEv(unitId, { taskId: task.id, type: 'skipped', payload: null });
     }
 
   } else if (cs.recorded && cs.recordingBlob) {
-    const mediaId = `${unitId}_${task.id}_${Date.now()}`;
+    const mediaId = `${unitId}_${task.id}_${phase}_${Date.now()}`;
     await saveMediaBlob(mediaId, cs.recordingBlob);
-    saveCollectEvidence(unitId, { taskId: task.id, type: 'audio', mediaId, payload: { size: cs.recordingBlob.size } });
+    saveEv(unitId, { taskId: task.id, type: 'audio', mediaId, payload: { size: cs.recordingBlob.size } });
 
   } else {
-    saveCollectEvidence(unitId, { taskId: task.id, type: 'skipped', payload: null });
+    saveEv(unitId, { taskId: task.id, type: 'skipped', payload: null });
   }
 
-  renderCollectTask(cs.unit, cs.tasks, taskIdx + 1);
+  renderCollectTask(cs.unit, cs.tasks, taskIdx + 1, phase);
 };
 
 // ─────────────────────────────────────────────────────
@@ -778,10 +942,11 @@ window.collectNext = async function(unitId, taskIdx) {
 // ─────────────────────────────────────────────────────
 function renderParentDashboard() {
   const s = getState();
-  const pending = getPendingParentReviews(UNITS);
+  const pendingV1 = getPendingVerdict1(UNITS);
+  const pendingV2 = getPendingVerdict2(UNITS);
   const reviewed = UNITS.filter(u => {
     const us = getUnitState(u.id);
-    return !!us.parentVerdict;
+    return us.parentVerdictCekUlang || us.parentVerdict;
   });
 
   app.innerHTML = `
@@ -793,36 +958,54 @@ function renderParentDashboard() {
       <h1 class="parent-title">Penilaian Bukti</h1>
       <p class="parent-desc">
         Anda menilai hasil rekaman atau tulisan ${esc(s.childName || 'anak')} berdasarkan panduan di bawah ini.
-        Penilaian Anda akan dicatat sebagai bukti kemampuan.
+        Penilaian Anda dicatat sebagai bukti kemampuan.
       </p>
 
-      ${pending.length === 0 ? `
+      ${pendingV1.length === 0 && pendingV2.length === 0 ? `
         <div class="parent-empty">
           <div class="parent-empty-icon">✓</div>
           <div>Tidak ada bukti yang menunggu penilaian saat ini.</div>
         </div>
-      ` : `
-        <div class="parent-section-title">Menunggu penilaian (${pending.length})</div>
-        ${pending.map(u => renderParentReviewCard(u, getUnitState(u.id), false)).join('')}
-      `}
+      ` : ''}
+
+      ${pendingV1.length > 0 ? `
+        <div class="parent-section-title">Menunggu penilaian cek awal (${pendingV1.length})</div>
+        ${pendingV1.map(u => renderParentReviewCard(u, getUnitState(u.id), 'cek_awal', false)).join('')}
+      ` : ''}
+
+      ${pendingV2.length > 0 ? `
+        <div class="parent-section-title">Menunggu penilaian cek ulang (${pendingV2.length})</div>
+        ${pendingV2.map(u => renderParentReviewCard(u, getUnitState(u.id), 'cek_ulang', false)).join('')}
+      ` : ''}
 
       ${reviewed.length > 0 ? `
         <div class="parent-section-title parent-section-title--done">Sudah dinilai</div>
-        ${reviewed.map(u => renderParentReviewCard(u, getUnitState(u.id), true)).join('')}
+        ${reviewed.map(u => {
+          const us = getUnitState(u.id);
+          const donePhase = us.parentVerdictCekUlang ? 'cek_ulang' : 'cek_awal';
+          return renderParentReviewCard(u, us, donePhase, true);
+        }).join('')}
       ` : ''}
     </div>
   `;
 }
 
-function renderParentReviewCard(unit, us, isDone) {
-  const verdict = us.parentVerdict;
-  const evidenceList = us.collectEvidence ?? [];
+function renderParentReviewCard(unit, us, verdikPhase, isDone) {
+  const evidenceList = verdikPhase === 'cek_ulang'
+    ? (us.collectCekUlangEvidence ?? [])
+    : (us.collectEvidence ?? []);
+  const verdict = verdikPhase === 'cek_ulang' ? us.parentVerdictCekUlang : us.parentVerdict;
+
+  const hasRealEvidence = evidenceList.some(e => e.type !== 'skipped');
+  const allSkipped = evidenceList.length > 0 && !hasRealEvidence;
   const hasMedia = evidenceList.some(e => e.mediaId);
   const textEvidence = evidenceList.find(e => e.type === 'text');
 
+  const phaseLabel = verdikPhase === 'cek_ulang' ? 'Cek ulang' : 'Cek awal';
+
   return `
     <div class="parent-review-card ${isDone ? 'parent-review-card--done' : ''}">
-      <div class="prc-id">${esc(unit.id)}</div>
+      <div class="prc-id">${esc(unit.id)} · ${phaseLabel}</div>
       <div class="prc-label">${esc(unit.label)}</div>
 
       ${unit.rubrik_orang_tua ? `
@@ -848,7 +1031,7 @@ function renderParentReviewCard(unit, us, isDone) {
             <div id="media-${e.mediaId}" class="media-container"></div>
           `).join('')}
         </div>
-      ` : evidenceList.every(e => e.type === 'skipped') ? `
+      ` : allSkipped ? `
         <div class="prc-evidence prc-skipped">Tugas ini dilewati tanpa bukti.</div>
       ` : ''}
 
@@ -857,11 +1040,16 @@ function renderParentReviewCard(unit, us, isDone) {
           ${verdict.verdict === 'BISA' ? '✓ Dinilai: Sudah bisa' : '○ Dinilai: Perlu latihan lagi'}
           <span class="prc-verdict-date">${formatDate(verdict.verdictAt)}</span>
         </div>
-        <button class="btn-ghost btn-small" onclick="undoParentVerdict('${unit.id}')">Ubah penilaian</button>
+        <button class="btn-ghost btn-small" onclick="undoParentVerdict('${unit.id}', '${verdikPhase}')">Ubah penilaian</button>
+      ` : allSkipped ? `
+        <div class="prc-warning">
+          ⚠ Tidak ada karya anak yang tersimpan. Tugas perlu diulang sebelum dapat dinilai.
+        </div>
+        <button class="btn-ghost" onclick="navigate('#unit/${unit.id}')">Ulang tugas ini</button>
       ` : `
         <div class="prc-actions">
-          <button class="btn-verdict-bisa" onclick="submitParentVerdict('${unit.id}', 'BISA')">✓ Sudah bisa</button>
-          <button class="btn-verdict-latihan" onclick="submitParentVerdict('${unit.id}', 'PERLU_LATIHAN')">○ Perlu latihan lagi</button>
+          <button class="btn-verdict-bisa" onclick="submitParentVerdict('${unit.id}', 'BISA', '${verdikPhase}')">✓ Sudah bisa</button>
+          <button class="btn-verdict-latihan" onclick="submitParentVerdict('${unit.id}', 'PERLU_LATIHAN', '${verdikPhase}')">○ Perlu latihan lagi</button>
         </div>
       `}
     </div>
@@ -885,15 +1073,24 @@ window.playEvidenceMedia = async function(mediaId, type, btn) {
   }
 };
 
-window.submitParentVerdict = function(unitId, verdict) {
-  saveParentVerdict(unitId, verdict);
+window.submitParentVerdict = function(unitId, verdict, phase) {
+  if (phase === 'cek_ulang') {
+    saveParentVerdictCekUlang(unitId, verdict);
+  } else {
+    saveParentVerdict(unitId, verdict);
+  }
   renderParentDashboard();
 };
 
-window.undoParentVerdict = function(unitId) {
+window.undoParentVerdict = function(unitId, phase) {
   const s = getState();
   if (s.units[unitId]) {
-    s.units[unitId].parentVerdict = null;
+    if (phase === 'cek_ulang') {
+      s.units[unitId].parentVerdictCekUlang = null;
+      s.units[unitId].masteryDecision = null;
+    } else {
+      s.units[unitId].parentVerdict = null;
+    }
     localStorage.setItem('plps_bi_kelas1_state', JSON.stringify(s));
   }
   renderParentDashboard();
@@ -910,7 +1107,9 @@ function renderUnitReport(unitId) {
   const cekAwal = us.cekAwal;
   const cekUlang = us.cekUlang;
   const decision = us.masteryDecision;
-  const pVerdict = us.parentVerdict;
+  const pVerdict1 = us.parentVerdict;
+  const pVerdict2 = us.parentVerdictCekUlang;
+  const isCollect = isCollectUnit(unitId);
 
   app.innerHTML = `
     <div class="view-report">
@@ -922,53 +1121,82 @@ function renderUnitReport(unitId) {
       <h1 class="report-title">${esc(unit.label)}</h1>
       <div class="report-child">${esc(s.childName)} · ${esc(s.kelas)}</div>
 
-      <div class="report-section">
-        <div class="report-section-title">Cek awal</div>
-        ${cekAwal ? `
-          <div class="report-outcome outcome-${cekAwal.outcome.toLowerCase()}">${getOutcomeLabel(cekAwal.outcome)}</div>
-          ${cekAwal.totalItems > 0 ? `<div class="report-detail">${cekAwal.correctItems}/${cekAwal.totalItems} benar</div>` : ''}
-          <div class="report-time">Tanggal: ${formatDate(cekAwal.scoredAt)}</div>
-        ` : `<div class="report-empty">Belum dilakukan.</div>`}
-      </div>
-
-      ${pVerdict ? `
-        <div class="report-section mastery-section ${pVerdict.verdict === 'BISA' ? 'mastery-proven' : 'mastery-not-proven'}">
-          <div class="mastery-badge">
-            ${pVerdict.verdict === 'BISA' ? '✓ Dinilai orang tua: Sudah bisa' : '○ Dinilai orang tua: Perlu latihan lagi'}
-          </div>
-          <div class="mastery-reason">Penilaian orang tua pada ${formatDate(pVerdict.verdictAt)}</div>
-          <div class="mastery-disclaimer">Penilaian ini berdasarkan panduan yang tersedia. Bukan pengganti asesmen formal.</div>
-        </div>
-      ` : ''}
-
-      ${cekUlang ? `
+      ${isCollect ? `
         <div class="report-section">
-          <div class="report-section-title">Cek ulang</div>
-          <div class="report-outcome outcome-${cekUlang.outcome.toLowerCase()}">${getOutcomeLabel(cekUlang.outcome)}</div>
-          ${cekUlang.totalItems > 0 ? `<div class="report-detail">${cekUlang.correctItems}/${cekUlang.totalItems} benar</div>` : ''}
-          <div class="report-time">Tanggal: ${formatDate(cekUlang.scoredAt)}</div>
+          <div class="report-section-title">Cek awal</div>
+          ${pVerdict1 ? `
+            <div class="report-outcome outcome-${pVerdict1.verdict === 'BISA' ? 'terlihat_bisa' : 'masih_belajar'}">
+              ${pVerdict1.verdict === 'BISA' ? 'Dinilai orang tua: Sudah bisa' : 'Dinilai orang tua: Perlu latihan'}
+            </div>
+            <div class="report-time">Tanggal: ${formatDate(pVerdict1.verdictAt)}</div>
+          ` : cekAwal ? `
+            <div class="report-outcome outcome-bukti_terkumpul_belum_dapat_dinilai_otomatis">Bukti terkumpul — belum dinilai</div>
+          ` : `<div class="report-empty">Belum dilakukan.</div>`}
         </div>
-      ` : ''}
 
-      ${decision ? `
-        <div class="report-section mastery-section ${decision.masteryProven ? 'mastery-proven' : 'mastery-not-proven'}">
-          <div class="mastery-badge">
-            ${decision.masteryProven ? '✓ Berhasil pada cek ini' : '○ Belum berhasil pada cek ulang'}
+        ${pVerdict2 ? `
+          <div class="report-section">
+            <div class="report-section-title">Cek ulang</div>
+            <div class="report-outcome outcome-${pVerdict2.verdict === 'BISA' ? 'terlihat_bisa' : 'masih_belajar'}">
+              ${pVerdict2.verdict === 'BISA' ? 'Dinilai orang tua: Sudah bisa' : 'Dinilai orang tua: Perlu latihan'}
+            </div>
+            <div class="report-time">Tanggal: ${formatDate(pVerdict2.verdictAt)}</div>
           </div>
-          <div class="mastery-reason">${esc(decision.reason)}</div>
-          ${decision.masteryProven ? `
-            <div class="mastery-disclaimer">
-              Ini menunjukkan anak berhasil pada sesi cek ini dengan soal berbeda dari cek awal.
-              Kemampuan yang stabil perlu dikonfirmasi pada sesi lain di hari berbeda.
+        ` : ''}
+
+        ${decision ? `
+          <div class="report-section mastery-section ${decision.masteryProven ? 'mastery-proven' : 'mastery-not-proven'}">
+            <div class="mastery-badge">
+              ${decision.masteryProven ? '✓ Berhasil terbukti (cek awal + cek ulang)' : '○ Belum berhasil pada cek ulang'}
             </div>
-            <div class="before-after">
-              <div class="ba-col"><div class="ba-label">Sebelum</div><div class="ba-value">${getOutcomeLabel(cekAwal?.outcome)}</div></div>
-              <div class="ba-arrow">→</div>
-              <div class="ba-col"><div class="ba-label">Setelah</div><div class="ba-value">${getOutcomeLabel(cekUlang?.outcome)}</div></div>
-            </div>
-          ` : ''}
+            <div class="mastery-reason">${esc(decision.reason)}</div>
+            ${decision.masteryProven ? `
+              <div class="mastery-disclaimer">
+                Orang tua menilai anak bisa pada cek awal dan cek ulang dengan bahan berbeda.
+                Konfirmasi lebih lanjut dianjurkan pada sesi lain di hari berbeda.
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+      ` : `
+        <div class="report-section">
+          <div class="report-section-title">Cek awal</div>
+          ${cekAwal ? `
+            <div class="report-outcome outcome-${cekAwal.outcome.toLowerCase()}">${getOutcomeLabel(cekAwal.outcome)}</div>
+            ${cekAwal.totalItems > 0 ? `<div class="report-detail">${cekAwal.correctItems}/${cekAwal.totalItems} benar</div>` : ''}
+            <div class="report-time">Tanggal: ${formatDate(cekAwal.scoredAt)}</div>
+          ` : `<div class="report-empty">Belum dilakukan.</div>`}
         </div>
-      ` : ''}
+
+        ${cekUlang ? `
+          <div class="report-section">
+            <div class="report-section-title">Cek ulang</div>
+            <div class="report-outcome outcome-${cekUlang.outcome.toLowerCase()}">${getOutcomeLabel(cekUlang.outcome)}</div>
+            ${cekUlang.totalItems > 0 ? `<div class="report-detail">${cekUlang.correctItems}/${cekUlang.totalItems} benar</div>` : ''}
+            <div class="report-time">Tanggal: ${formatDate(cekUlang.scoredAt)}</div>
+          </div>
+        ` : ''}
+
+        ${decision ? `
+          <div class="report-section mastery-section ${decision.masteryProven ? 'mastery-proven' : 'mastery-not-proven'}">
+            <div class="mastery-badge">
+              ${decision.masteryProven ? '✓ Berhasil pada cek ini' : '○ Belum berhasil pada cek ulang'}
+            </div>
+            <div class="mastery-reason">${esc(decision.reason)}</div>
+            ${decision.masteryProven ? `
+              <div class="mastery-disclaimer">
+                Ini menunjukkan anak berhasil pada sesi cek ini dengan soal berbeda dari cek awal.
+                Kemampuan yang stabil perlu dikonfirmasi pada sesi lain di hari berbeda.
+              </div>
+              <div class="before-after">
+                <div class="ba-col"><div class="ba-label">Sebelum</div><div class="ba-value">${getOutcomeLabel(cekAwal?.outcome)}</div></div>
+                <div class="ba-arrow">→</div>
+                <div class="ba-col"><div class="ba-label">Setelah</div><div class="ba-value">${getOutcomeLabel(cekUlang?.outcome)}</div></div>
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+      `}
 
       <div class="report-batas">
         <strong>Catatan batas sistem:</strong><br/>
@@ -976,7 +1204,7 @@ function renderUnitReport(unitId) {
       </div>
 
       <div class="report-actions">
-        ${!decision && !pVerdict ? `<button class="btn-primary" onclick="navigate('#unit/${unit.id}')">Lanjutkan perjalanan</button>` : ''}
+        ${!decision ? `<button class="btn-primary" onclick="navigate('#unit/${unit.id}')">Lanjutkan perjalanan</button>` : ''}
         <button class="btn-ghost" onclick="navigate('#map')">Kembali ke peta</button>
         ${!us.visitClosed ? `<button class="btn-ghost btn-small" onclick="doCloseVisit('${unit.id}')">Tutup kunjungan unit ini</button>` : ''}
       </div>
@@ -996,7 +1224,7 @@ function renderFullReport() {
   app.innerHTML = `
     <div class="view-report">
       <header class="check-header">
-        <button class="btn-back" onclick="navigate('#map')">← Peta</button>
+        <button class="btn-back" onclick="navigate('#home')">← Profil</button>
         <div class="check-badge">Untuk orang tua · Laporan keseluruhan</div>
       </header>
       <h1 class="report-title">${s.childName ? esc(s.childName) : 'Anak'}</h1>
@@ -1006,8 +1234,7 @@ function renderFullReport() {
         ${UNITS.map(u => {
           const us = getUnitState(u.id);
           const outcome = us.masteryDecision?.masteryProven ? OUTCOME.TERLIHAT_BISA
-            : us.parentVerdict?.verdict === 'BISA' ? OUTCOME.DINILAI_ORANG_TUA_BISA
-            : us.parentVerdict?.verdict === 'PERLU_LATIHAN' ? OUTCOME.DINILAI_ORANG_TUA_PERLU_LATIHAN
+            : us.masteryDecision && !us.masteryDecision.masteryProven ? OUTCOME.MASIH_BELAJAR
             : us.cekAwal?.outcome ?? null;
           return `
             <div class="full-report-row">
@@ -1023,8 +1250,8 @@ function renderFullReport() {
       </div>
 
       <div class="report-batas">
-        "Berhasil pada cek ini" menunjukkan hasil pada sesi tersebut — bukan klaim kemampuan stabil.<br/>
-        Penilaian orang tua berdasarkan panduan rubrik yang disediakan sistem.
+        "Berhasil terbukti" = orang tua menilai anak bisa pada cek awal dan cek ulang dengan bahan berbeda.<br/>
+        "Berhasil pada cek ini" = hasil sesi tunggal — belum dikonfirmasi.
       </div>
     </div>
   `;

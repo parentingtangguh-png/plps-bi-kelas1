@@ -6,13 +6,17 @@
  *   childName, kelas, createdAt,
  *   units: {
  *     [unitId]: {
+ *       // Unit AUTO/AUDIO_GATED
  *       cekAwal: SessionResult | null,
  *       latihan: { responses, savedAt } | null,
  *       cekUlang: SessionResult | null,
  *       masteryDecision: MasteryDecision | null,
  *       visitClosed: boolean,
- *       collectEvidence: CollectEvidence[] | null,
- *       parentVerdict: ParentVerdict | null,
+ *       // Unit COLLECT — perjalanan dua fase + dua verdik
+ *       collectEvidence: CollectEvidence[] | null,       // bukti cek_awal
+ *       collectCekUlangEvidence: CollectEvidence[] | null, // bukti cek_ulang (bahan baru)
+ *       parentVerdict: ParentVerdict | null,             // verdik fase 1
+ *       parentVerdictCekUlang: ParentVerdict | null,     // verdik fase 2 (penentu mastery)
  *     }
  *   },
  *   progressLog: ProgressEvent[],
@@ -113,7 +117,8 @@ export function getUnitState(unitId) {
   return getState().units[unitId] ?? {
     cekAwal: null, latihan: null, cekUlang: null,
     masteryDecision: null, visitClosed: false,
-    collectEvidence: null, parentVerdict: null,
+    collectEvidence: null, collectCekUlangEvidence: null,
+    parentVerdict: null, parentVerdictCekUlang: null,
   };
 }
 
@@ -161,7 +166,34 @@ export function saveParentVerdict(unitId, verdict) {
   const s = getState();
   if (!s.units[unitId]) s.units[unitId] = {};
   s.units[unitId].parentVerdict = { verdict, verdictAt: new Date().toISOString() };
-  logEvent(s, 'parent_verdict', unitId, { verdict });
+  logEvent(s, 'parent_verdict_cek_awal', unitId, { verdict });
+  save(s);
+}
+
+export function saveCollectCekUlangEvidence(unitId, evidence) {
+  const s = getState();
+  if (!s.units[unitId]) s.units[unitId] = {};
+  if (!s.units[unitId].collectCekUlangEvidence) s.units[unitId].collectCekUlangEvidence = [];
+  s.units[unitId].collectCekUlangEvidence.push({ ...evidence, collectedAt: new Date().toISOString() });
+  logEvent(s, 'collect_cek_ulang_evidence_saved', unitId, { taskId: evidence.taskId, type: evidence.type });
+  save(s);
+}
+
+export function saveParentVerdictCekUlang(unitId, verdict) {
+  const s = getState();
+  if (!s.units[unitId]) s.units[unitId] = {};
+  s.units[unitId].parentVerdictCekUlang = { verdict, verdictAt: new Date().toISOString() };
+  // Keputusan mastery COLLECT: verdik ke-2 = BISA → mastery proven
+  const masteryProven = verdict === 'BISA';
+  s.units[unitId].masteryDecision = {
+    masteryProven,
+    reason: masteryProven
+      ? 'Orang tua menilai anak bisa pada cek ulang dengan bahan baru.'
+      : 'Orang tua menilai anak perlu latihan lebih lanjut pada cek ulang.',
+    decidedAt: new Date().toISOString(),
+  };
+  if (masteryProven) logEvent(s, 'mastery_proven', unitId, { via: 'parent_verdict_cek_ulang' });
+  logEvent(s, 'parent_verdict_cek_ulang', unitId, { verdict });
   save(s);
 }
 
@@ -183,15 +215,13 @@ function logEvent(state, eventType, unitId, data) {
 
 /**
  * Semua unit outcomes untuk findRootGap.
- * Parent verdict 'BISA' diperlakukan setara TERLIHAT_BISA untuk prasyarat.
+ * Mastery COLLECT: masteryDecision.masteryProven (set saat verdik ke-2 = BISA).
  */
 export function getAllUnitOutcomes() {
   const s = getState();
   const result = {};
   for (const [unitId, us] of Object.entries(s.units)) {
     if (us.masteryDecision?.masteryProven) {
-      result[unitId] = 'TERLIHAT_BISA';
-    } else if (us.parentVerdict?.verdict === 'BISA') {
       result[unitId] = 'TERLIHAT_BISA';
     } else if (us.cekAwal?.outcome) {
       result[unitId] = us.cekAwal.outcome;
@@ -203,15 +233,34 @@ export function getAllUnitOutcomes() {
 }
 
 /**
- * Unit COLLECT yang sudah ada bukti tapi belum ada verdik orang tua.
+ * Unit COLLECT dengan bukti cek_awal yang menunggu verdik pertama.
  */
-export function getPendingParentReviews(units) {
+export function getPendingVerdict1(units) {
   const s = getState();
   return units.filter(u => {
     const us = s.units[u.id];
     if (!us) return false;
-    const hasEvidence = us.collectEvidence && us.collectEvidence.length > 0;
+    const hasEvidence = us.collectEvidence?.length > 0;
     const noVerdict = !us.parentVerdict;
     return hasEvidence && noVerdict;
   });
+}
+
+/**
+ * Unit COLLECT dengan bukti cek_ulang yang menunggu verdik kedua.
+ */
+export function getPendingVerdict2(units) {
+  const s = getState();
+  return units.filter(u => {
+    const us = s.units[u.id];
+    if (!us) return false;
+    const hasEvidence = us.collectCekUlangEvidence?.length > 0;
+    const noVerdict = !us.parentVerdictCekUlang;
+    return hasEvidence && noVerdict;
+  });
+}
+
+/** Gabungan semua pending untuk badge di peta. */
+export function getPendingParentReviews(units) {
+  return [...getPendingVerdict1(units), ...getPendingVerdict2(units)];
 }
