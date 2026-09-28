@@ -212,7 +212,17 @@ function renderUnitCard(unit, outcome, rootGap) {
 
 function getUnitStatusInfo(unit, outcome, us) {
   if (us.masteryDecision?.masteryProven) {
-    return { label: 'Dinilai bisa: cek awal + cek ulang ✓', cssClass: 'unit-card--mastered', canStart: true, actionLabel: 'Lihat laporan' };
+    let masteredLabel;
+    if (isCollectUnit(unit.id)) {
+      masteredLabel = us.masteryDecision.verdict1 === 'BISA'
+        ? 'Dinilai bisa: cek awal + cek ulang ✓'
+        : 'Dinilai bisa pada cek ulang setelah berlatih';
+    } else {
+      masteredLabel = us.cekAwal?.outcome === 'TERLIHAT_BISA'
+        ? 'Berhasil pada cek awal + cek ulang ✓'
+        : 'Berhasil pada cek ulang setelah berlatih';
+    }
+    return { label: masteredLabel, cssClass: 'unit-card--mastered', canStart: true, actionLabel: 'Lihat laporan' };
   }
   if (us.masteryDecision && !us.masteryDecision.masteryProven) {
     return { label: 'Perlu latihan lanjutan', cssClass: 'unit-card--active', canStart: true, actionLabel: 'Lanjutkan' };
