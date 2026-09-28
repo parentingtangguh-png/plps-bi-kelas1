@@ -419,7 +419,7 @@ function renderItemSession(unit, items, phase, responsesAcc, onDone) {
           ${item.panels.map((p, i) => `
             <div class="panel">
               <div class="panel-num">Gambar ${i + 1}</div>
-              <div class="panel-emoji">${p.emoji}</div>
+              <div class="panel-visual">${p.svg || esc(p.emoji || '')}</div>
               <div class="panel-desc">${esc(p.deskripsi)}</div>
             </div>
           `).join('')}
@@ -1032,7 +1032,7 @@ function renderCollectTask(unit, tasks, taskIdx, phase) {
           ${task.panels.map((p, i) => `
             <div class="panel">
               <div class="panel-num">Gambar ${i + 1}</div>
-              <div class="panel-emoji">${p.emoji}</div>
+              <div class="panel-visual">${p.svg || esc(p.emoji || '')}</div>
               <div class="panel-desc">${esc(p.deskripsi)}</div>
             </div>
           `).join('')}

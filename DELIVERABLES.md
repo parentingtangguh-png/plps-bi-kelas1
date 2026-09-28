@@ -230,21 +230,23 @@ Audit baca-ulang semua 16 unit. **Tidak ada data soal yang diubah** — temuan m
 
 ### Temuan
 
-#### K-1 — Kritis (berpotensi menghasilkan data tidak valid)
+#### K-1 — ~~Kritis~~ RESOLVED 2026-09-29
 
 **L02 FAM-B: semua 4 item FAM-B menanyakan "pesan apa"**
-- Item: L02-CA-B1, L02-LAT-B1, L02-LM-B1, L02-CU-B1
-- Masalah: "pesan" / "amanat" adalah konsep abstrak yang baru dikuasai di akhir Fase A (kelas 2). Di awal kelas 1, anak belum terbiasa dengan framing "pesan moral cerita".
-- Dampak: anak kelas 1 awal bisa menjawab salah bukan karena tidak memahami cerita, melainkan karena tidak mengerti pertanyaannya.
-- Usulan: ganti FAM-B L02 dengan pertanyaan konkret (tokoh mana yang melakukan X, apa yang terjadi pada akhir cerita).
+- RESOLVED commit (lihat changelog) — 4 item FAM-B diganti ke pertanyaan konkret:
+  - L02-CA-B1: "Apa yang terjadi pada belalang saat musim dingin tiba?"
+  - L02-LT-B1: "Bagaimana elang bisa bebas dari jaring pemburu?"
+  - L02-LM-B1: "Mengapa adik tidak punya teman?"
+  - L02-CU-B1: "Mengapa kura-kura tiba di garis akhir lebih dulu?"
+- FAM-B kini mengukur sebab-akibat dan hasil akhir cerita (konkret), bukan pesan moral abstrak.
 
-#### K-2 — Kritis (keterbatasan teknis menghasilkan beban membaca tak disengaja)
+#### K-2 — ~~Kritis~~ RESOLVED 2026-09-29
 
 **R03 FAM-A dan FAM-B: panel menggunakan emoji + teks keterangan**
-- Item: R03-CA-A1/B1, R03-LAT-A1/B1, R03-LM-A1/B1, R03-CU-A1/B1
-- Masalah: emoji rendernya berbeda per device/font; teks keterangan di bawah setiap panel menambah beban membaca yang tidak disengaja untuk unit yang seharusnya menguji pemahaman visual.
-- Dampak: anak yang belum lancar membaca mungkin mengalami hambatan pada unit membaca-visual ini.
-- Usulan: ganti emoji+teks dengan gambar SVG atau ilustrasi nyata yang bisa dibaca tanpa teks pendamping.
+- RESOLVED commit (lihat changelog) — semua 33 panel R03 diganti ke inline SVG.
+- SVG: viewBox 80×80, warna solid, konsisten lintas device/font.
+- Field `deskripsi` tetap ada sebagai caption teks di bawah gambar (aksesibilitas).
+- app.js: render `p.svg` jika ada, fallback ke `p.emoji` (backward compatible).
 
 #### M-1 — Minor (tidak menghalangi validitas, tapi perlu dicatat)
 
@@ -259,12 +261,12 @@ Audit baca-ulang semua 16 unit. **Tidak ada data soal yang diubah** — temuan m
 - Unit sudah memiliki `catatan_batas` di cp.js, tapi tidak ada pengecekan/peringatan di UI intro
 - Usulan: tambah satu kalimat di intro R02 yang meminta orang tua memastikan anak sudah bisa membaca mandiri.
 
-#### M-3 — Minor
+#### M-3 — ~~Minor~~ RESOLVED 2026-09-29
 
 **L01/L02: item bank sangat tipis (2 item per fase)**
-- Masing-masing: 2 cek_awal, 2 latihan/latihan_mandiri, 2 cek_ulang
-- Tidak cukup untuk variasi konteks dan mengurangi risiko hafalan
-- Minimum yang disarankan: 5–8 item per fase
+- RESOLVED commit (lihat changelog) — ditambah 3 item per fase untuk L01 dan L02.
+- L01: cek_awal 5 item, latihan 5 item, latihan_mandiri 5 item, cek_ulang 5 item.
+- L02: cek_awal 5 item, latihan 5 item, latihan_mandiri 5 item, cek_ulang 5 item.
 
 #### M-4 — Minor
 
@@ -278,4 +280,4 @@ Audit baca-ulang semua 16 unit. **Tidak ada data soal yang diubah** — temuan m
 - Angka ini mungkin terlalu longgar untuk memastikan anak sungguh menulis 2 kalimat
 - Usulan: naikkan ke 30–40 karakter, atau validasi jumlah spasi/kata
 
-*Dokumen diperbarui 2026-09-29 dari implementasi aktual commit 8cb4bd0.*
+*Dokumen diperbarui 2026-09-29 dari implementasi aktual commit 8cb4bd0 + perbaikan sesi 2026-09-29.*

@@ -49,6 +49,52 @@ export const ITEMS = [
     instruksi_anak: 'Dengarkan percakapan ini dengan baik. Soal akan muncul setelah rekaman selesai.',
   },
 
+  {
+    id: 'L01-CA-A2',
+    family: 'FAM-A',
+    phase: 'cek_awal',
+    audio_script: 'Dita: Kak, pensil warna saya mana? Kakak: Di laci meja belajarmu. Dita: Oh iya, ketemu! Terima kasih, Kak.',
+    audio_label: 'Percakapan Dita dan kakak',
+    soal: 'Di mana pensil warna Dita?',
+    opsi: [
+      { id: 'a', teks: 'Di dalam tas' },
+      { id: 'b', teks: 'Di atas meja makan' },
+      { id: 'c', teks: 'Di laci meja belajar' },
+    ],
+    kunci: 'c',
+    instruksi_anak: 'Dengarkan percakapan ini dengan baik. Soal akan muncul setelah rekaman selesai.',
+  },
+  {
+    id: 'L01-CA-B2',
+    family: 'FAM-B',
+    phase: 'cek_awal',
+    audio_script: 'Ibu: Hari ini kita mau kemana, Ayah? Ayah: Ke kebun binatang. Anak: Asyik! Aku mau lihat gajah! Ayah: Nanti kita foto sama gajah ya.',
+    audio_label: 'Percakapan keluarga',
+    soal: 'Apa rencana keluarga hari itu?',
+    opsi: [
+      { id: 'a', teks: 'Pergi ke pantai' },
+      { id: 'b', teks: 'Pergi ke kebun binatang' },
+      { id: 'c', teks: 'Pergi ke pasar' },
+    ],
+    kunci: 'b',
+    instruksi_anak: 'Dengarkan percakapan ini dengan baik. Soal akan muncul setelah rekaman selesai.',
+  },
+  {
+    id: 'L01-CA-A3',
+    family: 'FAM-A',
+    phase: 'cek_awal',
+    audio_script: 'Andi: Teman-teman, besok hari ulang tahun saya. Teman: Wah selamat ya, Ndi! Andi: Terima kasih. Saya bawa kue donat besok.',
+    audio_label: 'Percakapan Andi dan teman',
+    soal: 'Kue apa yang akan dibawa Andi besok?',
+    opsi: [
+      { id: 'a', teks: 'Kue tart' },
+      { id: 'b', teks: 'Kue donat' },
+      { id: 'c', teks: 'Kue brownies' },
+    ],
+    kunci: 'b',
+    instruksi_anak: 'Dengarkan percakapan ini dengan baik. Soal akan muncul setelah rekaman selesai.',
+  },
+
   // ═══════════════════════════════════════════
   // LATIHAN TERPANDU (3 soal)
   // ═══════════════════════════════════════════
@@ -104,6 +150,41 @@ export const ITEMS = [
     instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
   },
 
+  {
+    id: 'L01-LT-B2',
+    family: 'FAM-B',
+    phase: 'latihan',
+    audio_script: 'Mama: Nanti malam kita masak bareng ya. Anak: Mau masak apa, Ma? Mama: Sup ayam. Kamu boleh bantu iris wortelnya.',
+    audio_label: 'Percakapan mama dan anak',
+    soal: 'Tentang apa percakapan mama dan anak?',
+    opsi: [
+      { id: 'a', teks: 'Tentang belanja sayuran' },
+      { id: 'b', teks: 'Tentang masak bersama malam ini' },
+      { id: 'c', teks: 'Tentang makan di restoran' },
+    ],
+    kunci: 'b',
+    umpan_balik_benar: 'Betul! Mereka berencana memasak sup ayam bersama.',
+    umpan_balik_salah: 'Simak kembali. Mama mengajak anak melakukan apa malam ini?',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+  {
+    id: 'L01-LT-A3',
+    family: 'FAM-A',
+    phase: 'latihan',
+    audio_script: 'Paman: Kamu kelas berapa sekarang, Nak? Anak: Kelas satu, Paman. Paman: Sudah bisa membaca? Anak: Sudah, sedikit-sedikit.',
+    audio_label: 'Percakapan paman dan anak',
+    soal: 'Kelas berapa anak itu sekarang?',
+    opsi: [
+      { id: 'a', teks: 'Kelas dua' },
+      { id: 'b', teks: 'Kelas satu' },
+      { id: 'c', teks: 'Kelas tiga' },
+    ],
+    kunci: 'b',
+    umpan_balik_benar: 'Tepat! Anak menyebutkan kelas satu.',
+    umpan_balik_salah: 'Dengarkan kembali. Anak menjawab pertanyaan paman tentang kelasnya.',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+
   // ═══════════════════════════════════════════
   // LATIHAN MANDIRI (3 soal)
   // ═══════════════════════════════════════════
@@ -153,6 +234,37 @@ export const ITEMS = [
     instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
   },
 
+  {
+    id: 'L01-LM-B2',
+    family: 'FAM-B',
+    phase: 'latihan_mandiri',
+    audio_script: 'Guru: Anak-anak, minggu depan kita akan menanam bunga di halaman sekolah. Murid: Kita bawa apa, Bu? Guru: Bawa bibit bunga dan tanah dari rumah.',
+    audio_label: 'Percakapan guru dan murid',
+    soal: 'Apa yang sedang dibicarakan guru dan murid?',
+    opsi: [
+      { id: 'a', teks: 'Rencana menanam bunga' },
+      { id: 'b', teks: 'Rencana memasak bersama' },
+      { id: 'c', teks: 'Rencana lomba lari' },
+    ],
+    kunci: 'a',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+  {
+    id: 'L01-LM-A3',
+    family: 'FAM-A',
+    phase: 'latihan_mandiri',
+    audio_script: 'Kakak: Adik, sudah gosok gigi? Adik: Belum, Kak. Kakak: Gosok dulu sebelum tidur ya. Adik: Iya Kak, pakai sikat biru.',
+    audio_label: 'Percakapan kakak dan adik',
+    soal: 'Sikat gigi warna apa yang dipakai adik?',
+    opsi: [
+      { id: 'a', teks: 'Merah' },
+      { id: 'b', teks: 'Hijau' },
+      { id: 'c', teks: 'Biru' },
+    ],
+    kunci: 'c',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+
   // ═══════════════════════════════════════════
   // CEK ULANG — skrip baru (3 soal)
   // ═══════════════════════════════════════════
@@ -199,6 +311,38 @@ export const ITEMS = [
       { id: 'c', teks: 'Kunjungan ke puskesmas' },
     ],
     kunci: 'a',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+];
+
+  {
+    id: 'L01-CU-B2',
+    family: 'FAM-B',
+    phase: 'cek_ulang',
+    audio_script: 'Ayah: Tadi di sekolah ada apa, Nak? Anak: Ada pertunjukan wayang, Yah. Ayah: Wah seru! Ceritanya tentang apa? Anak: Tentang Pandawa dan Kurawa.',
+    audio_label: 'Percakapan ayah dan anak',
+    soal: 'Apa yang sedang dibicarakan ayah dan anak?',
+    opsi: [
+      { id: 'a', teks: 'Tugas sekolah' },
+      { id: 'b', teks: 'Pertunjukan wayang di sekolah' },
+      { id: 'c', teks: 'Lomba menggambar' },
+    ],
+    kunci: 'b',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+  {
+    id: 'L01-CU-A3',
+    family: 'FAM-A',
+    phase: 'cek_ulang',
+    audio_script: 'Pak Pos: Selamat siang, ada paket untuk keluarga Budi. Ibu: Dari mana, Pak? Pak Pos: Dari Bandung. Tolong tanda tangan di sini.',
+    audio_label: 'Percakapan pak pos dan ibu',
+    soal: 'Dari mana paket itu dikirim?',
+    opsi: [
+      { id: 'a', teks: 'Dari Surabaya' },
+      { id: 'b', teks: 'Dari Bandung' },
+      { id: 'c', teks: 'Dari Jakarta' },
+    ],
+    kunci: 'b',
     instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
   },
 ];
