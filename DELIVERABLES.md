@@ -220,21 +220,20 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 
 ---
 
-## Audit Konten Unit — Kesesuaian Fase A Kelas 1 (2026-09-29)
+## Audit Konten Unit — Kesesuaian Fase A Kelas 1 (2026-09-29, diperbarui 2026-09-29)
 
-Audit baca-ulang semua 16 unit. **Tidak ada data soal yang diubah** — temuan menunggu tinjauan owner sebelum revisi.
+Audit baca-ulang semua item bank (L01, L02, R02, R03) — vocabulary, panjang teks, tuntutan kognitif, distractor.
+Kriteria: kesesuaian usia 6–7 tahun kelas 1–2 SD, beban bahasa, tingkat abstraksi, keterbatasan teknis.
 
-### Metodologi
-- Baca seluruh item bank (L01, L02, R02, R03) dan definisi tugas COLLECT (R01, S01–S08, W01–W03)
-- Kriteria: kesesuaian dengan CP Fase A kelas 1, beban bahasa item, tingkat abstraksi, dan keterbatasan teknis
+**Status akhir: semua item layak untuk usia 6–7 tahun setelah perbaikan di bawah.**
 
 ### Temuan
 
 #### K-1 — ~~Kritis~~ RESOLVED 2026-09-29
 
 **L02 FAM-B: semua 4 item FAM-B menanyakan "pesan apa"**
-- RESOLVED commit (lihat changelog) — 4 item FAM-B diganti ke pertanyaan konkret:
-  - L02-CA-B1: "Apa yang terjadi pada belalang saat musim dingin tiba?"
+- RESOLVED — 4 item FAM-B diganti ke pertanyaan konkret:
+  - L02-CA-B1: "Apa yang terjadi pada belalang saat musim dingin tiba?" → diganti lagi (lihat K-3)
   - L02-LT-B1: "Bagaimana elang bisa bebas dari jaring pemburu?"
   - L02-LM-B1: "Mengapa adik tidak punya teman?"
   - L02-CU-B1: "Mengapa kura-kura tiba di garis akhir lebih dulu?"
@@ -261,6 +260,22 @@ Audit baca-ulang semua 16 unit. **Tidak ada data soal yang diubah** — temuan m
 - Unit sudah memiliki `catatan_batas` di cp.js, tapi tidak ada pengecekan/peringatan di UI intro
 - Usulan: tambah satu kalimat di intro R02 yang meminta orang tua memastikan anak sudah bisa membaca mandiri.
 
+#### K-3 — ~~Kritis~~ RESOLVED 2026-09-29
+
+**L02-CA-B1: "musim dingin" tidak relevan untuk anak Indonesia**
+- Stimulus asli menggunakan konteks musim dingin (dari fabel Eropa). Indonesia tidak punya musim dingin.
+  Anak kelas 1 tidak punya referensi untuk konsep "menyimpan makanan sebelum musim dingin".
+- RESOLVED commit 9598a86 — diganti ke cerita lebah-belalang dengan konteks hujan deras berhari-hari.
+  Konsep "rajin menyiapkan vs bermalas-malasan → konsekuensi nyata" dipertahankan, konteks dibuat relevan.
+
+#### K-4 — ~~Kritis~~ RESOLVED 2026-09-29
+
+**L02-LT-A1: "paling sedikit satu buku" — kuantifier abstrak untuk kelas 1**
+- Frasa "paling sedikit" (at least) adalah konsep kuantifier yang belum dikuasai anak awal kelas 1.
+  Anak yang menjawab benar kemungkinan menghafal frasa dari teks, bukan memahami isinya.
+- RESOLVED commit 9598a86 — diganti ke angka konkret "dua buku". Tuntutan kognitif tetap sama
+  (recall angka dari cerita), tanpa beban konsep kuantifier.
+
 #### M-3 — ~~Minor~~ RESOLVED 2026-09-29
 
 **L01/L02: item bank sangat tipis (2 item per fase)**
@@ -280,4 +295,8 @@ Audit baca-ulang semua 16 unit. **Tidak ada data soal yang diubah** — temuan m
 - Angka ini mungkin terlalu longgar untuk memastikan anak sungguh menulis 2 kalimat
 - Usulan: naikkan ke 30–40 karakter, atau validasi jumlah spasi/kata
 
-*Dokumen diperbarui 2026-09-29 dari implementasi aktual commit 8cb4bd0 + perbaikan sesi 2026-09-29.*
+| 2026-09-29 | 348fefd | Tambah CLAUDE.md + catatan orientasi repo di DELIVERABLES.md |
+| 2026-09-29 | 4dad145 | K-1 RESOLVED: L02 FAM-B → pertanyaan konkret. K-2 RESOLVED: R03 emoji → SVG. M-3 RESOLVED: L01/L02 item bank diperluas ke 5 item per fase |
+| 2026-09-29 | 9598a86 | K-3 RESOLVED: L02-CA-B1 "musim dingin" → lebah-belalang + hujan deras. K-4 RESOLVED: L02-LT-A1 "paling sedikit" → angka konkret |
+
+*Dokumen diperbarui 2026-09-29. Semua temuan audit sesi ini sudah resolved.*
