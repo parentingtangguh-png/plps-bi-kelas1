@@ -194,6 +194,7 @@ function renderUnitCard(unit, outcome, rootGap) {
   const us = getUnitState(unit.id);
   const isRootGap = unit.id === rootGap;
   const statusInfo = getUnitStatusInfo(unit, outcome, us);
+  const dest = statusInfo.actionDest ?? `#unit/${unit.id}`;
 
   return `
     <div class="unit-card ${statusInfo.cssClass} ${isRootGap ? 'unit-card--root-gap' : ''}">
@@ -201,7 +202,7 @@ function renderUnitCard(unit, outcome, rootGap) {
       <div class="unit-card-label">${esc(unit.label)}</div>
       <div class="unit-card-status">${statusInfo.label}</div>
       ${statusInfo.canStart ? `
-        <button class="btn-unit-action" onclick="navigate('#unit/${unit.id}')">
+        <button class="btn-unit-action" onclick="navigate('${dest}')">
           ${statusInfo.actionLabel}
         </button>
       ` : `<div class="unit-card-locked">${statusInfo.actionLabel}</div>`}
@@ -218,13 +219,21 @@ function getUnitStatusInfo(unit, outcome, us) {
   }
   if (isCollectUnit(unit.id)) {
     if (us.collectCekUlangEvidence?.length > 0) {
-      return { label: 'Menunggu penilaian cek ulang', cssClass: 'unit-card--pending', canStart: true, actionLabel: 'Lihat di dashboard' };
+      const allSkipped2 = us.collectCekUlangEvidence.every(e => e.type === 'skipped');
+      if (allSkipped2) {
+        return { label: 'Belum ada karya cek ulang', cssClass: 'unit-card--closed', canStart: true, actionLabel: 'Ulangi pengumpulan' };
+      }
+      return { label: 'Menunggu penilaian cek ulang', cssClass: 'unit-card--pending', canStart: true, actionLabel: 'Buka Dashboard →', actionDest: '#parent' };
     }
     if (us.parentVerdict) {
       return { label: `Verdik cek awal: ${us.parentVerdict.verdict === 'BISA' ? 'Bisa' : 'Perlu latihan'}`, cssClass: 'unit-card--active', canStart: true, actionLabel: 'Lanjutkan' };
     }
     if (us.collectEvidence?.length > 0) {
-      return { label: 'Menunggu penilaian cek awal', cssClass: 'unit-card--pending', canStart: true, actionLabel: 'Lihat di dashboard' };
+      const allSkipped1 = us.collectEvidence.every(e => e.type === 'skipped');
+      if (allSkipped1) {
+        return { label: 'Belum ada karya', cssClass: 'unit-card--closed', canStart: true, actionLabel: 'Ulangi pengumpulan' };
+      }
+      return { label: 'Menunggu penilaian cek awal', cssClass: 'unit-card--pending', canStart: true, actionLabel: 'Buka Dashboard →', actionDest: '#parent' };
     }
   }
   if (us.visitClosed) {
@@ -236,7 +245,11 @@ function getUnitStatusInfo(unit, outcome, us) {
   const unitOutcomes = getAllUnitOutcomes();
   const prereqOk = unit.prerequisite.every(id => unitOutcomes[id] === OUTCOME.TERLIHAT_BISA);
   if (!prereqOk && unit.prerequisite.length > 0) {
-    return { label: 'Prasyarat belum terpenuhi', cssClass: 'unit-card--locked', canStart: false, actionLabel: 'Selesaikan prasyarat dulu' };
+    const unmetNames = unit.prerequisite
+      .filter(id => unitOutcomes[id] !== OUTCOME.TERLIHAT_BISA)
+      .map(id => UNITS_BY_ID[id]?.label ?? id)
+      .join(', ');
+    return { label: 'Prasyarat belum terpenuhi', cssClass: 'unit-card--locked', canStart: false, actionLabel: `Selesaikan dulu: ${unmetNames}` };
   }
   return { label: 'Tersedia', cssClass: 'unit-card--available', canStart: true, actionLabel: 'Mulai cek' };
 }
@@ -501,12 +514,36 @@ function renderCekAwalResult(unit, us) {
           <p>${esc(s.childName)} perlu latihan penguatan sebelum cek ulang.</p>
         </div>
         <div class="next-steps">
-          <button class="btn-primary" onclick="startLatihan('${unit.id}')">Mulai latihan penguatan →</button>
+          <button class="btn-primary" onclick="showLatihanPenguatanIntro('${unit.id}')">Mulai latihan penguatan →</button>
         </div>
       `}
     </div>
   `;
 }
+
+window.showLatihanPenguatanIntro = function(unitId) {
+  const unit = UNITS_BY_ID[unitId];
+  if (!unit) return;
+  app.innerHTML = `
+    <div class="view-check">
+      <header class="check-header">
+        <button class="btn-back" onclick="navigate('#map')">← Peta</button>
+        <div class="check-badge">Untuk anak · Latihan penguatan</div>
+      </header>
+      <h1 class="check-title">${esc(unit.label)}</h1>
+      <div class="collect-notice">
+        <strong>Jalur latihan ini berisi tiga bagian:</strong>
+        <ol style="margin:8px 0 0 16px;line-height:1.8;">
+          <li><strong>Latihan penguatan</strong> — soal dengan umpan balik langsung</li>
+          <li><strong>Latihan mandiri</strong> — soal tanpa umpan balik</li>
+          <li><strong>Cek ulang</strong> — soal baru untuk konfirmasi kemampuan</li>
+        </ol>
+      </div>
+      <button class="btn-primary" onclick="startLatihan('${unitId}')">Mulai latihan penguatan →</button>
+      <button class="btn-ghost" onclick="navigate('#map')">Nanti saja</button>
+    </div>
+  `;
+};
 
 window.startLatihan = function(unitId) {
   const unit = UNITS_BY_ID[unitId];
