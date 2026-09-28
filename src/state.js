@@ -188,7 +188,7 @@ export function saveParentVerdictCekUlang(unitId, verdict) {
   s.units[unitId].masteryDecision = {
     masteryProven,
     reason: masteryProven
-      ? 'Orang tua menilai anak bisa pada cek ulang dengan bahan baru.'
+      ? 'Orang tua menilai anak bisa pada cek awal dan cek ulang (bahan berbeda). Bukan pengganti asesmen formal.'
       : 'Orang tua menilai anak perlu latihan lebih lanjut pada cek ulang.',
     decidedAt: new Date().toISOString(),
   };

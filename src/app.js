@@ -211,7 +211,7 @@ function renderUnitCard(unit, outcome, rootGap) {
 
 function getUnitStatusInfo(unit, outcome, us) {
   if (us.masteryDecision?.masteryProven) {
-    return { label: 'Berhasil terbukti ✓', cssClass: 'unit-card--mastered', canStart: true, actionLabel: 'Lihat laporan' };
+    return { label: 'Dinilai bisa: cek awal + cek ulang ✓', cssClass: 'unit-card--mastered', canStart: true, actionLabel: 'Lihat laporan' };
   }
   if (us.masteryDecision && !us.masteryDecision.masteryProven) {
     return { label: 'Perlu latihan lanjutan', cssClass: 'unit-card--active', canStart: true, actionLabel: 'Lanjutkan' };
@@ -1147,13 +1147,14 @@ function renderUnitReport(unitId) {
         ${decision ? `
           <div class="report-section mastery-section ${decision.masteryProven ? 'mastery-proven' : 'mastery-not-proven'}">
             <div class="mastery-badge">
-              ${decision.masteryProven ? '✓ Berhasil terbukti (cek awal + cek ulang)' : '○ Belum berhasil pada cek ulang'}
+              ${decision.masteryProven ? '✓ Orang tua menilai bisa: cek awal dan cek ulang' : '○ Orang tua menilai perlu latihan pada cek ulang'}
             </div>
             <div class="mastery-reason">${esc(decision.reason)}</div>
             ${decision.masteryProven ? `
               <div class="mastery-disclaimer">
-                Orang tua menilai anak bisa pada cek awal dan cek ulang dengan bahan berbeda.
-                Konfirmasi lebih lanjut dianjurkan pada sesi lain di hari berbeda.
+                Ini mencatat bahwa orang tua menilai anak bisa pada kedua cek dengan bahan berbeda.
+                Penilaian ini bukan pengganti asesmen formal — kemampuan yang stabil perlu dikonfirmasi
+                pada sesi lain di hari berbeda oleh pengamat berbeda.
               </div>
             ` : ''}
           </div>
@@ -1250,7 +1251,8 @@ function renderFullReport() {
       </div>
 
       <div class="report-batas">
-        "Berhasil terbukti" = orang tua menilai anak bisa pada cek awal dan cek ulang dengan bahan berbeda.<br/>
+        "Dinilai bisa: cek awal + cek ulang" = orang tua menilai anak bisa pada kedua cek dengan bahan berbeda.
+        Ini bukan klaim kemampuan stabil — bukan pengganti asesmen formal.<br/>
         "Berhasil pada cek ini" = hasil sesi tunggal — belum dikonfirmasi.
       </div>
     </div>
