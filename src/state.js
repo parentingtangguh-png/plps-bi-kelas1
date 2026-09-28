@@ -28,6 +28,72 @@
  */
 
 const STORAGE_KEY = 'plps_bi_kelas1_state';
+const ACTIVE_CHILD_KEY = 'plps_bi_kelas1_active_child';
+const CHILD_META_KEY   = 'plps_bi_kelas1_child_meta';
+
+// ─── Active child ─────────────────────────────────────
+
+export function getActiveChildId() {
+  try { return localStorage.getItem(ACTIVE_CHILD_KEY); } catch { return null; }
+}
+
+export function getActiveChildMeta() {
+  try {
+    const raw = localStorage.getItem(CHILD_META_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+export async function setActiveChild(child) {
+  try {
+    localStorage.setItem(ACTIVE_CHILD_KEY, child.id);
+    localStorage.setItem(CHILD_META_KEY, JSON.stringify(child));
+  } catch {}
+  await loadStateFromSupabase(child.id);
+}
+
+export function clearActiveChild() {
+  try {
+    localStorage.removeItem(ACTIVE_CHILD_KEY);
+    localStorage.removeItem(CHILD_META_KEY);
+  } catch {}
+}
+
+export async function loadStateFromSupabase(childId) {
+  try {
+    const { supabase } = await import('./supabase.js');
+    const { data, error } = await supabase
+      .from('child_states')
+      .select('state_json')
+      .eq('child_id', childId)
+      .single();
+    if (error && error.code !== 'PGRST116') throw error;
+    if (data?.state_json) {
+      localStorage.setItem(`plps_bi_kelas1_state_${childId}`, JSON.stringify(data.state_json));
+    }
+  } catch (e) {
+    console.warn('Load dari Supabase gagal, gunakan cache lokal:', e);
+  }
+}
+
+async function syncToSupabase(state) {
+  const childId = getActiveChildId();
+  if (!childId) return;
+  try {
+    const { supabase } = await import('./supabase.js');
+    const { error } = await supabase
+      .from('child_states')
+      .upsert({ child_id: childId, state_json: state, updated_at: new Date().toISOString() });
+    if (error) console.warn('Supabase sync error:', error);
+  } catch (e) {
+    console.warn('Supabase sync gagal:', e);
+  }
+}
+
+function getStorageKey() {
+  const childId = getActiveChildId();
+  return childId ? `plps_bi_kelas1_state_${childId}` : STORAGE_KEY;
+}
 
 // ─── IndexedDB untuk media blobs ─────────────────────
 
@@ -82,7 +148,7 @@ export async function getMediaBlob(id) {
 
 function load() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(getStorageKey());
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
@@ -91,10 +157,11 @@ function load() {
 
 function save(state) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(getStorageKey(), JSON.stringify(state));
   } catch {
     console.warn('localStorage tidak tersedia.');
   }
+  syncToSupabase(state).catch(() => {});
 }
 
 export function getState() {
@@ -102,7 +169,14 @@ export function getState() {
 }
 
 function newState() {
-  return { childName: '', kelas: '', createdAt: new Date().toISOString(), units: {}, progressLog: [] };
+  const meta = getActiveChildMeta();
+  return {
+    childName: meta?.nama ?? '',
+    kelas: meta?.kelas ?? '',
+    createdAt: new Date().toISOString(),
+    units: {},
+    progressLog: [],
+  };
 }
 
 export function saveProfile(childName, kelas) {
@@ -245,7 +319,8 @@ export function closeVisit(unitId) {
 }
 
 export function clearState() {
-  try { localStorage.removeItem(STORAGE_KEY); } catch {}
+  const key = getStorageKey();
+  try { localStorage.removeItem(key); } catch {}
 }
 
 function logEvent(state, eventType, unitId, data) {

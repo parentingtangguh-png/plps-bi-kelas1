@@ -10,6 +10,11 @@
  *   #parent     — dashboard orang tua (penilaian bukti)
  */
 
+import { getSession, signInWithGoogle, signOut, onAuthStateChange, getUserDisplayName } from './auth.js';
+import { getChildren, addChild, deleteChild } from './children.js';
+import {
+  getActiveChildId, getActiveChildMeta, setActiveChild, clearActiveChild, loadStateFromSupabase,
+} from './state.js';
 import { UNITS, UNITS_BY_ID, ELEMEN } from '../data/cp.js';
 import { ITEMS as R02_ITEMS, getItemsByPhase as R02ByPhase } from '../data/items/R02.js';
 import { ITEMS as R03_ITEMS, getItemsByPhase as R03ByPhase } from '../data/items/R03.js';
@@ -24,7 +29,7 @@ import {
   saveCekUlang, saveMasteryDecision, saveCollectEvidence, saveCollectLatihanEvidence,
   saveCollectCekUlangEvidence, saveParentVerdict, saveParentVerdictCekUlang, closeVisit,
   getAllUnitOutcomes, getPendingVerdict1, getPendingVerdict2, getPendingParentReviews,
-  saveLatihanKonfirmasi, resetLatihanPercobaan, saveMediaBlob, getMediaBlob,
+  saveLatihanKonfirmasi, resetLatihanPercobaan, saveMediaBlob, getMediaBlob, clearState,
 } from './state.js';
 
 // ─────────────────────────────────────────────────────
@@ -46,10 +51,33 @@ const app = document.getElementById('app');
 
 function navigate(hash) { window.location.hash = hash; }
 
-window.addEventListener('hashchange', route);
-window.addEventListener('load', () => {
-  if (!window.location.hash) window.location.hash = '#home';
+window.addEventListener('hashchange', () => {
+  if (getActiveChildId()) route();
+});
+
+window.addEventListener('load', async () => {
+  app.innerHTML = `<div style="padding:48px 16px;text-align:center;color:#6b7280;">Memuat...</div>`;
+
+  // Supabase handles OAuth code exchange automatically on load
+  const session = await getSession();
+  if (!session) { renderAuthScreen(); return; }
+
+  const childId = getActiveChildId();
+  if (!childId) {
+    const children = await getChildren().catch(() => []);
+    renderChildPicker(session, children);
+    return;
+  }
+
+  // Refresh state from Supabase on each load (delta from other devices)
+  await loadStateFromSupabase(childId).catch(() => {});
+
+  if (!window.location.hash || window.location.hash === '#') window.location.hash = '#home';
   else route();
+
+  onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') { clearActiveChild(); renderAuthScreen(); }
+  });
 });
 
 function route() {
@@ -65,6 +93,121 @@ function route() {
     default:           renderHome(); break;
   }
 }
+
+// ─────────────────────────────────────────────────────
+// View: Auth
+// ─────────────────────────────────────────────────────
+function renderAuthScreen() {
+  app.innerHTML = `
+    <div class="view-home">
+      <div class="brand">
+        <div class="brand-title">PLPS</div>
+        <div class="brand-sub">Bahasa Indonesia · Kelas 1</div>
+      </div>
+      <div class="onboarding">
+        <p class="onboarding-desc">Petakan kemampuan Bahasa Indonesia anak. Masuk untuk menyimpan data dan mengelola lebih dari satu anak.</p>
+        <button class="btn-primary btn-google" id="btnGoogle">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="flex-shrink:0">
+            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+            <path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/>
+          </svg>
+          Masuk dengan Google
+        </button>
+        <p class="auth-note">Tidak ada yang dikirim tanpa izin Anda.</p>
+      </div>
+    </div>
+  `;
+  document.getElementById('btnGoogle').addEventListener('click', async () => {
+    try { await signInWithGoogle(); }
+    catch (e) { alert('Gagal masuk: ' + e.message); }
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// View: Pilih Anak
+// ─────────────────────────────────────────────────────
+function renderChildPicker(session, children) {
+  const displayName = getUserDisplayName(session);
+  app.innerHTML = `
+    <div class="view-home">
+      <div class="brand">
+        <div class="brand-title">PLPS</div>
+        <div class="brand-sub">Halo, ${esc(displayName)}</div>
+      </div>
+      <div class="child-picker">
+        <div class="child-picker-title">Pilih anak atau tambah baru</div>
+        ${children.length > 0 ? `
+          <div class="child-list">
+            ${children.map(c => `
+              <button class="child-card" data-id="${esc(c.id)}" data-nama="${esc(c.nama)}" data-kelas="${esc(c.kelas)}">
+                <span class="child-card-nama">${esc(c.nama)}</span>
+                <span class="child-card-kelas">${esc(c.kelas)}</span>
+              </button>
+            `).join('')}
+          </div>
+        ` : `<p class="child-empty">Belum ada anak yang ditambahkan.</p>`}
+        <form id="addChildForm" class="profile-form" style="margin-top:16px">
+          <div class="add-child-label">Tambah anak baru</div>
+          <label>Nama panggilan
+            <input type="text" id="newChildName" placeholder="Contoh: Rani" required maxlength="40" />
+          </label>
+          <label>Kelas
+            <select id="newChildKelas" required>
+              <option value="">Pilih kelas</option>
+              <option value="Kelas 1 SD">Kelas 1 SD</option>
+            </select>
+          </label>
+          <button type="submit" class="btn-primary">Tambah &amp; Mulai →</button>
+        </form>
+      </div>
+      <button class="btn-ghost btn-small" style="margin-top:8px" id="btnSignOut">Keluar</button>
+    </div>
+  `;
+
+  document.querySelectorAll('.child-card').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const child = { id: btn.dataset.id, nama: btn.dataset.nama, kelas: btn.dataset.kelas };
+      btn.textContent = 'Memuat...';
+      await setActiveChild(child);
+      window.location.hash = '#home';
+      route();
+    });
+  });
+
+  document.getElementById('addChildForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const nama = document.getElementById('newChildName').value.trim();
+    const kelas = document.getElementById('newChildKelas').value;
+    if (!nama || !kelas) return;
+    const btn = e.target.querySelector('button[type=submit]');
+    btn.disabled = true; btn.textContent = 'Menyimpan...';
+    try {
+      const child = await addChild(nama, kelas);
+      await setActiveChild(child);
+      window.location.hash = '#home';
+      route();
+    } catch (err) {
+      alert('Gagal menambah anak: ' + err.message);
+      btn.disabled = false; btn.textContent = 'Tambah & Mulai →';
+    }
+  });
+
+  document.getElementById('btnSignOut').addEventListener('click', async () => {
+    clearActiveChild();
+    await signOut();
+    renderAuthScreen();
+  });
+}
+
+window.showChildPicker = async function () {
+  const session = await getSession();
+  if (!session) { renderAuthScreen(); return; }
+  const children = await getChildren().catch(() => []);
+  clearActiveChild();
+  renderChildPicker(session, children);
+};
 
 // ─────────────────────────────────────────────────────
 // View: Home
@@ -87,7 +230,7 @@ function renderHome() {
         </div>
         <button class="btn-primary" onclick="navigate('#map')">Lihat Peta Unit</button>
         <button class="btn-secondary" onclick="navigate('#parent')">Dashboard Orang Tua</button>
-        <button class="btn-ghost btn-small" onclick="showResetConfirm()">Mulai ulang dengan anak lain</button>
+        <button class="btn-ghost btn-small" onclick="showChildPicker()">Pilih anak lain</button>
       ` : `
         <div class="onboarding">
           <p class="onboarding-desc">Petakan kemampuan Bahasa Indonesia anak. Tidak perlu akun — data tersimpan di perangkat ini.</p>
@@ -106,7 +249,7 @@ function renderHome() {
         </div>
       `}
       <footer class="home-footer">
-        Data tersimpan hanya di perangkat ini.<br/>
+        Data tersimpan di akun Anda.<br/>
         <a href="#fullreport" class="link-small">Lihat semua laporan</a>
       </footer>
     </div>
@@ -122,9 +265,10 @@ function renderHome() {
   });
 }
 
-window.showResetConfirm = function() {
-  if (confirm('Ini akan menghapus semua data dan laporan. Lanjutkan?')) {
-    import('./state.js').then(m => { m.clearState(); navigate('#home'); });
+window.showResetConfirm = function () {
+  if (confirm('Ini akan menghapus semua data anak ini di perangkat ini. Lanjutkan?')) {
+    clearState();
+    navigate('#home');
   }
 };
 

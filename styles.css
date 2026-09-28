@@ -554,3 +554,83 @@ button { cursor: pointer; font: inherit; border: none; }
     padding: 0 8px;
   }
 }
+
+
+/* ─── Auth & Child Picker ────────────────────────────── */
+.btn-google {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.auth-note {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.child-picker {
+  width: 100%;
+}
+
+.child-picker-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.child-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.child-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.child-card:hover {
+  border-color: #6366f1;
+  background: #f5f3ff;
+}
+
+.child-card-nama {
+  font-weight: 600;
+  color: #111827;
+  font-size: 1rem;
+}
+
+.child-card-kelas {
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.child-empty {
+  font-size: 0.88rem;
+  color: #9ca3af;
+  margin-bottom: 8px;
+}
+
+.add-child-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
