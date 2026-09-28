@@ -803,7 +803,10 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
       <button id="btnKonfirmasi" class="btn-primary" disabled onclick="konfirmasiLatihanSelesai('${unit.id}')">
         Konfirmasi — lanjut ke cek ulang →
       </button>
-      <button id="btnUlangLatihan" class="btn-secondary" style="display:none" onclick="startCollectLatihan('${unit.id}')">Ulangi latihan</button>
+      <!-- Fix 1: tombol ulangi tampak langsung jika ada media hilang; hidden jika tidak -->
+      <button id="btnUlangLatihan" class="btn-secondary"
+        style="display:${missingMedia.length ? '' : 'none'}"
+        onclick="startCollectLatihan('${unit.id}')">Ulangi latihan</button>
       <button class="btn-ghost" onclick="navigate('#map')">Nanti saja</button>
     </div>
   `;
@@ -841,7 +844,7 @@ window.checkKonfirmasiReady = function(unitId) {
   } else if (anyRetry) {
     btnK.disabled = true;
     btnU.style.display = '';
-    status.textContent = '○ Ada poin yang perlu diperbaiki. Ulangi latihan atau lanjutkan jika sudah cukup.';
+    status.textContent = '○ Ada poin yang perlu diperbaiki. Gunakan tombol "Ulangi latihan" di bawah.';
   } else if (allAnswered) {
     btnK.disabled = false;
     btnU.style.display = 'none';
@@ -854,7 +857,12 @@ window.checkKonfirmasiReady = function(unitId) {
 };
 
 window.konfirmasiLatihanSelesai = function(unitId) {
-  saveLatihanKonfirmasi(unitId);
+  // Fix 2: kumpulkan semua jawaban radio dan simpan ke state
+  const rubrikAnswers = {};
+  document.querySelectorAll('input[type=radio]:checked').forEach(r => {
+    rubrikAnswers[r.name] = r.value;
+  });
+  saveLatihanKonfirmasi(unitId, rubrikAnswers);
   startCollectCekUlang(unitId);
 };
 

@@ -178,11 +178,14 @@ export function saveCollectLatihanEvidence(unitId, evidence) {
   save(s);
 }
 
-export function saveLatihanKonfirmasi(unitId) {
+export function saveLatihanKonfirmasi(unitId, rubrikAnswers) {
   const s = getState();
   if (!s.units[unitId]) s.units[unitId] = {};
-  s.units[unitId].latihanKonfirmasi = { confirmedAt: new Date().toISOString() };
-  logEvent(s, 'latihan_konfirmasi', unitId, {});
+  s.units[unitId].latihanKonfirmasi = {
+    confirmedAt: new Date().toISOString(),
+    rubrikAnswers: rubrikAnswers ?? {},
+  };
+  logEvent(s, 'latihan_konfirmasi', unitId, { rubrikAnswers });
   save(s);
 }
 
