@@ -183,16 +183,26 @@ export function saveParentVerdictCekUlang(unitId, verdict) {
   const s = getState();
   if (!s.units[unitId]) s.units[unitId] = {};
   s.units[unitId].parentVerdictCekUlang = { verdict, verdictAt: new Date().toISOString() };
-  // Keputusan mastery COLLECT: verdik ke-2 = BISA → mastery proven
   const masteryProven = verdict === 'BISA';
+  const verdict1 = s.units[unitId].parentVerdict?.verdict ?? 'tidak_dicatat';
+  let reason;
+  if (masteryProven) {
+    reason = verdict1 === 'BISA'
+      ? 'Orang tua menilai anak bisa pada cek awal dan cek ulang (bahan berbeda). Bukan pengganti asesmen formal.'
+      : 'Orang tua menilai anak perlu latihan pada cek awal, namun bisa pada cek ulang setelah berlatih. Bukan pengganti asesmen formal.';
+  } else {
+    reason = verdict1 === 'BISA'
+      ? 'Orang tua menilai anak bisa pada cek awal, tetapi perlu latihan lebih lanjut pada cek ulang.'
+      : 'Orang tua menilai anak perlu latihan pada cek awal dan cek ulang.';
+  }
   s.units[unitId].masteryDecision = {
     masteryProven,
-    reason: masteryProven
-      ? 'Orang tua menilai anak bisa pada cek awal dan cek ulang (bahan berbeda). Bukan pengganti asesmen formal.'
-      : 'Orang tua menilai anak perlu latihan lebih lanjut pada cek ulang.',
+    reason,
+    verdict1,
+    verdict2: verdict,
     decidedAt: new Date().toISOString(),
   };
-  if (masteryProven) logEvent(s, 'mastery_proven', unitId, { via: 'parent_verdict_cek_ulang' });
+  if (masteryProven) logEvent(s, 'mastery_proven', unitId, { via: 'parent_verdict_cek_ulang', verdict1 });
   logEvent(s, 'parent_verdict_cek_ulang', unitId, { verdict });
   save(s);
 }

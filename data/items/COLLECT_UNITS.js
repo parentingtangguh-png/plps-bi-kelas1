@@ -4,10 +4,15 @@
  *   latihan   : latihan dengan panduan → lanjut ke cek ulang
  *   cek_ulang : bahan baru → verdik orang tua (2) → keputusan mastery
  *
+ * Setiap task latihan punya dua panduan:
+ *   panduan_penguatan  — untuk jalur verdik1=PERLU_LATIHAN (remedial, lebih terbimbing)
+ *   panduan_pendalaman — untuk jalur verdik1=BISA (pengayaan, lebih menantang/mandiri)
+ * app.js memilih panduan yang sesuai berdasarkan parentVerdict.
+ *
  * Tipe task per unit:
- *   audio    → needsRecording = true (S01–S08, R01)
- *   photo    → needsPhoto = true (W01, W02)
- *   text     → needsText = true (W03)
+ *   needsRecording = true → rekam suara (R01, S01–S08)
+ *   needsPhoto     = true → foto (W01, W02)
+ *   needsText      = true → ketik teks (W03)
  */
 
 export const COLLECT_PHASES = {
@@ -24,8 +29,9 @@ export const COLLECT_PHASES = {
     }],
     latihan: [{
       id: 'R01-LAT-1',
-      instruksi: 'Baca kata-kata ini dengan perlahan. Pisahkan tiap suku kata dulu, lalu gabungkan.',
-      panduan: '💡 Coba baca per suku kata dulu: "bu-ku", "me-ja", baru gabungkan: "buku", "meja".',
+      instruksi: 'Baca kata-kata ini sambil direkam.',
+      panduan_penguatan:  '💡 Penguatan: Baca pelan, pisahkan suku kata dulu — "po-hon", "su-ngai" — baru gabungkan.',
+      panduan_pendalaman: '💡 Pendalaman: Baca setiap kata secepat kamu bisa sambil tetap jelas. Coba tidak berhenti di tengah.',
       kata: ['pohon', 'sungai', 'hujan', 'angin', 'kucing'],
       needsRecording: true,
     }],
@@ -51,7 +57,8 @@ export const COLLECT_PHASES = {
     latihan: [{
       id: 'S01-LAT-1',
       instruksi: 'Lihat gambar ini. Coba ajukan pertanyaan tentang gambar.',
-      panduan: '💡 Gunakan kata tanya: "Apa", "Di mana", "Mengapa", "Siapa", atau "Bagaimana".',
+      panduan_penguatan:  '💡 Penguatan: Gunakan kata tanya: "Apa", "Di mana", "Mengapa", "Siapa", atau "Bagaimana".',
+      panduan_pendalaman: '💡 Pendalaman: Ajukan dua pertanyaan berbeda tentang gambar ini. Gunakan kata tanya yang berbeda untuk tiap pertanyaan.',
       stimulus_emoji: '🐱😴',
       stimulus_label: 'Seekor kucing tidur di atas bantal',
       needsRecording: true,
@@ -78,8 +85,9 @@ export const COLLECT_PHASES = {
     }],
     latihan: [{
       id: 'S02-LAT-1',
-      instruksi: 'Dengarkan pertanyaan ini, lalu jawab dengan kalimat lengkap.',
-      panduan: '💡 Jawab dengan kalimat penuh, bukan hanya satu kata. Contoh: "Saya suka makan nasi goreng."',
+      instruksi: 'Dengarkan pertanyaan ini, lalu jawab sambil direkam.',
+      panduan_penguatan:  '💡 Penguatan: Jawab dengan kalimat penuh, bukan hanya satu kata. Contoh: "Saya suka makan nasi goreng."',
+      panduan_pendalaman: '💡 Pendalaman: Jawab dengan kalimat lengkap, lalu tambahkan alasan mengapa. Contoh: "Saya suka nasi goreng karena rasanya enak."',
       audio_script: 'Makanan apa yang paling kamu suka?',
       audio_label: 'Pertanyaan untuk dijawab',
       needsRecording: true,
@@ -106,8 +114,9 @@ export const COLLECT_PHASES = {
     }],
     latihan: [{
       id: 'S03-LAT-1',
-      instruksi: 'Dengarkan komentar ini, lalu tanggapi dengan sopan.',
-      panduan: '💡 Mulai dengan "Terima kasih" atau "Iya, benar sekali". Lalu tambahkan satu kalimat tanggapan.',
+      instruksi: 'Dengarkan komentar ini, lalu tanggapi sambil direkam.',
+      panduan_penguatan:  '💡 Penguatan: Mulai dengan "Terima kasih" atau "Iya, benar". Lalu tambahkan satu kalimat tanggapan.',
+      panduan_pendalaman: '💡 Pendalaman: Tanggapi dengan santun, lalu ajukan satu pertanyaan kembali untuk melanjutkan percakapan.',
       audio_script: 'Wah, kamu sangat rajin belajar! Nilaimu pasti bagus.',
       audio_label: 'Komentar untuk ditanggapi',
       needsRecording: true,
@@ -134,8 +143,9 @@ export const COLLECT_PHASES = {
     }],
     latihan: [{
       id: 'S04-LAT-1',
-      instruksi: 'Lihat gambar ini. Ungkapkan perasaanmu dan jelaskan mengapa.',
-      panduan: '💡 Gunakan kata perasaan: senang, sedih, takut, marah, kaget, atau bangga. Lalu jelaskan alasannya.',
+      instruksi: 'Lihat gambar ini. Ungkapkan perasaanmu sambil direkam.',
+      panduan_penguatan:  '💡 Penguatan: Sebutkan nama perasaannya — senang, sedih, takut, marah, kaget — lalu jelaskan alasannya.',
+      panduan_pendalaman: '💡 Pendalaman: Sebutkan perasaanmu, jelaskan alasannya, dan ceritakan apa yang akan kamu lakukan jika ada di situasi itu.',
       stimulus_emoji: '🐶🏠',
       stimulus_label: 'Anak menemukan anak anjing tersesat di depan rumah',
       needsRecording: true,
@@ -160,8 +170,9 @@ export const COLLECT_PHASES = {
     }],
     latihan: [{
       id: 'S05-LAT-1',
-      instruksi: 'Ungkapkan gagasanmu tentang topik ini.',
-      panduan: '💡 Mulai dengan "Saya ingin..." atau "Menurut saya...". Berikan alasan atau contohnya.',
+      instruksi: 'Ungkapkan gagasanmu tentang topik ini sambil direkam.',
+      panduan_penguatan:  '💡 Penguatan: Mulai dengan "Saya ingin..." atau "Menurut saya...". Berikan satu alasan atau contoh.',
+      panduan_pendalaman: '💡 Pendalaman: Sampaikan gagasanmu dengan alasan yang jelas, lalu ceritakan apa yang akan terjadi jika gagasan itu dilakukan.',
       stimulus_label: 'Binatang apa yang paling ingin kamu pelihara, dan mengapa?',
       needsRecording: true,
     }],
@@ -185,8 +196,9 @@ export const COLLECT_PHASES = {
     }],
     latihan: [{
       id: 'S06-LAT-1',
-      instruksi: 'Baca cerita ini, lalu ceritakan kembali isinya.',
-      panduan: '💡 Ceritakan: siapa tokohnya, apa yang terjadi, dan bagaimana akhirnya.',
+      instruksi: 'Baca cerita ini, lalu ceritakan kembali sambil direkam.',
+      panduan_penguatan:  '💡 Penguatan: Ceritakan tiga hal: siapa tokohnya, apa yang terjadi, dan bagaimana akhirnya.',
+      panduan_pendalaman: '💡 Pendalaman: Ceritakan isi dengan lengkap, lalu tambahkan pendapatmu: apakah yang dilakukan tokoh itu baik? Mengapa?',
       stimulus_teks: 'Rina suka sekali membaca buku. Suatu hari ia meminjam buku di perpustakaan. Buku itu berisi cerita tentang naga yang baik hati. Rina membaca buku itu sampai selesai sebelum tidur.',
       needsRecording: true,
     }],
@@ -214,8 +226,9 @@ export const COLLECT_PHASES = {
     }],
     latihan: [{
       id: 'S07-LAT-1',
-      instruksi: 'Lihat rangkaian gambar ini. Ceritakan urutannya.',
-      panduan: '💡 Gunakan kata urutan: "pertama", "kemudian", "lalu", "akhirnya".',
+      instruksi: 'Lihat rangkaian gambar ini. Ceritakan urutannya sambil direkam.',
+      panduan_penguatan:  '💡 Penguatan: Gunakan kata urutan: "pertama", "kemudian", "lalu", "akhirnya".',
+      panduan_pendalaman: '💡 Pendalaman: Ceritakan urutan kejadian, lalu tambahkan perkiraan: apa yang akan terjadi setelah gambar terakhir?',
       panels: [
         { emoji: '🌱', deskripsi: 'Benih ditanam di tanah' },
         { emoji: '💧🌱', deskripsi: 'Tanaman disiram setiap hari' },
@@ -248,8 +261,9 @@ export const COLLECT_PHASES = {
     }],
     latihan: [{
       id: 'S08-LAT-1',
-      instruksi: 'Dengarkan cerita ini. Setelah selesai, ceritakan kembali isinya.',
-      panduan: '💡 Ceritakan: siapa tokohnya, apa masalahnya, dan bagaimana penyelesaiannya.',
+      instruksi: 'Dengarkan cerita ini. Setelah selesai, ceritakan kembali sambil direkam.',
+      panduan_penguatan:  '💡 Penguatan: Ceritakan tiga hal — siapa tokohnya, apa masalahnya, dan bagaimana penyelesaiannya.',
+      panduan_pendalaman: '💡 Pendalaman: Ceritakan isi secara lengkap, lalu tambahkan pendapatmu: apakah keputusan tokoh sudah tepat?',
       audio_script: 'Maya kehilangan pensil kesayangannya. Ia mencarinya di seluruh tas dan kotak pensil. Ternyata pensilnya jatuh ke bawah meja. Maya sangat lega dan berjanji akan lebih hati-hati.',
       audio_label: 'Cerita: Maya dan Pensilnya',
       needsRecording: true,
@@ -275,8 +289,9 @@ export const COLLECT_PHASES = {
     }],
     latihan: [{
       id: 'W01-LAT-1',
-      instruksi: 'Minta anak menulis kata-kata ini di kertas. Perhatikan bentuk hurufnya. Foto hasilnya.',
-      panduan: '💡 Perhatikan cara memegang pensil. Tulis perlahan dan pastikan setiap huruf bisa terbaca.',
+      instruksi: 'Minta anak menulis kata-kata ini di kertas. Foto hasilnya.',
+      panduan_penguatan:  '💡 Penguatan: Perhatikan cara memegang pensil. Tulis perlahan — setiap huruf harus bisa dibaca.',
+      panduan_pendalaman: '💡 Pendalaman: Tulis lebih rapi dari sebelumnya. Pastikan spasi antar kata terlihat jelas.',
       kata_target: ['pintu', 'kursi', 'jalan', 'malam'],
       needsPhoto: true,
     }],
@@ -299,8 +314,9 @@ export const COLLECT_PHASES = {
     }],
     latihan: [{
       id: 'W02-LAT-1',
-      instruksi: 'Minta anak menyalin kalimat ini di kertas. Perhatikan kerapiannya. Foto hasilnya.',
-      panduan: '💡 Latihan menyalin membantu anak mengenal bentuk huruf dan spasi antar kata.',
+      instruksi: 'Minta anak menyalin kalimat ini di kertas. Foto hasilnya.',
+      panduan_penguatan:  '💡 Penguatan: Bimbing anak menyalin pelan-pelan. Periksa setiap huruf sebelum lanjut ke kata berikutnya.',
+      panduan_pendalaman: '💡 Pendalaman: Minta anak menyalin tanpa bantuan. Perhatikan apakah spasi dan bentuk huruf lebih baik dari sebelumnya.',
       stimulus_teks: 'Saya suka membaca buku.',
       needsPhoto: true,
     }],
@@ -325,7 +341,8 @@ export const COLLECT_PHASES = {
     latihan: [{
       id: 'W03-LAT-1',
       instruksi: 'Tulis 2 sampai 3 kalimat tentang makanan kesukaanmu.',
-      panduan: '💡 Mulai dengan siapa/apa, lalu apa yang terjadi. Gunakan tanda titik di akhir kalimat.',
+      panduan_penguatan:  '💡 Penguatan: Mulai dengan siapa atau apa. Akhiri setiap kalimat dengan tanda titik.',
+      panduan_pendalaman: '💡 Pendalaman: Tulis 3 kalimat dengan kata penghubung — "karena", "tetapi", atau "dan" — di salah satu kalimat.',
       min_panjang: 20,
       needsText: true,
     }],
@@ -338,7 +355,6 @@ export const COLLECT_PHASES = {
   },
 };
 
-// Backward compat: helper untuk mengambil tasks per unit per fase
 export function getCollectTasks(unitId, phase) {
   return COLLECT_PHASES[unitId]?.[phase] ?? [];
 }

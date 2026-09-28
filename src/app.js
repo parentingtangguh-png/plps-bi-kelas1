@@ -269,6 +269,8 @@ function renderAutoUnit(unit, us) {
 function renderCollectUnit(unit, us) {
   if (us.masteryDecision) { renderUnitReport(unit.id); return; }
   if (us.collectCekUlangEvidence?.length > 0) { renderCollectCekUlangWaiting(unit, us); return; }
+  // latihan selesai → siap cek ulang (branch ini harus SEBELUM parentVerdict check)
+  if (us.latihan && us.parentVerdict && !us.collectCekUlangEvidence?.length) { renderPostLatihanCollect(unit, us); return; }
   if (us.parentVerdict) { renderPostVerdict1(unit, us); return; }
   if (us.cekAwal) { renderCekAwalResultCollect(unit, us); return; }
   renderCekAwalIntro(unit);
@@ -323,7 +325,14 @@ window.startCollect = function(unitId) {
 window.startCollectLatihan = function(unitId) {
   const phases = COLLECT_PHASES[unitId];
   if (!phases?.latihan?.length) { navigate('#map'); return; }
-  renderCollectTask(UNITS_BY_ID[unitId], phases.latihan, 0, 'latihan');
+  const verdict1 = getUnitState(unitId).parentVerdict?.verdict ?? 'PERLU_LATIHAN';
+  // Inject panduan yang sesuai jalur: penguatan (remedial) vs pendalaman (pengayaan)
+  const tasks = phases.latihan.map(t => ({
+    ...t,
+    panduan: verdict1 === 'BISA' ? (t.panduan_pendalaman ?? t.panduan) : (t.panduan_penguatan ?? t.panduan),
+    _latihanJenis: verdict1 === 'BISA' ? 'pendalaman' : 'penguatan',
+  }));
+  renderCollectTask(UNITS_BY_ID[unitId], tasks, 0, 'latihan');
 };
 
 window.startCollectCekUlang = function(unitId) {
@@ -904,7 +913,10 @@ window.toggleRecording = function(unitId, taskIdx) {
 window.collectNext = async function(unitId, taskIdx, phase) {
   const cs = window._collectState;
   const task = cs.tasks[taskIdx];
-  const saveEv = phase === 'cek_ulang' ? saveCollectCekUlangEvidence : saveCollectEvidence;
+  // Latihan bukan untuk direview orang tua — hanya cek_awal dan cek_ulang yang disimpan sebagai bukti
+  const saveEv = phase === 'cek_ulang' ? saveCollectCekUlangEvidence
+               : phase === 'latihan'   ? null
+               : saveCollectEvidence;
 
   if (task.needsText) {
     const input = document.getElementById('writingInput');
@@ -914,23 +926,23 @@ window.collectNext = async function(unitId, taskIdx, phase) {
       alert(`Tulis paling sedikit ${minLen} karakter terlebih dahulu.`);
       return;
     }
-    saveEv(unitId, { taskId: task.id, type: 'text', payload: text });
+    if (saveEv) saveEv(unitId, { taskId: task.id, type: 'text', payload: text });
 
   } else if (task.needsPhoto) {
     if (cs.photoBlob) {
       const mediaId = `${unitId}_${task.id}_${phase}_${Date.now()}`;
       await saveMediaBlob(mediaId, cs.photoBlob);
-      saveEv(unitId, { taskId: task.id, type: 'photo', mediaId, payload: { size: cs.photoBlob.size } });
-    } else {
+      if (saveEv) saveEv(unitId, { taskId: task.id, type: 'photo', mediaId, payload: { size: cs.photoBlob.size } });
+    } else if (saveEv) {
       saveEv(unitId, { taskId: task.id, type: 'skipped', payload: null });
     }
 
   } else if (cs.recorded && cs.recordingBlob) {
     const mediaId = `${unitId}_${task.id}_${phase}_${Date.now()}`;
     await saveMediaBlob(mediaId, cs.recordingBlob);
-    saveEv(unitId, { taskId: task.id, type: 'audio', mediaId, payload: { size: cs.recordingBlob.size } });
+    if (saveEv) saveEv(unitId, { taskId: task.id, type: 'audio', mediaId, payload: { size: cs.recordingBlob.size } });
 
-  } else {
+  } else if (saveEv) {
     saveEv(unitId, { taskId: task.id, type: 'skipped', payload: null });
   }
 
@@ -1147,7 +1159,13 @@ function renderUnitReport(unitId) {
         ${decision ? `
           <div class="report-section mastery-section ${decision.masteryProven ? 'mastery-proven' : 'mastery-not-proven'}">
             <div class="mastery-badge">
-              ${decision.masteryProven ? '✓ Orang tua menilai bisa: cek awal dan cek ulang' : '○ Orang tua menilai perlu latihan pada cek ulang'}
+              ${decision.masteryProven
+                ? (decision.verdict1 === 'BISA'
+                    ? '✓ Dinilai bisa: cek awal dan cek ulang'
+                    : '✓ Dinilai bisa pada cek ulang (setelah berlatih)')
+                : (decision.verdict1 === 'BISA'
+                    ? '○ Dinilai bisa pada cek awal, perlu latihan pada cek ulang'
+                    : '○ Perlu latihan pada cek awal dan cek ulang')}
             </div>
             <div class="mastery-reason">${esc(decision.reason)}</div>
             ${decision.masteryProven ? `
