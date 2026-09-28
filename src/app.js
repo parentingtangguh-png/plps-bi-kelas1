@@ -704,22 +704,24 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
   // Lacak media yang hilang untuk blokir konfirmasi
   const missingMedia = [];
 
-  // Bangun HTML karya per task
-  const karya = await Promise.all(evidence.map(async (ev, evIdx) => {
-    const task = latihanTasks.find(t => t.id === ev.taskId);
+  // Loop berdasarkan latihanTasks (bukan evidence) agar rubrik selalu muncul
+  // meski blob URL expired atau evidence kosong — rubrik bergantung pada task definition,
+  // bukan pada ketersediaan media saat render
+  const karya = await Promise.all(latihanTasks.map(async (task, taskIdx) => {
+    const ev = evidence.find(e => e.taskId === task.id);
     // Pilih rubrik sesuai jalur
-    const rubrikArr = (task?.rubrik_orang_tua?.[jenis]) ?? (task?.rubrik_orang_tua ?? []);
+    const rubrikArr = (task.rubrik_orang_tua?.[jenis]) ?? [];
 
     let mediaHtml = '';
-    let mediaMissing = false;
-    if (ev.type === 'audio' && ev.mediaId) {
+    if (!ev) {
+      mediaHtml = `<p style="color:#9ca3af;font-size:0.9rem;">— belum dikumpulkan —</p>`;
+    } else if (ev.type === 'audio' && ev.mediaId) {
       const blob = await getMediaBlob(ev.mediaId);
       if (blob) {
         const url = URL.createObjectURL(blob);
         mediaHtml = `<audio controls src="${url}" style="width:100%;margin:8px 0;"></audio>`;
       } else {
-        mediaMissing = true;
-        missingMedia.push(ev.taskId);
+        missingMedia.push(task.id);
         mediaHtml = `<p class="collect-skipped-warning" data-missing="1">⚠ Rekaman tidak ditemukan di perangkat ini. Tidak dapat dikonfirmasi — ulangi latihan.</p>`;
       }
     } else if (ev.type === 'photo' && ev.mediaId) {
@@ -728,8 +730,7 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
         const url = URL.createObjectURL(blob);
         mediaHtml = `<img src="${url}" style="max-width:100%;border-radius:8px;margin:8px 0;" />`;
       } else {
-        mediaMissing = true;
-        missingMedia.push(ev.taskId);
+        missingMedia.push(task.id);
         mediaHtml = `<p class="collect-skipped-warning" data-missing="1">⚠ Foto tidak ditemukan di perangkat ini. Tidak dapat dikonfirmasi — ulangi latihan.</p>`;
       }
     } else if (ev.type === 'text') {
@@ -738,8 +739,7 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
       mediaHtml = `<p style="color:#9ca3af;font-size:0.9rem;">— tugas dilewati —</p>`;
     }
 
-    // Rubrik sebagai radio wajib; tiap nama unik per butir
-    // Tetap tampilkan rubrik meski media hilang/dilewati — parent harus tetap observasi
+    // Rubrik selalu muncul berdasarkan task definition, bukan kondisi media
     const rubrikHtml = rubrikArr.length ? `
       <div style="margin-top:10px;">
         <strong style="font-size:0.85rem;">Yang perlu diamati:</strong>
@@ -747,11 +747,11 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
           <div class="rubrik-item" style="margin:8px 0;">
             <p style="margin:0 0 4px;font-size:0.9rem;">${esc(r)}</p>
             <label style="margin-right:12px;">
-              <input type="radio" name="rubrik_${evIdx}_${rIdx}" value="ok" onchange="checkKonfirmasiReady('${unit.id}')">
+              <input type="radio" name="rubrik_${taskIdx}_${rIdx}" value="ok" onchange="checkKonfirmasiReady('${unit.id}')">
               ✓ Sesuai panduan
             </label>
             <label>
-              <input type="radio" name="rubrik_${evIdx}_${rIdx}" value="retry" onchange="checkKonfirmasiReady('${unit.id}')">
+              <input type="radio" name="rubrik_${taskIdx}_${rIdx}" value="retry" onchange="checkKonfirmasiReady('${unit.id}')">
               ✗ Perlu mencoba lagi
             </label>
           </div>`).join('')}
@@ -759,16 +759,15 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
 
     return `
       <div class="task-review-card" style="border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;margin:10px 0;">
-        <div style="font-size:0.85rem;color:#6b7280;margin-bottom:6px;">${esc(task?.instruksi ?? ev.taskId)}</div>
+        <div style="font-size:0.85rem;color:#6b7280;margin-bottom:6px;">${esc(task.instruksi ?? task.id)}</div>
         ${mediaHtml}
         ${rubrikHtml}
       </div>`;
   }));
 
-  // Hitung total butir rubrik yang perlu dijawab
-  const totalRubrik = evidence.reduce((acc, ev) => {
-    const task = latihanTasks.find(t => t.id === ev.taskId);
-    const arr = (task?.rubrik_orang_tua?.[jenis]) ?? (task?.rubrik_orang_tua ?? []);
+  // Hitung total butir rubrik dari task definition (bukan dari evidence)
+  const totalRubrik = latihanTasks.reduce((acc, task) => {
+    const arr = task.rubrik_orang_tua?.[jenis] ?? [];
     return acc + arr.length;
   }, 0);
 
