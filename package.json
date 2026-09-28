@@ -5,6 +5,11 @@
   "private": true,
   "scripts": {
     "dev": "npx serve . --port 3000 --cors",
-    "start": "npx serve . --port 3000 --cors"
+    "start": "npx serve . --port 3000 --cors",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.142.0"
   }
 }
