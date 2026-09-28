@@ -178,6 +178,16 @@ export function saveCollectLatihanEvidence(unitId, evidence) {
   save(s);
 }
 
+export function resetLatihanPercobaan(unitId) {
+  const s = getState();
+  if (!s.units[unitId]) s.units[unitId] = {};
+  s.units[unitId].collectLatihanEvidence = [];
+  s.units[unitId].latihanKonfirmasi = null;
+  s.units[unitId].latihan = null;
+  logEvent(s, 'latihan_reset', unitId, {});
+  save(s);
+}
+
 export function saveLatihanKonfirmasi(unitId, rubrikAnswers) {
   const s = getState();
   if (!s.units[unitId]) s.units[unitId] = {};

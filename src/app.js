@@ -24,7 +24,7 @@ import {
   saveCekUlang, saveMasteryDecision, saveCollectEvidence, saveCollectLatihanEvidence,
   saveCollectCekUlangEvidence, saveParentVerdict, saveParentVerdictCekUlang, closeVisit,
   getAllUnitOutcomes, getPendingVerdict1, getPendingVerdict2, getPendingParentReviews,
-  saveLatihanKonfirmasi, saveMediaBlob, getMediaBlob,
+  saveLatihanKonfirmasi, resetLatihanPercobaan, saveMediaBlob, getMediaBlob,
 } from './state.js';
 
 // ─────────────────────────────────────────────────────
@@ -327,6 +327,8 @@ window.startCollect = function(unitId) {
 window.startCollectLatihan = function(unitId) {
   const phases = COLLECT_PHASES[unitId];
   if (!phases?.latihan?.length) { navigate('#map'); return; }
+  // Bersihkan percobaan latihan sebelumnya agar tinjauan hanya melihat karya terbaru
+  resetLatihanPercobaan(unitId);
   const verdict1 = getUnitState(unitId).parentVerdict?.verdict ?? 'PERLU_LATIHAN';
   // Inject panduan yang sesuai jalur: penguatan (remedial) vs pendalaman (pengayaan)
   const tasks = phases.latihan.map(t => ({
