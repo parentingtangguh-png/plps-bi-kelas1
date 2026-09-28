@@ -60,9 +60,9 @@ export const UNITS = [
     id: 'BI-A-L01',
     elemen: 'MENYIMAK',
     label: 'Informasi dalam percakapan yang didengar',
-    tuntutan: 'Anak mendengar rekaman percakapan pendek tanpa transkrip terlihat, lalu menjawab pertanyaan tentang siapa yang berbicara, apa yang dibicarakan, atau apa yang terjadi.',
+    tuntutan: 'Orang tua membacakan percakapan pendek untuk anak tanpa anak melihat teksnya, lalu anak menjawab pertanyaan tentang siapa yang berbicara, apa yang dibicarakan, atau apa yang terjadi.',
     evidence_mode: EVIDENCE_MODE.AUDIO_GATED,
-    catatan_batas: 'Penilaian hanya dapat dilakukan jika audio berhasil diputar dan anak mendengarnya sebelum soal terbuka. Jika audio gagal, sesi dihentikan tanpa skor.',
+    catatan_batas: 'Orang tua perlu membacakan teks percakapan dengan suara nyaring sebelum soal terbuka. Pastikan anak mendengarkan, bukan membaca sendiri.',
     prerequisite: [],
   },
   {

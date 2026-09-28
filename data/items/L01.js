@@ -2,13 +2,9 @@
  * Item bank untuk BI-A-L01 — Informasi dalam percakapan yang didengar
  * Evidence mode: AUDIO_GATED
  *
- * Setiap item memiliki sumber audio (teks skrip yang akan di-TTS atau file audio).
- * Audio HARUS diputar sebelum soal terbuka.
- * Jika audio gagal diputar, sesi dihentikan dengan status TUGAS_GAGAL_BERJALAN.
- *
- * Di MVP ini, audio direpresentasikan oleh teks skrip yang dibacakan browser
- * menggunakan Web Speech API (speechSynthesis). Jika tidak tersedia, status
- * menjadi TUGAS_GAGAL_BERJALAN.
+ * Setiap item memiliki audio_script: teks percakapan yang dibacakan orang tua.
+ * Orang tua HARUS membacakan teks sebelum soal terbuka (tombol "Sudah dibacakan →").
+ * Pastikan anak mendengarkan, bukan membaca sendiri.
  *
  * Family:
  *   FAM-A: informasi tersurat dalam percakapan (siapa, apa, di mana)
