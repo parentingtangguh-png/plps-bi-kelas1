@@ -7,9 +7,11 @@ Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-28 (diperbarui)
 
 ```
 Lokasi   : D:\ribuan_pengguna\CLAUDE\plps-bi-kelas1\
-Commit   : fe209f3
+Commit   : 8354921
 Branch   : master
+Remote   : https://github.com/parentingtangguh-png/plps-bi-kelas1.git
 Deploy   : https://plps-bi-kelas1.parentingtangguh.workers.dev
+Version  : 350e138a-342e-46f9-a02d-2105ea7a52b7
 ```
 
 **Menjalankan:**
@@ -54,8 +56,8 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 
 | ID | Label | Evidence Mode | Status Otomasi | Hasil Uji | Catatan |
 |----|-------|--------------|----------------|-----------|---------|
-| BI-A-L01 | Informasi dalam percakapan yang didengar | AUDIO_GATED | **Otomatis penuh** ✓ | **LULUS** — diaudit 2026-09-28 | Orang tua membacakan teks percakapan. Tombol "Sudah dibacakan →" membuka soal. Item bank: 6 item (cek_awal 2, latihan 2, cek_ulang 2) |
-| BI-A-L02 | Pesan cerita yang didengar | AUDIO_GATED | **Otomatis penuh** ✓ | UI tersedia, belum diaudit end-to-end | Prerequisite L01. Sama dengan L01 — orang tua membacakan. |
+| BI-A-L01 | Informasi dalam percakapan yang didengar | AUDIO_GATED | **Otomatis penuh** ✓ | **LULUS** — diaudit 2026-09-28 | Orang tua membacakan teks percakapan. Tombol "Sudah dibacakan →" membuka soal. Item bank: 6 item (cek_awal 2, latihan 2, cek_ulang 2). Pengantar latihan penguatan (tiga bagian) ditambahkan commit 0b0fb2e. |
+| BI-A-L02 | Pesan cerita yang didengar | AUDIO_GATED | **Otomatis penuh** ✓ | UI tersedia, belum diaudit end-to-end | Prerequisite L01. Gate: cek ulang L01 gagal → L02 terkunci (diperbaiki commit 8354921). |
 | BI-A-R01 | Membaca kata sederhana dengan suara | COLLECT | **Hanya kumpulkan bukti** | UI stub tersedia | MediaRecorder untuk rekam suara. Penilaian kefasihan butuh manusia atau ASR. |
 | BI-A-R02 | Memahami isi bacaan | AUTO | **Otomatis penuh** ✓ | **LULUS** — end-to-end teruji | Cek_awal → latihan → cek_ulang → mastery decision. Smoke test: 1/2 cek_awal (Masih belajar) → 3/3 cek_ulang (Terlihat bisa) → mastery proven. |
 | BI-A-R03 | Memahami peristiwa dalam rangkaian visual | AUTO | **Otomatis penuh** ✓ | **LULUS** — intro + item display teruji | Panel emoji + teks caption. Alur identik R02. Mastery end-to-end belum dijalankan penuh. |
@@ -133,7 +135,7 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 **BLOCK-BI-03: ~~Audio TTS~~ — RESOLVED 2026-09-28**
 - TTS speechSynthesis dihapus sepenuhnya; diganti kotak baca-nyaring orang tua
 - Orang tua membacakan teks yang ditampilkan di layar — tidak ada ketergantungan browser TTS
-- Commit: 81c0ac3, fe209f3
+- Commit: 81c0ac3, fe209f3, 977d0c3
 
 **BLOCK-BI-04: Tidak ada multi-child / multi-session support**
 - State tersimpan per browser localStorage sebagai satu profil
@@ -177,5 +179,20 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 | 2026-09-28 | c061052 | Fix rubrik selalu muncul dari task definition (bukan evidence) |
 | 2026-09-28 | 81c0ac3 | Ganti TTS dengan kotak baca-nyaring orang tua |
 | 2026-09-28 | fe209f3 | Perbarui teks intro L01 — hapus referensi audio/TTS |
+| 2026-09-28 | 977d0c3 | Koreksi teks TTS lama di L02 — tuntutan dan catatan_batas |
+| 2026-09-28 | 0b0fb2e | Fix navigasi peta: COLLECT card label+tujuan, unit terkunci sebut nama prasyarat, pengantar latihan penguatan L01 |
+| 2026-09-28 | 8354921 | Fix gate prasyarat: cek ulang gagal mengunci unit berikutnya (L02 dst) |
 
-*Dokumen diperbarui 2026-09-28 dari implementasi aktual commit fe209f3.*
+### Status pengujian sesi 2026-09-28
+
+| Item | Metode uji | Hasil |
+|------|-----------|-------|
+| Gate L01→L02: cek ulang gagal → L02 terkunci | UI live (manual) | **PASS** |
+| Kartu COLLECT: "Buka Dashboard →" menuju #parent | UI live (Claude) | **PASS** |
+| Kartu COLLECT: tanpa karya → "Ulangi pengumpulan" | UI live (Claude) | **PASS** |
+| Unit terkunci: nama prasyarat muncul di kartu | UI live (Claude) | **PASS** |
+| Pengantar latihan penguatan L01 (tiga bagian) | UI live (Claude) | **PASS** |
+| Jalur L01 lengkap melalui latihan | Penelusuran kode | Belum perjalanan penuh |
+| Jalur COLLECT lengkap pascacommit | Penelusuran kode | Belum perjalanan penuh |
+
+*Dokumen diperbarui 2026-09-28 dari implementasi aktual commit 8354921.*
