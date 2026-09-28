@@ -1,5 +1,5 @@
 # MVP 2 PLPS — Deliverables
-Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-27
+Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-28 (diperbarui)
 
 ---
 
@@ -7,8 +7,9 @@ Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-27
 
 ```
 Lokasi   : D:\ribuan_pengguna\CLAUDE\plps-bi-kelas1\
-Commit   : d62accf
+Commit   : fe209f3
 Branch   : master
+Deploy   : https://plps-bi-kelas1.parentingtangguh.workers.dev
 ```
 
 **Menjalankan:**
@@ -30,19 +31,19 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 
 | ID | Elemen CP | Tuntutan CP (ringkas) | Unit Operasional | Bahan / Stimulus | Bukti yang Dikumpulkan | Hasil yang Dapat Diputuskan Sistem |
 |----|-----------|----------------------|-----------------|-----------------|----------------------|-----------------------------------|
-| BI-A-L01 | Menyimak | Memahami informasi dari percakapan nonsastra aural | Informasi dalam percakapan yang didengar | Rekaman percakapan pendek (TTS speechSynthesis) | Jawaban pilihan ganda, ScoringOutcome per item | TERLIHAT_BISA / MASIH_BELAJAR (jika audio berhasil) |
-| BI-A-L02 | Menyimak | Memahami pesan teks sastra aural | Pesan cerita yang didengar | Rekaman cerita pendek (TTS) | Jawaban pilihan ganda | TERLIHAT_BISA / MASIH_BELAJAR (audio harus berhasil) |
+| BI-A-L01 | Menyimak | Memahami informasi dari percakapan nonsastra aural | Informasi dalam percakapan yang didengar | Orang tua membacakan percakapan pendek (teks ditampilkan di layar) | Jawaban pilihan ganda, ScoringOutcome per item | TERLIHAT_BISA / MASIH_BELAJAR |
+| BI-A-L02 | Menyimak | Memahami pesan teks sastra aural | Pesan cerita yang didengar | Orang tua membacakan cerita pendek (teks ditampilkan di layar) | Jawaban pilihan ganda | TERLIHAT_BISA / MASIH_BELAJAR |
 | BI-A-R01 | Membaca & Memirsa | Membaca kata-kata sederhana dengan fasih | Membaca kata sederhana dengan suara | Daftar kata KV/KVK/KVKV di layar | Rekaman suara anak membaca | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
 | BI-A-R02 | Membaca & Memirsa | Memahami isi bacaan | Memahami isi bacaan | Teks pendek 3–5 kalimat di layar | Jawaban pilihan ganda (auto-scored) | TERLIHAT_BISA / MASIH_BELAJAR — **fully automatic** |
 | BI-A-R03 | Membaca & Memirsa | Memahami tayangan yang dipirsa | Memahami peristiwa dalam rangkaian visual | Rangkaian 3–4 panel emoji + keterangan | Jawaban pilihan ganda (auto-scored) | TERLIHAT_BISA / MASIH_BELAJAR — **fully automatic** |
 | BI-A-S01 | Berbicara & Mempresentasikan | Bertanya dengan santun | Mengajukan pertanyaan lisan | Gambar/situasi stimulus | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
-| BI-A-S02 | Berbicara & Mempresentasikan | Menjawab pertanyaan | Menjawab pertanyaan secara lisan | Pertanyaan lisan (TTS) | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
-| BI-A-S03 | Berbicara & Mempresentasikan | Menanggapi komentar | Menanggapi komentar secara lisan | Komentar lisan (TTS) | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
+| BI-A-S02 | Berbicara & Mempresentasikan | Menjawab pertanyaan | Menjawab pertanyaan secara lisan | Orang tua membacakan pertanyaan (teks di layar) | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
+| BI-A-S03 | Berbicara & Mempresentasikan | Menanggapi komentar | Menanggapi komentar secara lisan | Orang tua membacakan komentar (teks di layar) | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
 | BI-A-S04 | Berbicara & Mempresentasikan | Mengungkapkan perasaan | Mengungkapkan perasaan secara lisan | Gambar/situasi | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
 | BI-A-S05 | Berbicara & Mempresentasikan | Mengungkapkan gagasan | Mengungkapkan gagasan secara lisan | Topik bebas | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
 | BI-A-S06 | Berbicara & Mempresentasikan | Menceritakan kembali teks | Menceritakan kembali bacaan | Teks pendek dari R02 | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
 | BI-A-S07 | Berbicara & Mempresentasikan | Menceritakan kembali tayangan | Menceritakan kembali rangkaian visual | Panel visual dari R03 | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
-| BI-A-S08 | Berbicara & Mempresentasikan | Menceritakan kembali cerita didengar | Menceritakan kembali cerita yang didengar | Audio cerita L02 | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
+| BI-A-S08 | Berbicara & Mempresentasikan | Menceritakan kembali cerita didengar | Menceritakan kembali cerita yang didengar | Orang tua membacakan cerita (teks di layar, sama dengan L02) | Rekaman suara | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
 | BI-A-W01 | Menulis | Menulis permulaan | Menulis permulaan | Petunjuk menulis huruf/kata | Teks di textarea atau foto tulisan | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
 | BI-A-W02 | Menulis | Mengembangkan tulisan tangan | Mengumpulkan contoh tulisan tangan | Instruksi upload foto | File foto tulisan tangan | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS |
 | BI-A-W03 | Menulis | Menulis teks sederhana | Menulis teks sederhana dalam beberapa kalimat | Petunjuk tulis bebas | Teks textarea (min 20 karakter) | BUKTI_TERKUMPUL_BELUM_DAPAT_DINILAI_OTOMATIS (cek panjang saja) |
@@ -53,8 +54,8 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 
 | ID | Label | Evidence Mode | Status Otomasi | Hasil Uji | Catatan |
 |----|-------|--------------|----------------|-----------|---------|
-| BI-A-L01 | Informasi dalam percakapan yang didengar | AUDIO_GATED | **Otomatis bersyarat** | Belum diuji (TTS env) | Audio speechSynthesis harus berhasil. Jika gagal → TUGAS_GAGAL_BERJALAN. Item bank: 6 item (cek_awal 2, latihan 2, cek_ulang 2) |
-| BI-A-L02 | Pesan cerita yang didengar | AUDIO_GATED | **Otomatis bersyarat** | Belum diuji | Prerequisite L01. Sama dengan L01. |
+| BI-A-L01 | Informasi dalam percakapan yang didengar | AUDIO_GATED | **Otomatis penuh** ✓ | **LULUS** — diaudit 2026-09-28 | Orang tua membacakan teks percakapan. Tombol "Sudah dibacakan →" membuka soal. Item bank: 6 item (cek_awal 2, latihan 2, cek_ulang 2) |
+| BI-A-L02 | Pesan cerita yang didengar | AUDIO_GATED | **Otomatis penuh** ✓ | UI tersedia, belum diaudit end-to-end | Prerequisite L01. Sama dengan L01 — orang tua membacakan. |
 | BI-A-R01 | Membaca kata sederhana dengan suara | COLLECT | **Hanya kumpulkan bukti** | UI stub tersedia | MediaRecorder untuk rekam suara. Penilaian kefasihan butuh manusia atau ASR. |
 | BI-A-R02 | Memahami isi bacaan | AUTO | **Otomatis penuh** ✓ | **LULUS** — end-to-end teruji | Cek_awal → latihan → cek_ulang → mastery decision. Smoke test: 1/2 cek_awal (Masih belajar) → 3/3 cek_ulang (Terlihat bisa) → mastery proven. |
 | BI-A-R03 | Memahami peristiwa dalam rangkaian visual | AUTO | **Otomatis penuh** ✓ | **LULUS** — intro + item display teruji | Panel emoji + teks caption. Alur identik R02. Mastery end-to-end belum dijalankan penuh. |
@@ -83,11 +84,10 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 
 | Komponen | Teknologi | Biaya |
 |----------|-----------|-------|
-| Text-to-Speech untuk L01/L02 | `window.speechSynthesis` (Web Speech API) | **Rp 0** — browser built-in |
-| Alternatif jika TTS gagal | Rekaman audio statis (.mp3) di-host sendiri | Biaya hosting saja (sangat kecil) |
+| Baca-nyaring L01/L02/S02/S03/S08 | Orang tua membaca teks di layar | **Rp 0** — tidak ada TTS |
 | Transkripsi rekaman suara R01/S-units | Tidak diimplementasikan | Belum ada biaya; butuh ASR jika diotomasi |
 
-**Catatan:** speechSynthesis tersedia di semua browser modern. Kualitas suara bervariasi per OS/browser. Untuk produk, disarankan audio statis pre-recorded (satu kali biaya produksi, tidak ada biaya per-request).
+**Catatan:** TTS dihapus sepenuhnya (commit 81c0ac3). Orang tua memegang peran fasilitator bacaan — konsisten dengan pendekatan pedagogis Fase A.
 
 ### AI
 
@@ -130,10 +130,10 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 - Upload foto W02 belum ada endpoint tujuan
 - Untuk produk: butuh upload ke object storage dan simpan URL di state
 
-**BLOCK-BI-03: Audio TTS speechSynthesis tidak diuji di semua environment**
-- Kualitas dan ketersediaan TTS berbeda per OS/browser
-- Android Chrome sering memerlukan interaksi pengguna sebelum speechSynthesis bisa autoplay
-- Fix: pre-record audio statis sebagai fallback wajib untuk L01/L02
+**BLOCK-BI-03: ~~Audio TTS~~ — RESOLVED 2026-09-28**
+- TTS speechSynthesis dihapus sepenuhnya; diganti kotak baca-nyaring orang tua
+- Orang tua membacakan teks yang ditampilkan di layar — tidak ada ketergantungan browser TTS
+- Commit: 81c0ac3, fe209f3
 
 **BLOCK-BI-04: Tidak ada multi-child / multi-session support**
 - State tersimpan per browser localStorage sebagai satu profil
@@ -166,4 +166,16 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 
 ---
 
-*Dokumen ini dihasilkan 2026-09-27 dari implementasi aktual commit d62accf.*
+---
+
+## Changelog
+
+| Tanggal | Commit | Perubahan |
+|---------|--------|-----------|
+| 2026-09-27 | d62accf | Implementasi awal MVP 2 |
+| 2026-09-28 | 75fb1de | Fix tombol Konfirmasi disabled visual (abu-abu) |
+| 2026-09-28 | c061052 | Fix rubrik selalu muncul dari task definition (bukan evidence) |
+| 2026-09-28 | 81c0ac3 | Ganti TTS dengan kotak baca-nyaring orang tua |
+| 2026-09-28 | fe209f3 | Perbarui teks intro L01 — hapus referensi audio/TTS |
+
+*Dokumen diperbarui 2026-09-28 dari implementasi aktual commit fe209f3.*
