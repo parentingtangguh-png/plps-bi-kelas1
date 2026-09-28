@@ -1284,7 +1284,7 @@ function renderParentReviewCard(unit, us, verdikPhase, isDone) {
           <span class="prc-verdict-date">${formatDate(verdict.verdictAt)}</span>
         </div>
         <div class="prc-done-actions">
-          <button class="btn-primary btn-small" onclick="navigate('#unit/${unit.id}')">Lanjutkan: ${esc(unit.id)} →</button>
+          <button class="btn-primary btn-small" onclick="navigate('#unit/${unit.id}')">${us.masteryDecision ? `Lihat laporan: ${esc(unit.id)} →` : `Lanjutkan: ${esc(unit.id)} →`}</button>
           <button class="btn-ghost btn-small" onclick="undoParentVerdict('${unit.id}', '${verdikPhase}')">Ubah penilaian</button>
         </div>
       ` : allSkipped ? `
