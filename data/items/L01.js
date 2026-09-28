@@ -313,8 +313,6 @@ export const ITEMS = [
     kunci: 'a',
     instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
   },
-];
-
   {
     id: 'L01-CU-B2',
     family: 'FAM-B',

@@ -297,8 +297,6 @@ export const ITEMS = [
     kunci: 'b',
     instruksi_anak: 'Dengarkan cerita ini baik-baik.',
   },
-];
-
   {
     id: 'L02-CU-B2',
     family: 'FAM-B',
