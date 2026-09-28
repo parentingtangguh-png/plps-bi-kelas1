@@ -171,6 +171,18 @@ button { cursor: pointer; font: inherit; border: none; }
   margin-bottom: 20px;
 }
 
+/* ── Read-aloud box (pengganti TTS) ── */
+.read-aloud-box {
+  background: #fffbeb; border: 1.5px solid #fcd34d;
+  border-radius: var(--radius); padding: 14px 16px; margin: 12px 0;
+}
+.read-aloud-label {
+  font-size: .8rem; color: #92400e; font-weight: 600; margin-bottom: 6px;
+}
+.read-aloud-text {
+  font-size: 1.05rem; color: var(--color-text); line-height: 1.6;
+}
+
 /* ── Audio ── */
 .audio-section {
   background: var(--color-warn-light); border-radius: var(--radius);

@@ -372,10 +372,12 @@ function renderItemSession(unit, items, phase, responsesAcc, onDone) {
 
       ${hasAudio ? `
         <div class="audio-section" id="audioSection">
-          <div class="audio-label">${esc(item.instruksi_anak ?? 'Dengarkan dengan baik.')}</div>
-          <div class="audio-label-content">${esc(item.audio_label)}</div>
-          <button id="playBtn" class="btn-play" onclick="playAudio('${unit.id}', ${idx})">▶ Putar audio</button>
-          <div id="audioStatus" class="audio-status">Tekan tombol putar.</div>
+          <div class="audio-label">${esc(item.audio_label)}</div>
+          <div class="read-aloud-box">
+            <p class="read-aloud-label">📖 Orang tua membacakan untuk anak:</p>
+            <p class="read-aloud-text">${esc(item.audio_script)}</p>
+          </div>
+          <button id="playBtn" class="btn-primary" onclick="markAudioRead('${unit.id}', ${idx})">Sudah dibacakan →</button>
         </div>
         <div id="questionSection" style="display:none;">
       ` : ''}
@@ -417,35 +419,14 @@ function renderItemSession(unit, items, phase, responsesAcc, onDone) {
   }
 }
 
-window.playAudio = function(unitId, itemIdx) {
-  if (!('speechSynthesis' in window)) {
-    document.getElementById('audioStatus').textContent = 'Audio tidak tersedia di browser ini. Sesi dihentikan.';
-    document.getElementById('playBtn').disabled = true;
-    saveCekAwal(unitId, { outcome: OUTCOME.TUGAS_GAGAL_BERJALAN, totalItems: 0, correctItems: 0, ratio: null });
-    setTimeout(() => renderUnit(unitId), 2000);
-    return;
-  }
-  const sess = window._currentSession;
-  const item = sess.items[itemIdx];
-  const utt = new SpeechSynthesisUtterance(item.audio_script);
-  utt.lang = 'id-ID'; utt.rate = 0.85;
+window.markAudioRead = function(unitId, itemIdx) {
   document.getElementById('playBtn').disabled = true;
-  document.getElementById('audioStatus').textContent = '⏳ Memutar...';
-  utt.onend = () => {
-    document.getElementById('audioStatus').textContent = '✓ Audio selesai diputar.';
-    const qs = document.getElementById('questionSection');
-    const qt = document.querySelector('.question-text');
-    const opts = document.getElementById('options');
-    if (qs) qs.style.display = 'block';
-    if (qt) qt.style.display = 'block';
-    if (opts) opts.style.display = 'flex';
-  };
-  utt.onerror = () => {
-    document.getElementById('audioStatus').textContent = 'Audio gagal diputar. Sesi dihentikan.';
-    saveCekAwal(unitId, { outcome: OUTCOME.TUGAS_GAGAL_BERJALAN, totalItems: 0, correctItems: 0, ratio: null });
-    setTimeout(() => renderUnit(unitId), 2000);
-  };
-  window.speechSynthesis.speak(utt);
+  const qs = document.getElementById('questionSection');
+  const qt = document.querySelector('.question-text');
+  const opts = document.getElementById('options');
+  if (qs) qs.style.display = 'block';
+  if (qt) qt.style.display = 'block';
+  if (opts) opts.style.display = 'flex';
 };
 
 window.selectOption = function(btn, unitId, itemIdx, selectedId, kunci, itemId, family) {
@@ -984,8 +965,10 @@ function renderCollectTask(unit, tasks, taskIdx, phase) {
       ${task.instruksi ? `<p class="check-desc">${esc(task.instruksi)}</p>` : ''}
 
       ${hasAudio ? `
-        <button id="playCollectBtn" class="btn-play" onclick="playCollectAudio('${unit.id}', ${taskIdx})">▶ Putar audio</button>
-        <div id="collectAudioStatus" class="audio-status">Tekan tombol putar terlebih dahulu.</div>
+        <div class="read-aloud-box">
+          <p class="read-aloud-label">📖 Orang tua membacakan untuk anak:</p>
+          <p class="read-aloud-text">${esc(task.audio_script)}</p>
+        </div>
       ` : ''}
 
       ${hasPanels ? `
@@ -1060,25 +1043,6 @@ function renderCollectTask(unit, tasks, taskIdx, phase) {
   }
 }
 
-window.playCollectAudio = function(unitId, taskIdx) {
-  const cs = window._collectState;
-  if (!cs) return;
-  const task = cs.tasks[taskIdx];
-  if (!('speechSynthesis' in window)) {
-    document.getElementById('collectAudioStatus').textContent = 'Audio tidak tersedia.';
-    return;
-  }
-  const utt = new SpeechSynthesisUtterance(task.audio_script);
-  utt.lang = 'id-ID'; utt.rate = 0.85;
-  document.getElementById('playCollectBtn').disabled = true;
-  document.getElementById('collectAudioStatus').textContent = '⏳ Memutar...';
-  utt.onend = () => document.getElementById('collectAudioStatus').textContent = '✓ Audio selesai.';
-  utt.onerror = () => {
-    document.getElementById('collectAudioStatus').textContent = 'Audio gagal diputar.';
-    document.getElementById('playCollectBtn').disabled = false;
-  };
-  window.speechSynthesis.speak(utt);
-};
 
 let mediaRecorder = null;
 let recordedChunks = [];
