@@ -21,10 +21,10 @@ import {
 } from './scoring.js';
 import {
   getState, saveProfile, getUnitState, saveCekAwal, saveLatihanResponses,
-  saveCekUlang, saveMasteryDecision, saveCollectEvidence, saveCollectCekUlangEvidence,
-  saveParentVerdict, saveParentVerdictCekUlang, closeVisit,
+  saveCekUlang, saveMasteryDecision, saveCollectEvidence, saveCollectLatihanEvidence,
+  saveCollectCekUlangEvidence, saveParentVerdict, saveParentVerdictCekUlang, closeVisit,
   getAllUnitOutcomes, getPendingVerdict1, getPendingVerdict2, getPendingParentReviews,
-  saveMediaBlob, getMediaBlob,
+  saveLatihanKonfirmasi, saveMediaBlob, getMediaBlob,
 } from './state.js';
 
 // ─────────────────────────────────────────────────────
@@ -269,8 +269,10 @@ function renderAutoUnit(unit, us) {
 function renderCollectUnit(unit, us) {
   if (us.masteryDecision) { renderUnitReport(unit.id); return; }
   if (us.collectCekUlangEvidence?.length > 0) { renderCollectCekUlangWaiting(unit, us); return; }
-  // latihan selesai → siap cek ulang (branch ini harus SEBELUM parentVerdict check)
-  if (us.latihan && us.parentVerdict && !us.collectCekUlangEvidence?.length) { renderPostLatihanCollect(unit, us); return; }
+  // latihan selesai + konfirmasi orang tua → siap cek ulang
+  if (us.latihan && us.latihanKonfirmasi && us.parentVerdict && !us.collectCekUlangEvidence?.length) { renderPostLatihanCollect(unit, us); return; }
+  // latihan selesai tapi belum dikonfirmasi orang tua → layar konfirmasi + tampilkan karya
+  if (us.latihan && !us.latihanKonfirmasi && us.parentVerdict) { renderLatihanKonfirmasiOrangTua(unit, us); return; }
   if (us.parentVerdict) { renderPostVerdict1(unit, us); return; }
   if (us.cekAwal) { renderCekAwalResultCollect(unit, us); return; }
   renderCekAwalIntro(unit);
@@ -689,48 +691,88 @@ function renderLatihanBlokirTanpaKarya(unit) {
   `;
 }
 
-// Fix B: setelah latihan selesai dengan karya, orang tua konfirmasi sebelum cek ulang
-function renderLatihanKonfirmasiOrangTua(unit) {
-  const us = getUnitState(unit.id);
+// Fix B: setelah latihan selesai dengan karya, orang tua lihat karya + rubrik lalu konfirmasi
+async function renderLatihanKonfirmasiOrangTua(unit, us) {
   const s = getState();
   const jenis = us.parentVerdict?.verdict === 'BISA' ? 'pendalaman' : 'penguatan';
+  const evidence = us.collectLatihanEvidence ?? [];
+  const phases = COLLECT_PHASES[unit.id];
+  const latihanTasks = phases?.latihan ?? [];
+
+  // Bangun HTML karya per task
+  const karya = await Promise.all(evidence.map(async (ev) => {
+    const task = latihanTasks.find(t => t.id === ev.taskId);
+    const rubrik = task?.rubrik_orang_tua ?? [];
+    const rubrikHtml = rubrik.length
+      ? `<ul class="rubrik-list">${rubrik.map(r => `<li>${esc(r)}</li>`).join('')}</ul>`
+      : '';
+
+    let mediaHtml = '';
+    if (ev.type === 'audio' && ev.mediaId) {
+      const blob = await getMediaBlob(ev.mediaId);
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        mediaHtml = `<audio controls src="${url}" style="width:100%;margin:8px 0;"></audio>`;
+      } else {
+        mediaHtml = `<p class="collect-skipped-warning">⚠ Rekaman tidak ditemukan di perangkat ini.</p>`;
+      }
+    } else if (ev.type === 'photo' && ev.mediaId) {
+      const blob = await getMediaBlob(ev.mediaId);
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        mediaHtml = `<img src="${url}" style="max-width:100%;border-radius:8px;margin:8px 0;" />`;
+      } else {
+        mediaHtml = `<p class="collect-skipped-warning">⚠ Foto tidak ditemukan di perangkat ini.</p>`;
+      }
+    } else if (ev.type === 'text') {
+      mediaHtml = `<div class="stimulus-box" style="white-space:pre-wrap;">${esc(ev.payload ?? '')}</div>`;
+    } else {
+      mediaHtml = `<p style="color:#9ca3af;font-size:0.9rem;">— tugas dilewati —</p>`;
+    }
+
+    return `
+      <div style="border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;margin:10px 0;">
+        <div style="font-size:0.85rem;color:#6b7280;margin-bottom:6px;">${esc(task?.instruksi ?? ev.taskId)}</div>
+        ${mediaHtml}
+        ${rubrikHtml ? `<div style="margin-top:8px;"><strong style="font-size:0.85rem;">Yang perlu diamati:</strong>${rubrikHtml}</div>` : ''}
+      </div>`;
+  }));
+
   app.innerHTML = `
     <div class="view-result">
       <header class="check-header">
         <button class="btn-back" onclick="navigate('#map')">← Peta</button>
-        <div class="check-badge">Untuk orang tua · Konfirmasi latihan</div>
+        <div class="check-badge">Untuk orang tua · Tinjau hasil latihan</div>
       </header>
       <h1 class="result-title">${esc(unit.label)}</h1>
 
       <div class="journey-steps">
         <div class="journey-step journey-step--done">① Kumpulkan bukti cek awal ✓</div>
         <div class="journey-step journey-step--done">② Orang tua nilai cek awal ✓</div>
-        <div class="journey-step journey-step--done">③ Latihan ${jenis} ✓ — menunggu konfirmasi</div>
+        <div class="journey-step journey-step--done">③ Latihan ${jenis} ✓ — menunggu tinjauan</div>
         <div class="journey-step journey-step--pending">④ Kumpulkan bukti cek ulang</div>
         <div class="journey-step journey-step--pending">⑤ Orang tua nilai cek ulang</div>
       </div>
 
       <p class="check-desc">
-        ${esc(s.childName)} sudah menyelesaikan latihan ${jenis}.
-        Sebelum lanjut ke cek ulang, orang tua perlu mengamati apakah latihan tadi berjalan dengan baik.
+        ${esc(s.childName)} sudah menyelesaikan latihan ${jenis}. Lihat karya di bawah, periksa poin yang perlu diamati, lalu konfirmasi.
       </p>
 
-      <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 16px;margin:12px 0;">
-        <strong>Panduan orang tua:</strong><br>
-        ${jenis === 'penguatan'
-          ? 'Apakah anak mengikuti latihan dengan sungguh-sungguh? Jika sudah, konfirmasi agar lanjut ke cek ulang dengan bahan baru.'
-          : 'Apakah anak menyelesaikan tantangan pendalaman? Jika sudah, konfirmasi agar lanjut ke cek ulang dengan bahan baru.'
-        }
-      </div>
+      ${karya.join('')}
 
-      <button class="btn-primary" onclick="startCollectCekUlang('${unit.id}')">
-        Konfirmasi dan mulai cek ulang →
+      <button class="btn-primary" onclick="konfirmasiLatihanSelesai('${unit.id}')">
+        Konfirmasi — lanjut ke cek ulang →
       </button>
       <button class="btn-secondary" onclick="startCollectLatihan('${unit.id}')">Ulangi latihan</button>
       <button class="btn-ghost" onclick="navigate('#map')">Nanti saja</button>
     </div>
   `;
 }
+
+window.konfirmasiLatihanSelesai = function(unitId) {
+  saveLatihanKonfirmasi(unitId);
+  startCollectCekUlang(unitId);
+};
 
 // Setelah latihan: pengalihan ke cek ulang ditampilkan di sini
 // (latihan selesai → saveLatihanResponses kosong → renderUnit → renderPostLatihanCollect)
@@ -811,9 +853,9 @@ function renderCollectTask(unit, tasks, taskIdx, phase) {
         renderLatihanBlokirTanpaKarya(unit);
         return;
       }
-      // latihan selesai dengan karya → simpan jumlah karya, lanjut ke konfirmasi orang tua (Fix B)
+      // latihan selesai dengan karya → simpan; dispatcher akan routing ke konfirmasi orang tua
       saveLatihanResponses(unit.id, [{ tasksDone: done }]);
-      renderLatihanKonfirmasiOrangTua(unit);
+      renderUnit(unit.id);
       return;
     } else {
       // cek_awal selesai
@@ -987,7 +1029,7 @@ window.collectNext = async function(unitId, taskIdx, phase) {
   const task = cs.tasks[taskIdx];
   // Latihan bukan untuk direview orang tua — hanya cek_awal dan cek_ulang yang disimpan sebagai bukti
   const saveEv = phase === 'cek_ulang' ? saveCollectCekUlangEvidence
-               : phase === 'latihan'   ? null
+               : phase === 'latihan'   ? saveCollectLatihanEvidence
                : saveCollectEvidence;
 
   if (task.needsText) {

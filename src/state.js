@@ -117,8 +117,8 @@ export function getUnitState(unitId) {
   return getState().units[unitId] ?? {
     cekAwal: null, latihan: null, cekUlang: null,
     masteryDecision: null, visitClosed: false,
-    collectEvidence: null, collectCekUlangEvidence: null,
-    parentVerdict: null, parentVerdictCekUlang: null,
+    collectEvidence: null, collectLatihanEvidence: null, collectCekUlangEvidence: null,
+    parentVerdict: null, parentVerdictCekUlang: null, latihanKonfirmasi: null,
   };
 }
 
@@ -167,6 +167,22 @@ export function saveParentVerdict(unitId, verdict) {
   if (!s.units[unitId]) s.units[unitId] = {};
   s.units[unitId].parentVerdict = { verdict, verdictAt: new Date().toISOString() };
   logEvent(s, 'parent_verdict_cek_awal', unitId, { verdict });
+  save(s);
+}
+
+export function saveCollectLatihanEvidence(unitId, evidence) {
+  const s = getState();
+  if (!s.units[unitId]) s.units[unitId] = {};
+  if (!s.units[unitId].collectLatihanEvidence) s.units[unitId].collectLatihanEvidence = [];
+  s.units[unitId].collectLatihanEvidence.push({ ...evidence, collectedAt: new Date().toISOString() });
+  save(s);
+}
+
+export function saveLatihanKonfirmasi(unitId) {
+  const s = getState();
+  if (!s.units[unitId]) s.units[unitId] = {};
+  s.units[unitId].latihanKonfirmasi = { confirmedAt: new Date().toISOString() };
+  logEvent(s, 'latihan_konfirmasi', unitId, {});
   save(s);
 }
 
