@@ -739,7 +739,8 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
     }
 
     // Rubrik sebagai radio wajib; tiap nama unik per butir
-    const rubrikHtml = rubrikArr.length && !mediaMissing ? `
+    // Tetap tampilkan rubrik meski media hilang/dilewati — parent harus tetap observasi
+    const rubrikHtml = rubrikArr.length ? `
       <div style="margin-top:10px;">
         <strong style="font-size:0.85rem;">Yang perlu diamati:</strong>
         ${rubrikArr.map((r, rIdx) => `
@@ -765,11 +766,10 @@ async function renderLatihanKonfirmasiOrangTua(unit, us) {
   }));
 
   // Hitung total butir rubrik yang perlu dijawab
-  const totalRubrik = evidence.reduce((acc, ev, evIdx) => {
+  const totalRubrik = evidence.reduce((acc, ev) => {
     const task = latihanTasks.find(t => t.id === ev.taskId);
     const arr = (task?.rubrik_orang_tua?.[jenis]) ?? (task?.rubrik_orang_tua ?? []);
-    const missing = missingMedia.includes(ev.taskId);
-    return acc + (missing ? 0 : arr.length);
+    return acc + arr.length;
   }, 0);
 
   app.innerHTML = `
