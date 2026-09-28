@@ -1,5 +1,10 @@
 # MVP 2 PLPS — Deliverables
-Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-28 (diperbarui)
+Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-29 (diperbarui)
+
+> **Catatan orientasi untuk Claude:** Dokumen ini ada di repo `plps-bi-kelas1`
+> (`D:\ribuan_pengguna\CLAUDE\plps-bi-kelas1`). Ini repo yang aktif dikerjakan.
+> Repo `plps` (`D:\ribuan_pengguna\CLAUDE\plps`) adalah repo berbeda (Numerasi/Literasi
+> kelas 3–6) yang sedang di-freeze. Jangan campur keduanya.
 
 ---
 
@@ -7,11 +12,11 @@ Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-28 (diperbarui)
 
 ```
 Lokasi   : D:\ribuan_pengguna\CLAUDE\plps-bi-kelas1\
-Commit   : 8354921
+Commit   : 8cb4bd0
 Branch   : master
 Remote   : https://github.com/parentingtangguh-png/plps-bi-kelas1.git
 Deploy   : https://plps-bi-kelas1.parentingtangguh.workers.dev
-Version  : 350e138a-342e-46f9-a02d-2105ea7a52b7
+Version  : 01103104-2bc7-45eb-8ca3-6ab34fb950fa
 ```
 
 **Menjalankan:**
@@ -182,8 +187,11 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 | 2026-09-28 | 977d0c3 | Koreksi teks TTS lama di L02 — tuntutan dan catatan_batas |
 | 2026-09-28 | 0b0fb2e | Fix navigasi peta: COLLECT card label+tujuan, unit terkunci sebut nama prasyarat, pengantar latihan penguatan L01 |
 | 2026-09-28 | 8354921 | Fix gate prasyarat: cek ulang gagal mengunci unit berikutnya (L02 dst) |
+| 2026-09-28 | 6f5fd0a | Perbaiki layout responsif 320–400px — baris laporan 2-baris (fr-label span full), tombol → 36×36px touch target, header peta wrap 2 baris |
+| 2026-09-28 | 38644fc | white-space:nowrap header tombol semua lebar (414–428px) + kontras .batas-note #92400e (6.37:1 WCAG AA) |
+| 2026-09-28 | 8cb4bd0 | Banner rootGap label adaptif ("Mulai dari sini →" / "Lanjutkan" / "Kunjungi lagi") + status kartu "Belum dimulai" + redaksi tombol kembali ke peta |
 
-### Status pengujian sesi 2026-09-28
+### Status pengujian sesi 2026-09-29
 
 | Item | Metode uji | Hasil |
 |------|-----------|-------|
@@ -195,4 +203,79 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 | Jalur L01 lengkap melalui latihan | Penelusuran kode | Belum perjalanan penuh |
 | Jalur COLLECT lengkap pascacommit | Penelusuran kode | Belum perjalanan penuh |
 
-*Dokumen diperbarui 2026-09-28 dari implementasi aktual commit 8354921.*
+### Status pengujian sesi 2026-09-29
+
+| Item | Metode uji | Hasil |
+|------|-----------|-------|
+| Layout responsif baris laporan (full-report-row) 320px | UI live (Claude) | **PASS** — fr-label lebar 262px, → 36×36px |
+| Header peta wrap 2 baris 320px ("Orang Tua" tidak membungkus) | UI live (Claude) | **PASS** |
+| Header peta tombol tidak wrap 375px, 414px, 428px | UI live (Claude) | **PASS** — white-space:nowrap berlaku global |
+| Kontras .batas-note (#92400e atas #fef3c7) | Computed style (Claude) | **PASS** — 6.37:1 WCAG AA |
+| Banner rootGap: unit baru → "Mulai dari sini →" | State injection (Claude) | **PASS** |
+| Banner rootGap: unit cek_awal sudah ada → "Lanjutkan" | State injection (Claude) | **PASS** |
+| Banner rootGap: unit visitClosed → "Kunjungi lagi" | State injection (Claude) | **PASS** |
+| Status kartu: unit tersedia → "Belum dimulai" (bukan "Tersedia") | UI live (Claude) | **PASS** |
+| Status kartu: visitClosed → "Belum selesai — kunjungan ditutup" | State injection (Claude) | **PASS** |
+| Tombol "Kembali ke peta, lanjutkan nanti" + teks penjelasan | UI live (Claude) | **PASS** — tombol "Tutup kunjungan unit ini" diganti |
+
+---
+
+## Audit Konten Unit — Kesesuaian Fase A Kelas 1 (2026-09-29)
+
+Audit baca-ulang semua 16 unit. **Tidak ada data soal yang diubah** — temuan menunggu tinjauan owner sebelum revisi.
+
+### Metodologi
+- Baca seluruh item bank (L01, L02, R02, R03) dan definisi tugas COLLECT (R01, S01–S08, W01–W03)
+- Kriteria: kesesuaian dengan CP Fase A kelas 1, beban bahasa item, tingkat abstraksi, dan keterbatasan teknis
+
+### Temuan
+
+#### K-1 — Kritis (berpotensi menghasilkan data tidak valid)
+
+**L02 FAM-B: semua 4 item FAM-B menanyakan "pesan apa"**
+- Item: L02-CA-B1, L02-LAT-B1, L02-LM-B1, L02-CU-B1
+- Masalah: "pesan" / "amanat" adalah konsep abstrak yang baru dikuasai di akhir Fase A (kelas 2). Di awal kelas 1, anak belum terbiasa dengan framing "pesan moral cerita".
+- Dampak: anak kelas 1 awal bisa menjawab salah bukan karena tidak memahami cerita, melainkan karena tidak mengerti pertanyaannya.
+- Usulan: ganti FAM-B L02 dengan pertanyaan konkret (tokoh mana yang melakukan X, apa yang terjadi pada akhir cerita).
+
+#### K-2 — Kritis (keterbatasan teknis menghasilkan beban membaca tak disengaja)
+
+**R03 FAM-A dan FAM-B: panel menggunakan emoji + teks keterangan**
+- Item: R03-CA-A1/B1, R03-LAT-A1/B1, R03-LM-A1/B1, R03-CU-A1/B1
+- Masalah: emoji rendernya berbeda per device/font; teks keterangan di bawah setiap panel menambah beban membaca yang tidak disengaja untuk unit yang seharusnya menguji pemahaman visual.
+- Dampak: anak yang belum lancar membaca mungkin mengalami hambatan pada unit membaca-visual ini.
+- Usulan: ganti emoji+teks dengan gambar SVG atau ilustrasi nyata yang bisa dibaca tanpa teks pendamping.
+
+#### M-1 — Minor (tidak menghalangi validitas, tapi perlu dicatat)
+
+**L01 FAM-B: semua item FAM-B menanyakan "topik apa" (lebih abstrak dari FAM-A)**
+- FAM-A (tersurat: siapa berbicara, apa yang dikatakan) → tepat kelas 1
+- FAM-B (topik percakapan) → satu level lebih abstrak, tapi masih dalam jangkauan anak kelas 1 akhir
+- Tidak kritis; pantau distribusi skor FAM-A vs FAM-B untuk evidens.
+
+#### M-2 — Minor
+
+**R02: asumsi anak bisa membaca mandiri tidak diverifikasi sebelum sesi**
+- Unit sudah memiliki `catatan_batas` di cp.js, tapi tidak ada pengecekan/peringatan di UI intro
+- Usulan: tambah satu kalimat di intro R02 yang meminta orang tua memastikan anak sudah bisa membaca mandiri.
+
+#### M-3 — Minor
+
+**L01/L02: item bank sangat tipis (2 item per fase)**
+- Masing-masing: 2 cek_awal, 2 latihan/latihan_mandiri, 2 cek_ulang
+- Tidak cukup untuk variasi konteks dan mengurangi risiko hafalan
+- Minimum yang disarankan: 5–8 item per fase
+
+#### M-4 — Minor
+
+**S-units (S01–S08): rubrik_orang_tua sudah ada di cp.js tapi belum diaudit konsistensinya dengan item bank COLLECT_UNITS.js**
+- Belum ada task definition yang berpasangan dengan setiap rubrik untuk diverifikasi keselarasannya
+
+#### M-5 — Minor
+
+**W03: batas minimum 20 karakter sangat rendah**
+- 2–3 kalimat bahasa Indonesia akan mengandung jauh lebih dari 20 karakter
+- Angka ini mungkin terlalu longgar untuk memastikan anak sungguh menulis 2 kalimat
+- Usulan: naikkan ke 30–40 karakter, atau validasi jumlah spasi/kata
+
+*Dokumen diperbarui 2026-09-29 dari implementasi aktual commit 8cb4bd0.*
