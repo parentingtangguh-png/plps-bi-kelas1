@@ -139,6 +139,15 @@ function renderMap() {
   const rootGap = findRootGap(unitOutcomes, UNITS);
   const pendingCount = getPendingParentReviews(UNITS).length;
 
+  // Label tombol banner sesuai kondisi unit yang direkomendasikan
+  let rootGapActionLabel = 'Mulai dari sini →';
+  if (rootGap) {
+    const rgUs = getUnitState(rootGap);
+    if (rgUs.visitClosed) rootGapActionLabel = 'Kunjungi lagi';
+    else if (rgUs.masteryDecision && !rgUs.masteryDecision.masteryProven) rootGapActionLabel = 'Lanjutkan';
+    else if (rgUs.cekAwal || rgUs.collectEvidence?.length > 0) rootGapActionLabel = 'Lanjutkan';
+  }
+
   const elemenGroups = Object.entries(ELEMEN).map(([key, el]) => ({
     key, el, units: UNITS.filter(u => u.elemen === key),
   }));
@@ -167,7 +176,7 @@ function renderMap() {
         <div class="root-gap-banner">
           <div class="rg-label">Titik mulai yang direkomendasikan</div>
           <div class="rg-unit">${esc(UNITS_BY_ID[rootGap]?.label ?? rootGap)}</div>
-          <button class="btn-accent btn-small" onclick="navigate('#unit/${rootGap}')">Mulai dari sini →</button>
+          <button class="btn-accent btn-small" onclick="navigate('#unit/${rootGap}')">${rootGapActionLabel}</button>
         </div>
       ` : ''}
 
@@ -247,7 +256,7 @@ function getUnitStatusInfo(unit, outcome, us) {
     }
   }
   if (us.visitClosed) {
-    return { label: 'Kunjungan ditutup', cssClass: 'unit-card--closed', canStart: true, actionLabel: 'Kunjungi lagi' };
+    return { label: 'Belum selesai — kunjungan ditutup', cssClass: 'unit-card--closed', canStart: true, actionLabel: 'Kunjungi lagi' };
   }
   if (us.cekAwal) {
     return { label: 'Sedang dijalani', cssClass: 'unit-card--active', canStart: true, actionLabel: 'Lanjutkan' };
@@ -261,7 +270,7 @@ function getUnitStatusInfo(unit, outcome, us) {
       .join(', ');
     return { label: 'Prasyarat belum terpenuhi', cssClass: 'unit-card--locked', canStart: false, actionLabel: `Selesaikan dulu: ${unmetNames}` };
   }
-  return { label: 'Tersedia', cssClass: 'unit-card--available', canStart: true, actionLabel: 'Mulai cek' };
+  return { label: 'Belum dimulai', cssClass: 'unit-card--available', canStart: true, actionLabel: 'Mulai cek' };
 }
 
 // ─────────────────────────────────────────────────────
@@ -1459,7 +1468,10 @@ function renderUnitReport(unitId) {
       <div class="report-actions">
         ${!decision ? `<button class="btn-primary" onclick="navigate('#unit/${unit.id}')">Lanjutkan perjalanan</button>` : ''}
         <button class="btn-ghost" onclick="navigate('#map')">Kembali ke peta</button>
-        ${!us.visitClosed ? `<button class="btn-ghost btn-small" onclick="doCloseVisit('${unit.id}')">Tutup kunjungan unit ini</button>` : ''}
+        ${!us.visitClosed ? `
+          <p class="close-visit-note">Tombol di bawah membawa Anda kembali ke peta. Unit ini bisa dibuka lagi kapan saja, dan semua hasil yang sudah tersimpan tidak hilang.</p>
+          <button class="btn-ghost btn-small" onclick="doCloseVisit('${unit.id}')">Kembali ke peta, lanjutkan nanti</button>
+        ` : ''}
       </div>
     </div>
   `;
