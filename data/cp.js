@@ -69,9 +69,9 @@ export const UNITS = [
     id: 'BI-A-L02',
     elemen: 'MENYIMAK',
     label: 'Pesan cerita yang didengar',
-    tuntutan: 'Anak mendengar rekaman cerita pendek, lalu menjawab pertanyaan tentang pesan atau isi cerita.',
+    tuntutan: 'Orang tua membacakan cerita pendek untuk anak tanpa anak melihat teksnya, lalu anak menjawab pertanyaan tentang pesan atau isi cerita.',
     evidence_mode: EVIDENCE_MODE.AUDIO_GATED,
-    catatan_batas: 'Sama dengan L01 — audio harus terputar sebelum soal dibuka.',
+    catatan_batas: 'Orang tua perlu membacakan teks cerita dengan suara nyaring sebelum soal terbuka. Pastikan anak mendengarkan, bukan membaca sendiri.',
     prerequisite: ['BI-A-L01'],
   },
 
