@@ -168,9 +168,33 @@ function route() {
     case 'unit':       renderUnit(param); break;
     case 'report':     renderUnitReport(param); break;
     case 'fullreport': renderFullReport(); break;
-    case 'parent':     renderParentDashboard(); break;
-    default:           renderHome(); break;
+    case 'parent':       renderParentDashboard(); break;
+    case 'coming-soon':  renderComingSoon(); break;
+    default:             renderHome(); break;
   }
+}
+
+// ─────────────────────────────────────────────────────
+// View: Coming Soon (stub Commerce)
+// ─────────────────────────────────────────────────────
+function renderComingSoon() {
+  const s = getState();
+  app.innerHTML = `
+    <div class="view-home">
+      <header class="check-header">
+        <button class="btn-back" onclick="navigate('#map')">← Peta</button>
+      </header>
+      <div style="padding:32px 0;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:12px;">🚧</div>
+        <h1 style="font-size:1.2rem;font-weight:600;margin-bottom:8px;">Program latihan terbimbing</h1>
+        <p style="color:#6b7280;font-size:.95rem;line-height:1.6;max-width:320px;margin:0 auto 24px;">
+          Program untuk membantu ${esc(s.childName ?? 'anak Anda')} menguasai kompetensi ini sedang disiapkan.
+          Tinggalkan kontak Anda dan kami kabari saat tersedia.
+        </p>
+        <button class="btn-ghost" onclick="navigate('#map')">Kembali ke peta</button>
+      </div>
+    </div>
+  `;
 }
 
 // ─────────────────────────────────────────────────────
@@ -1837,11 +1861,18 @@ function renderUnitReport(unitId) {
         ${esc(unit.catatan_batas ?? '')}
       </div>
 
+      ${decision && !decision.masteryProven ? `
+        <div class="offer-banner">
+          <div class="offer-banner-text">Bantu ${esc(s.childName)} melewati ini dengan program yang lebih terstruktur — kesempatan menjadi juara semakin terbuka.</div>
+          <button class="btn-offer" onclick="navigate('#coming-soon')">Lihat program →</button>
+        </div>
+      ` : ''}
+
       <div class="report-actions">
         ${!decision ? `<button class="btn-primary" onclick="navigate('#unit/${unit.id}')">Lanjutkan perjalanan</button>` : ''}
         ${decision && !decision.masteryProven ? `
-          <p class="report-next-action">Anak perlu latihan lebih lanjut. Kembali ke unit ini kapan saja untuk mencoba latihan penguatan lagi.</p>
-          <button class="btn-primary" onclick="navigate('#unit/${unit.id}')">Coba latihan lagi →</button>
+          <p class="report-next-action">Atau coba latihan penguatan lagi kapan saja.</p>
+          <button class="btn-ghost" onclick="navigate('#unit/${unit.id}')">Coba latihan lagi →</button>
         ` : ''}
         <button class="btn-ghost" onclick="navigate('#map')">Kembali ke peta</button>
         ${!us.visitClosed ? `

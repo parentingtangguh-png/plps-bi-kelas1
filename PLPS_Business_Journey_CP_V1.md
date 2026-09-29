@@ -62,7 +62,7 @@ langsung oleh orang tua dengan panduan dari sistem.
 
 ## Struktur Diagnostic per Unit
 
-Setiap unit OTOMATIS menggunakan siklus empat fase yang sama:
+Setiap unit OTOMATIS menggunakan siklus berikut:
 
 ```
 CEK AWAL
@@ -70,9 +70,9 @@ CEK AWAL
   → Sistem menilai otomatis
 
   Jika hasil CEK AWAL ≥ threshold:
-    → LATIHAN PENDALAMAN (soal lebih dalam / kompleksitas lebih tinggi)
-    → LATIHAN MANDIRI
-    → CEK ULANG (soal baru, konteks baru)
+    → Orang tua memilih:
+        (a) Langsung ke CEK ULANG  — tanpa latihan tambahan
+        (b) LATIHAN PENDALAMAN dulu → LATIHAN MANDIRI → CEK ULANG
     → Mastery decision
 
   Jika hasil CEK AWAL < threshold:
@@ -81,6 +81,10 @@ CEK AWAL
     → CEK ULANG (soal baru, konteks baru)
     → Mastery decision
 ```
+
+Jika cek awal berhasil, latihan pendalaman dan latihan mandiri bersifat
+**opsional** — orang tua yang memutuskan apakah anak perlu latihan tambahan
+sebelum cek ulang. Sistem tidak memaksakan urutan empat fase pada jalur ini.
 
 Unit COLLECT menggunakan siklus serupa tetapi buktinya berupa karya anak
 (rekaman / foto) yang dikumpulkan per tugas, bukan pilihan jawaban.
@@ -145,6 +149,20 @@ Ini berbeda dari model "tanpa akun" yang dipertimbangkan sebelumnya.
 
 ### Tahap 1 — Diagnostic (semua elemen)
 
+**Tujuan diagnostic:**
+Memberi orang tua gambaran jujur tentang posisi anak di seluruh 4 elemen
+CP Bahasa Indonesia Fase A — sebelum ada keputusan apapun tentang intervensi
+atau pembelian.
+
+Orang tua tidak bisa membuat keputusan yang tepat tanpa tahu di mana anak
+sebenarnya berdiri. Diagnostic ini gratis karena itu bukan kemurahan hati —
+melainkan syarat agar keputusan orang tua berikutnya bermakna, bukan didasari
+ketidaktahuan.
+
+Hasil diagnostic bukan vonis. Ia menjawab satu pertanyaan:
+*"Dari yang bisa kami periksa hari ini, kompetensi mana yang sudah terlihat,
+dan mana yang belum?"*
+
 **Yang diukur per elemen:**
 
 *Menyimak (L01, L02):*
@@ -170,8 +188,9 @@ Ini berbeda dari model "tanpa akun" yang dipertimbangkan sebelumnya.
 
 **Prerequisite antar unit:**
 Unit-unit dalam satu elemen memiliki urutan prerequisite. Unit berikutnya
-hanya terbuka jika unit sebelumnya sudah mastery. Prerequisite dihormati
-secara sistem — tidak bisa dilangkahi.
+terbuka segera setelah unit sebelumnya berhasil pada **cek awal** (≥ threshold),
+tidak perlu menunggu cek ulang selesai. Prerequisite dihormati secara sistem
+— tidak bisa dilangkahi.
 
 ---
 
@@ -181,10 +200,12 @@ secara sistem — tidak bisa dilangkahi.
 Unit paling awal dalam prerequisite chain yang belum mastery.
 
 **Yang ditampilkan ke orang tua:**
-Bukan skor angka. Kalimat konkret berbasis unit dan elemen:
-> "Dari yang kami periksa, [nama] terlihat bisa memahami informasi dari
-> bacaan yang ia dengar. Memahami urutan kejadian dari gambar belum terlihat —
-> ini yang perlu diperkuat terlebih dahulu."
+Banner "Titik mulai yang direkomendasikan" dengan nama unit dan tombol aksi
+(Mulai / Lanjutkan / Kunjungi lagi sesuai kondisi unit tersebut).
+
+Kalimat naratif konkret per unit (contoh: *"Memahami urutan kejadian dari
+gambar belum terlihat — ini yang perlu diperkuat terlebih dahulu"*) belum
+diimplementasikan; saat ini hanya nama unit yang ditampilkan.
 
 **Yang tidak ditampilkan:**
 - Persentase (misleading untuk jumlah soal yang terbatas)
@@ -233,6 +254,10 @@ Academic state hanya berubah melalui assessment dan rule engine.
 4. Cek ulang — soal baru, konteks baru → mastery decision
 ```
 
+Untuk unit Menyimak (L01, L02): layar soal menghadap **orang tua**; anak
+mendengarkan cerita yang dibacakan, tidak membaca teks sendiri. Ini
+diinstruksikan eksplisit di antarmuka sebelum soal terbuka.
+
 Struktur ini sudah berjalan untuk unit OTOMATIS (L01, L02, R02, R03).
 Unit COLLECT (R01, S01–S08, W01–W03) menggunakan model pengumpulan
 bukti yang dinilai orang tua.
@@ -266,6 +291,16 @@ Selisih inilah yang dijual — bukan durasi belajar, bukan jumlah soal
 Label yang digunakan sistem saat ini:
 - "Berhasil pada cek awal + cek ulang" — mastery sejak awal
 - "Berhasil pada cek ulang setelah berlatih" — perlu latihan dulu
+
+**Catatan stabilitas yang ditampilkan di laporan:**
+Laporan unit secara eksplisit mengingatkan orang tua bahwa keberhasilan pada
+satu sesi belum membuktikan kemampuan yang stabil — konfirmasi pada hari
+berbeda direkomendasikan.
+
+**Yang boleh diklaim:**
+- Anak berhasil menjawab soal cek ulang dengan bahan baru — ini bukti konkret, bukan estimasi
+- Kompetensi spesifik yang dilatih terlihat dikuasai pada sesi ini
+- Ada perbedaan nyata antara kondisi sebelum dan sesudah latihan
 
 **Yang tidak boleh diklaim:**
 - Mastery dari satu soal atau satu sesi
@@ -393,6 +428,6 @@ orang tua baru
 
 ---
 
-*V1.1 — direvisi 2026-09-29. Mencerminkan implementasi aktual P0–P1.*
+*V1.2 — direvisi 2026-09-29. Disesuaikan dengan hasil audit: struktur fase opsional setelah cek awal berhasil, waktu buka prerequisite (cek awal, bukan cek ulang), status root gap banner (nama unit, belum kalimat naratif), instruksi fasilitator Menyimak, catatan stabilitas di laporan.*
 *P2–P7 adalah roadmap yang belum dibangun.*
 *Scope Numerasi/Literasi (jalur domain) di-freeze sampai ada keputusan eksplisit.*
