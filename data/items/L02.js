@@ -405,6 +405,9 @@ export const ITEMS = [
   },
 ];
 
-export function getItemsByPhase(phase) {
-  return ITEMS.filter(i => i.phase === phase);
+export function getItemsByPhase(phase, kelas) {
+  return ITEMS.filter(i =>
+    i.phase === phase &&
+    (kelas == null || Number(i.kelas_soal) === Number(kelas))
+  );
 }

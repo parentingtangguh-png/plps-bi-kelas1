@@ -231,8 +231,11 @@ export const ITEMS = [
 
 export const PHASE_ORDER = ['cek_awal', 'latihan', 'latihan_mandiri', 'cek_ulang'];
 
-export function getItemsByPhase(phase) {
-  return ITEMS.filter(i => i.phase === phase);
+export function getItemsByPhase(phase, kelas) {
+  return ITEMS.filter(i =>
+    i.phase === phase &&
+    (kelas == null || Number(i.kelas_soal) === Number(kelas))
+  );
 }
 
 export function getFamiliesInPhase(phase) {

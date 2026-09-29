@@ -44,6 +44,13 @@ const ITEM_BANKS = {
 
 function isCollectUnit(unitId) { return !!COLLECT_PHASES[unitId]; }
 
+// Kelas anak aktif (1 atau 2). null jika belum login/belum set.
+function getChildKelas() {
+  const meta = getActiveChildMeta();
+  const k = meta?.kelas;
+  return (k != null && k !== '') ? Number(k) : null;
+}
+
 // ─────────────────────────────────────────────────────
 // Router
 // ─────────────────────────────────────────────────────
@@ -486,7 +493,8 @@ window.startCekAwal = function(unitId) {
   const unit = UNITS_BY_ID[unitId];
   const bank = ITEM_BANKS[unitId];
   if (!bank) return;
-  const items = bank.byPhase('cek_awal');
+  const items = bank.byPhase('cek_awal', getChildKelas());
+  if (items.length === 0) { renderNoItemsForKelas(unitId); return; }
   renderItemSession(unit, items, 'cek_awal', [], (responses) => {
     const result = scoreSession(responses, items);
     saveCekAwal(unitId, result, unit.sumber_informasi ?? null);
@@ -520,6 +528,23 @@ window.startCollectCekUlang = function(unitId) {
   if (!phases?.cek_ulang?.length) { navigate('#map'); return; }
   renderCollectTask(UNITS_BY_ID[unitId], phases.cek_ulang, 0, 'cek_ulang');
 };
+
+function renderNoItemsForKelas(unitId) {
+  const kelas = getChildKelas();
+  const kelasLabel = kelas ? `Kelas ${kelas}` : 'kelas anak';
+  document.getElementById('app').innerHTML = `
+    <div class="screen">
+      <div class="card" style="text-align:center;padding:2rem 1.5rem;">
+        <div style="font-size:2rem;margin-bottom:.75rem;">📋</div>
+        <h2 style="margin:0 0 .5rem;">Soal belum tersedia</h2>
+        <p style="color:var(--text-muted);margin:0 0 1.5rem;">
+          Soal untuk <strong>${kelasLabel}</strong> pada bagian ini belum tersedia di versi ini.
+          Konten akan terus diperbarui.
+        </p>
+        <button class="btn-primary" onclick="navigate('#unit/${unitId}')">← Kembali ke unit</button>
+      </div>
+    </div>`;
+}
 
 // ─── Sesi Item (AUTO) ─────────────────────────────────
 
@@ -713,8 +738,10 @@ window.startLatihan = function(unitId) {
   const unit = UNITS_BY_ID[unitId];
   const bank = ITEM_BANKS[unitId];
   if (!bank) return;
-  const latihanItems = bank.byPhase('latihan');
-  const mandiriItems = bank.byPhase('latihan_mandiri');
+  const kelas = getChildKelas();
+  const latihanItems = bank.byPhase('latihan', kelas);
+  const mandiriItems = bank.byPhase('latihan_mandiri', kelas);
+  if (latihanItems.length === 0 && mandiriItems.length === 0) { renderNoItemsForKelas(unitId); return; }
   renderItemSession(unit, latihanItems, 'latihan', [], (lr) => {
     renderItemSession(unit, mandiriItems, 'latihan_mandiri', [], (mr) => {
       saveLatihanResponses(unitId, [...lr, ...mr]);
@@ -727,7 +754,8 @@ window.startLatihanPendalaman = function(unitId) {
   const unit = UNITS_BY_ID[unitId];
   const bank = ITEM_BANKS[unitId];
   if (!bank) return;
-  const mandiriItems = bank.byPhase('latihan_mandiri');
+  const mandiriItems = bank.byPhase('latihan_mandiri', getChildKelas());
+  if (mandiriItems.length === 0) { renderNoItemsForKelas(unitId); return; }
   renderItemSession(unit, mandiriItems, 'latihan_pendalaman', [], (mr) => {
     saveLatihanResponses(unitId, mr);
     renderUnit(unitId);
@@ -762,7 +790,8 @@ window.startCekUlang = function(unitId) {
   const unit = UNITS_BY_ID[unitId];
   const bank = ITEM_BANKS[unitId];
   if (!bank) return;
-  const items = bank.byPhase('cek_ulang');
+  const items = bank.byPhase('cek_ulang', getChildKelas());
+  if (items.length === 0) { renderNoItemsForKelas(unitId); return; }
   renderItemSession(unit, items, 'cek_ulang', [], (responses) => {
     const result = scoreSession(responses, items);
     saveCekUlang(unitId, result, unit.sumber_informasi ?? null);
