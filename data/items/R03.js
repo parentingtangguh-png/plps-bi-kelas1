@@ -874,6 +874,30 @@ export const ITEMS = [
     umpan_balik_salah: 'Lihat gambar ketiga. Apa yang turun dari langit dan menyebabkan genangan?',
   },
 
+  {
+    id: 'R03-LT-B3',
+    family: 'FAM-B',
+    phase: 'latihan',
+    kompetensi_id: 'sebab_akibat_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.anjing_kotor,   deskripsi: 'Anjing berlari masuk ke dalam rumah' },
+      { svg: SVG.jejak_kotor,    deskripsi: 'Jejak kaki kotor terlihat di lantai' },
+      { svg: SVG.ibu_mengepel,   deskripsi: 'Ibu mengepel lantai yang kotor' },
+    ],
+    soal: 'Mengapa ibu harus mengepel lantai?',
+    opsi: [
+      { id: 'a', teks: 'Karena lantai terkena hujan dari jendela yang terbuka' },
+      { id: 'b', teks: 'Karena anjing masuk dan meninggalkan jejak kotor di lantai' },
+      { id: 'c', teks: 'Karena ibu senang membersihkan rumah setiap hari' },
+    ],
+    kunci: 'b',
+    umpan_balik_benar: 'Tepat! Anjing yang masuk dengan kaki kotor membuat lantai menjadi kotor sehingga ibu harus mengepel.',
+    umpan_balik_salah: 'Perhatikan gambar pertama dan kedua — siapa yang menyebabkan lantai kotor?',
+  },
+
   // ═══════════════════════════════════════════
   // KELAS 2 — LATIHAN MANDIRI (2 soal)
   // ═══════════════════════════════════════════
@@ -922,6 +946,28 @@ export const ITEMS = [
     kunci: 'b',
   },
 
+  {
+    id: 'R03-LM-B3',
+    family: 'FAM-B',
+    phase: 'latihan_mandiri',
+    kompetensi_id: 'sebab_akibat_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.anak_tendang_bola, deskripsi: 'Anak menendang bola dengan keras' },
+      { svg: SVG.kaca_pecah,        deskripsi: 'Kaca jendela pecah terkena bola' },
+      { svg: SVG.anak_takut,        deskripsi: 'Anak berdiri ketakutan melihat kaca pecah' },
+    ],
+    soal: 'Mengapa anak terlihat ketakutan pada gambar ketiga?',
+    opsi: [
+      { id: 'a', teks: 'Karena anak melihat hewan besar di dekat rumah' },
+      { id: 'b', teks: 'Karena bola yang ditendang memecahkan kaca jendela' },
+      { id: 'c', teks: 'Karena anak jatuh dan lututnya terluka' },
+    ],
+    kunci: 'b',
+  },
+
   // ═══════════════════════════════════════════
   // KELAS 2 — CEK ULANG (2 soal)
   // ═══════════════════════════════════════════
@@ -966,6 +1012,27 @@ export const ITEMS = [
       { id: 'a', teks: 'Karena hari sangat panas tanpa awan' },
       { id: 'b', teks: 'Karena hujan baru saja berhenti dan sinar matahari kembali' },
       { id: 'c', teks: 'Karena ada lampu berwarna di langit' },
+    ],
+    kunci: 'b',
+  },
+  {
+    id: 'R03-CU-B3',
+    family: 'FAM-B',
+    phase: 'cek_ulang',
+    kompetensi_id: 'sebab_akibat_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.tidak_gosok_gigi, deskripsi: 'Anak tidur tanpa menggosok gigi' },
+      { svg: SVG.gigi_sakit,       deskripsi: 'Anak memegang pipi karena sakit gigi' },
+      { svg: SVG.dokter,           deskripsi: 'Anak diperiksa oleh dokter gigi' },
+    ],
+    soal: 'Mengapa anak harus pergi ke dokter gigi?',
+    opsi: [
+      { id: 'a', teks: 'Karena anak ingin memeriksa kesehatan rutin' },
+      { id: 'b', teks: 'Karena giginya sakit akibat tidak pernah menggosok gigi' },
+      { id: 'c', teks: 'Karena dokter memanggil anak untuk kontrol' },
     ],
     kunci: 'b',
   },

@@ -367,6 +367,63 @@ export const ITEMS = [
     ],
     kunci: 'b',
   },
+  // ═══════════════════════════════════════════
+  // KELAS 2 — TAMBAHAN FAM-B (total 3 per fase)
+  // ═══════════════════════════════════════════
+  {
+    id: 'R02-LT-B2',
+    family: 'FAM-B',
+    phase: 'latihan',
+    kompetensi_id: 'sebab_akibat_teks',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Sungai di dekat kampung Raka mulai keruh dan berbau busuk. Warga tidak bisa lagi mengambil air dari sungai untuk memasak. Ternyata, sebuah pabrik membuang limbah ke sungai tanpa diolah terlebih dahulu. Kepala desa lalu melaporkan masalah ini ke dinas lingkungan hidup.',
+    soal: 'Mengapa warga tidak bisa lagi mengambil air dari sungai?',
+    opsi: [
+      { id: 'a', teks: 'Karena musim kemarau panjang membuat sungai kering' },
+      { id: 'b', teks: 'Karena pabrik membuang limbah sehingga sungai keruh dan berbau' },
+      { id: 'c', teks: 'Karena jembatan sungai rusak dan berbahaya untuk dilalui' },
+    ],
+    kunci: 'b',
+    umpan_balik_benar: 'Tepat! Limbah pabrik menyebabkan sungai keruh dan berbau sehingga tidak bisa digunakan.',
+    umpan_balik_salah: 'Baca lagi kalimat kedua dan ketiga — apa yang menyebabkan sungai menjadi keruh?',
+  },
+  {
+    id: 'R02-LM-B2',
+    family: 'FAM-B',
+    phase: 'latihan_mandiri',
+    kompetensi_id: 'sebab_akibat_teks',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Pohon-pohon besar di hutan berfungsi menyerap air hujan. Ketika hutan ditebang, tidak ada lagi akar pohon yang menahan tanah. Saat hujan deras, air mengalir deras di permukaan tanah dan membawa lapisan tanah yang subur. Akibatnya, banjir dan tanah longsor sering terjadi di daerah sekitar hutan gundul.',
+    soal: 'Apa akibat dari hutan yang ditebang habis?',
+    opsi: [
+      { id: 'a', teks: 'Hutan menjadi lebih dingin dan sejuk' },
+      { id: 'b', teks: 'Banjir dan tanah longsor sering terjadi' },
+      { id: 'c', teks: 'Hewan-hewan hutan pindah ke kota' },
+    ],
+    kunci: 'b',
+  },
+  {
+    id: 'R02-CU-B2',
+    family: 'FAM-B',
+    phase: 'cek_ulang',
+    kompetensi_id: 'sebab_akibat_teks',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Deni lupa membawa payung saat berangkat sekolah walaupun langit sudah mendung. Di tengah jalan, hujan deras turun. Deni berteduh di warung pinggir jalan dan terlambat tiba di sekolah. Guru kelasnya menegur Deni dan memintanya untuk selalu memperhatikan prakiraan cuaca sebelum berangkat.',
+    soal: 'Mengapa Deni terlambat tiba di sekolah?',
+    opsi: [
+      { id: 'a', teks: 'Karena Deni bangun kesiangan' },
+      { id: 'b', teks: 'Karena Deni kehujanan dan harus berteduh di warung' },
+      { id: 'c', teks: 'Karena jalan menuju sekolah macet' },
+    ],
+    kunci: 'b',
+  },
+
   {
     id: 'R02-CU-C1',
     family: 'FAM-C',
