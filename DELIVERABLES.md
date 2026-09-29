@@ -426,10 +426,65 @@ Kriteria: kesesuaian usia 6–7 tahun kelas 1–2 SD, beban bahasa, tingkat abst
 - Angka ini mungkin terlalu longgar untuk memastikan anak sungguh menulis 2 kalimat
 - Usulan: naikkan ke 30–40 karakter, atau validasi jumlah spasi/kata
 
+---
+
+## Deliverable 8 — Canonical Item Schema & Kelas Gate (2026-09-29)
+
+### Canonical item schema
+
+Setiap item kini memiliki 4 field wajib:
+
+| Field | Nilai | Keterangan |
+|-------|-------|-----------|
+| `kompetensi_id` | string | Kompetensi spesifik yang diukur item ini (mis. `informasi_tersurat_percakapan`) |
+| `kelas_soal` | `1` atau `2` | Label rancangan — untuk kelas mana item ini dirancang. **Bukan gate akses unit**, bukan kelas anak. |
+| `tingkat_kompleksitas` | `rendah` / `sedang` | Estimasi rancangan; belum divalidasi empiris |
+| `cara_penyajian` | `teks_didengar` / `teks_dibaca` / `visual_diamati` | Sumber informasi yang diproses anak |
+
+Schema ini duplikasi-ready: mapel lain (MTK, IPAS, PPKn, Seni) tinggal isi field yang sama.
+
+**Mapping per unit:**
+
+| Unit | Family | kompetensi_id | kelas_soal | cara_penyajian |
+|------|--------|--------------|-----------|---------------|
+| L01 | FAM-A | informasi_tersurat_percakapan | 1 | teks_didengar |
+| L01 | FAM-B | topik_percakapan | 1 | teks_didengar |
+| L02 | FAM-A | informasi_tersurat_cerita | 1 | teks_didengar |
+| L02 | FAM-B | sebab_akibat_cerita | 2 | teks_didengar |
+| R02 | FAM-A | informasi_tersurat_bacaan | 1 | teks_dibaca |
+| R02 | FAM-B | urutan_kejadian_bacaan | 1 | teks_dibaca |
+| R02 | FAM-C | tujuan_teks | 2 | teks_dibaca |
+| R02 | FAM-D | hubungan_teks_konteks | 2 | teks_dibaca |
+| R03 | FAM-A | urutan_kejadian_visual | 1 | visual_diamati |
+| R03 | FAM-B | sebab_akibat_visual | 1 | visual_diamati |
+
+### Kelas gate
+
+`getItemsByPhase(phase, kelas)` memfilter item berdasarkan `kelas_soal`. Kelas anak dibaca dari `getActiveChildMeta().kelas` dan diteruskan ke semua titik pemanggilan: `startCekAwal`, `startLatihan`, `startLatihanPendalaman`, `startCekUlang`.
+
+Jika tidak ada soal untuk kelas anak di phase tersebut, `renderNoItemsForKelas` menampilkan pesan eksplisit — tidak ada skor palsu, tidak ada error diam.
+
+### Gap konten kelas 2 (ditemukan smoke test 2026-09-29)
+
+| Unit | Phase | Kelas 1 | Kelas 2 |
+|------|-------|---------|---------|
+| L01 | semua | ✓ 5 soal | ⚠ 0 soal |
+| L02 | cek_awal | ✓ 3 soal | ⚠ 1 soal (min 2 untuk valid) |
+| L02 | cek_ulang | ✓ 3 soal | ✓ 2 soal |
+| R02 | semua | ✓ ada | ⚠ 0 soal (FAM-C/D belum dibuat) |
+| R03 | semua | ✓ ada | ⚠ 0 soal |
+
+**Konsekuensi:** untuk V1, unit-unit otomatis hanya bisa digunakan penuh oleh anak kelas 1. Anak kelas 2 akan melihat pesan "Soal belum tersedia" di L01, R02, dan R03. Ini bukan bug — gate bekerja benar, kontennya yang belum ada.
+
+**Backlog konten kelas 2:** tambah item dengan `kelas_soal: 2` di L01 (semua phase), R02 FAM-C/D (semua phase), R03 (semua phase), dan L02 cek_awal (tambah 1 item lagi).
+
 | 2026-09-29 | 348fefd | Tambah CLAUDE.md + catatan orientasi repo di DELIVERABLES.md |
 | 2026-09-29 | 4dad145 | K-1 RESOLVED: L02 FAM-B → pertanyaan konkret. K-2 RESOLVED: R03 emoji → SVG. M-3 RESOLVED: L01/L02 item bank diperluas ke 5 item per fase |
 | 2026-09-29 | 9598a86 | K-3 RESOLVED: L02-CA-B1 "musim dingin" → lebah-belalang + hujan deras. K-4 RESOLVED: L02-LT-A1 "paling sedikit" → angka konkret |
 | 2026-09-29 | 78fd180 | fix(storage): upload media blob ke Supabase Storage setelah simpan ke IndexedDB |
 | 2026-09-29 | c096106 | audit: keamanan, isolasi user, bug state, error boundary — semua perbaikan |
+| 2026-09-29 | 4a1e53b | audit(L01/L02): perbaiki validitas klaim bukti menyimak — tambah sumber_informasi, instruksi_fasilitator, label L02 |
+| 2026-09-29 | 060efa4 | feat(items): tambah kompetensi_id, kelas_soal, tingkat_kompleksitas, cara_penyajian ke semua item (L01, L02, R02, R03) |
+| 2026-09-29 | 983fcdb | feat(kelas-gate): isolasi soal per kelas — filter getItemsByPhase(phase, kelas) di semua 5 titik pemanggilan |
 
-*Dokumen diperbarui 2026-09-29. Semua deliverable selesai. App live di production.*
+*Dokumen diperbarui 2026-09-29. App live di production.*
