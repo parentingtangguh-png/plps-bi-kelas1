@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 
-const REDIRECT_URL = window.location.origin + window.location.pathname;
+const REDIRECT_URL = window.location.origin;
 
 export async function signInWithGoogle() {
   const { error } = await supabase.auth.signInWithOAuth({
