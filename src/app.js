@@ -92,12 +92,48 @@ function activateDemoMode() {
   return true;
 }
 
+// ─────────────────────────────────────────────────────
+// Audit mode — ?audit=1
+// Bypass login, tampilkan child picker dengan 5 anak uji.
+// Semua state lokal saja — tidak menyentuh Supabase.
+// ─────────────────────────────────────────────────────
+const AUDIT_CHILDREN = [
+  { id: 'audit-child-1', nama: 'Rani Mukherjee',  kelas: 'Kelas 1 SD' },
+  { id: 'audit-child-2', nama: 'Rino Marino',     kelas: 'Kelas 2 SD' },
+  { id: 'audit-child-3', nama: 'Siti Rahayu',     kelas: 'Kelas 1 SD' },
+  { id: 'audit-child-4', nama: 'Doni Pratama',    kelas: 'Kelas 2 SD' },
+  { id: 'audit-child-5', nama: 'Bunga Lestari',   kelas: 'Kelas 1 SD' },
+];
+
+function activateAuditMode() {
+  if (new URLSearchParams(window.location.search).get('audit') !== '1') return false;
+  try {
+    AUDIT_CHILDREN.forEach(c => {
+      const key = `plps_bi_kelas1_state_${c.id}`;
+      if (!localStorage.getItem(key)) {
+        localStorage.setItem(key, JSON.stringify({
+          childName: c.nama, kelas: c.kelas,
+          createdAt: new Date().toISOString(), units: {}, progressLog: [],
+        }));
+      }
+    });
+    localStorage.removeItem('plps_bi_kelas1_active_child');
+    localStorage.removeItem('plps_bi_kelas1_child_meta');
+  } catch { return false; }
+  return true;
+}
+
 window.addEventListener('load', async () => {
   app.innerHTML = `<div style="padding:48px 16px;text-align:center;color:#6b7280;">Memuat...</div>`;
 
   if (activateDemoMode()) {
     if (!window.location.hash || window.location.hash === '#') window.location.hash = '#home';
     route();
+    return;
+  }
+
+  if (activateAuditMode()) {
+    renderAuditChildPicker();
     return;
   }
 
@@ -167,6 +203,52 @@ function renderAuthScreen() {
     catch (e) { alert('Gagal masuk: ' + e.message); }
   });
 }
+
+// ─────────────────────────────────────────────────────
+// View: Audit Child Picker (mode ?audit=1)
+// ─────────────────────────────────────────────────────
+function renderAuditChildPicker() {
+  const isAudit = new URLSearchParams(window.location.search).get('audit') === '1';
+  app.innerHTML = `
+    <div class="view-home">
+      <div class="demo-banner">🔍 MODE AUDIT — 5 anak uji, data lokal saja</div>
+      <div class="brand">
+        <div class="brand-title">PLPS</div>
+        <div class="brand-sub">Bahasa Indonesia · Uji Multi-Anak</div>
+      </div>
+      <div class="child-picker">
+        <div class="child-picker-title">Pilih anak untuk diagnostik</div>
+        <div class="child-list">
+          ${AUDIT_CHILDREN.map(c => `
+            <button class="child-card" data-id="${esc(c.id)}" data-nama="${esc(c.nama)}" data-kelas="${esc(c.kelas)}">
+              <span class="child-card-nama">${esc(c.nama)}</span>
+              <span class="child-card-kelas">${esc(c.kelas)}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  document.querySelectorAll('.child-card').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const child = { id: btn.dataset.id, nama: btn.dataset.nama, kelas: btn.dataset.kelas };
+      try {
+        localStorage.setItem('plps_bi_kelas1_active_child', child.id);
+        localStorage.setItem('plps_bi_kelas1_child_meta', JSON.stringify(child));
+      } catch {}
+      window.location.hash = '#home';
+      route();
+    });
+  });
+}
+
+window.showAuditChildPicker = function () {
+  try {
+    localStorage.removeItem('plps_bi_kelas1_active_child');
+    localStorage.removeItem('plps_bi_kelas1_child_meta');
+  } catch {}
+  renderAuditChildPicker();
+};
 
 // ─────────────────────────────────────────────────────
 // View: Pilih Anak
@@ -268,10 +350,14 @@ function renderHome() {
   const kelasLabel = formatKelas(s.kelas);
   document.title = `PLPS — Bahasa Indonesia ${kelasLabel}`;
 
-  const isDemo = new URLSearchParams(window.location.search).get('demo') === '1';
+  const params = new URLSearchParams(window.location.search);
+  const isDemo  = params.get('demo')  === '1';
+  const isAudit = params.get('audit') === '1';
+  const pickerFn = isAudit ? 'showAuditChildPicker()' : 'showChildPicker()';
   app.innerHTML = `
     <div class="view-home">
-      ${isDemo ? `<div class="demo-banner">🧪 MODE DEMO — data tidak disimpan ke server</div>` : ''}
+      ${isDemo  ? `<div class="demo-banner">🧪 MODE DEMO — data tidak disimpan ke server</div>` : ''}
+      ${isAudit ? `<div class="demo-banner">🔍 MODE AUDIT — 5 anak uji, data lokal saja</div>` : ''}
       <div class="brand">
         <div class="brand-title">PLPS</div>
         <div class="brand-sub">Bahasa Indonesia · ${esc(kelasLabel)}</div>
@@ -284,7 +370,7 @@ function renderHome() {
         </div>
         <button class="btn-primary" onclick="navigate('#map')">Lihat Peta Unit</button>
         <button class="btn-secondary" onclick="navigate('#parent')">Dashboard Orang Tua</button>
-        <button class="btn-ghost btn-small" onclick="showChildPicker()">Pilih / tambah anak</button>
+        <button class="btn-ghost btn-small" onclick="${pickerFn}">Pilih / tambah anak</button>
       ` : `
         <div class="onboarding">
           <p class="onboarding-desc">Petakan kemampuan Bahasa Indonesia anak. Tidak perlu akun — data tersimpan di perangkat ini.</p>
