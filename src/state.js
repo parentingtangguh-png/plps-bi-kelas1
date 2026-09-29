@@ -97,12 +97,27 @@ function getStorageKey() {
 
 // ─── IndexedDB untuk media blobs ─────────────────────
 
-const DB_NAME = 'plps_bi_kelas1_media';
 const STORE_NAME = 'recordings';
 
-function openMediaDB() {
+// DB dipartisi per userId — satu DB per akun, tidak bisa lintas user.
+// Demo/audit mode pakai suffix 'local'.
+let _cachedUserId = null;
+async function getMediaDbName() {
+  if (_cachedUserId) return `plps_bi_kelas1_media_${_cachedUserId}`;
+  try {
+    const { supabase } = await import('./supabase.js');
+    const { data: { user } } = await supabase.auth.getUser();
+    _cachedUserId = user?.id ?? 'local';
+  } catch {
+    _cachedUserId = 'local';
+  }
+  return `plps_bi_kelas1_media_${_cachedUserId}`;
+}
+
+async function openMediaDB() {
+  const dbName = await getMediaDbName();
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 1);
+    const req = indexedDB.open(dbName, 1);
     req.onupgradeneeded = e => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
