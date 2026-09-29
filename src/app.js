@@ -489,7 +489,7 @@ window.startCekAwal = function(unitId) {
   const items = bank.byPhase('cek_awal');
   renderItemSession(unit, items, 'cek_awal', [], (responses) => {
     const result = scoreSession(responses, items);
-    saveCekAwal(unitId, result);
+    saveCekAwal(unitId, result, unit.sumber_informasi ?? null);
     renderUnit(unitId);
   });
 };
@@ -551,6 +551,7 @@ function renderItemSession(unit, items, phase, responsesAcc, onDone) {
           <div class="audio-label">${esc(item.audio_label)}</div>
           <div class="read-aloud-box">
             <p class="read-aloud-label">📖 Orang tua membacakan untuk anak:</p>
+            ${unit.instruksi_fasilitator ? `<p class="fasilitator-note">⚠️ ${esc(unit.instruksi_fasilitator)}</p>` : ''}
             <p class="read-aloud-text">${esc(item.audio_script)}</p>
           </div>
           <button id="playBtn" class="btn-primary" onclick="markAudioRead('${unit.id}', ${idx})">Sudah dibacakan →</button>
@@ -764,7 +765,7 @@ window.startCekUlang = function(unitId) {
   const items = bank.byPhase('cek_ulang');
   renderItemSession(unit, items, 'cek_ulang', [], (responses) => {
     const result = scoreSession(responses, items);
-    saveCekUlang(unitId, result);
+    saveCekUlang(unitId, result, unit.sumber_informasi ?? null);
     const us = getUnitState(unitId);
     saveMasteryDecision(unitId, decideMastery(us.cekAwal, result));
     renderUnit(unitId);

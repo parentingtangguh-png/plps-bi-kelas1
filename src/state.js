@@ -224,11 +224,15 @@ export function getUnitState(unitId) {
   };
 }
 
-export function saveCekAwal(unitId, sessionResult) {
+export function saveCekAwal(unitId, sessionResult, sumberInformasi) {
   const s = getState();
   if (!s.units[unitId]) s.units[unitId] = {};
-  s.units[unitId].cekAwal = { ...sessionResult, scoredAt: new Date().toISOString() };
-  logEvent(s, 'cek_awal_completed', unitId, { outcome: sessionResult.outcome });
+  s.units[unitId].cekAwal = {
+    ...sessionResult,
+    sumber_informasi: sumberInformasi ?? null,
+    scoredAt: new Date().toISOString(),
+  };
+  logEvent(s, 'cek_awal_completed', unitId, { outcome: sessionResult.outcome, sumber_informasi: sumberInformasi ?? null });
   save(s);
 }
 
@@ -239,11 +243,15 @@ export function saveLatihanResponses(unitId, responses) {
   save(s);
 }
 
-export function saveCekUlang(unitId, sessionResult) {
+export function saveCekUlang(unitId, sessionResult, sumberInformasi) {
   const s = getState();
   if (!s.units[unitId]) s.units[unitId] = {};
-  s.units[unitId].cekUlang = { ...sessionResult, scoredAt: new Date().toISOString() };
-  logEvent(s, 'cek_ulang_completed', unitId, { outcome: sessionResult.outcome });
+  s.units[unitId].cekUlang = {
+    ...sessionResult,
+    sumber_informasi: sumberInformasi ?? null,
+    scoredAt: new Date().toISOString(),
+  };
+  logEvent(s, 'cek_ulang_completed', unitId, { outcome: sessionResult.outcome, sumber_informasi: sumberInformasi ?? null });
   save(s);
 }
 
