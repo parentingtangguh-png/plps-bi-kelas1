@@ -10,9 +10,10 @@ export async function getChildren() {
 }
 
 export async function addChild(nama, kelas) {
+  const { data: { user } } = await supabase.auth.getUser();
   const { data, error } = await supabase
     .from('children')
-    .insert({ nama, kelas })
+    .insert({ nama, kelas, parent_id: user.id })
     .select()
     .single();
   if (error) throw error;
