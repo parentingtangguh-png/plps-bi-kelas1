@@ -37,6 +37,10 @@ create policy "child_states_owner" on public.child_states
     where c.id = child_states.child_id and c.parent_id = auth.uid()
   ));
 
+-- 2b. Grant akses ke role authenticated (diperlukan agar PostgREST bisa query)
+grant select, insert, update, delete on public.children    to authenticated;
+grant select, insert, update, delete on public.child_states to authenticated;
+
 -- 3. Storage bucket untuk rekaman suara dan foto
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
