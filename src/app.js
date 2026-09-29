@@ -390,7 +390,7 @@ function renderHome() {
         </div>
       `}
       <footer class="home-footer">
-        ${isDemo ? '' : 'Data tersimpan di akun Anda.<br/>'}
+        ${(isDemo || isAudit) ? '' : 'Data tersimpan di akun Anda.<br/>'}
         <a href="#fullreport" class="link-small">Lihat semua laporan</a>
       </footer>
     </div>
@@ -701,7 +701,7 @@ function renderItemSession(unit, items, phase, responsesAcc, onDone) {
     <div class="view-check">
       <header class="check-header">
         <button class="btn-back" onclick="navigate('#map')">← Peta</button>
-        <div class="check-badge">Untuk anak · ${phaseLabel} · ${idx + 1} dari ${items.length} · Soal Kelas ${item.kelas_soal ?? ''}</div>
+        <div class="check-badge">Untuk anak · ${phaseLabel} · ${idx + 1} dari ${items.length} · Soal Kelas ${item.kelas_soal ?? ''} · ${esc(getState().childName ?? '')}</div>
       </header>
       <h1 class="check-title">${esc(unit.label)}</h1>
 
