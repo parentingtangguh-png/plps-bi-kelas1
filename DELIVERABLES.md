@@ -15,11 +15,11 @@ Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-29 (diperbarui)
 
 ```
 Lokasi   : D:\ribuan_pengguna\CLAUDE\plps-bi-kelas1\
-Commit   : 8cb4bd0
+Commit   : 6390b68
 Branch   : master
 Remote   : https://github.com/parentingtangguh-png/plps-bi-kelas1.git
 Deploy   : https://plps-bi-kelas1.parentingtangguh.workers.dev
-Version  : 01103104-2bc7-45eb-8ca3-6ab34fb950fa
+Version  : 0172f32c-a640-489a-92bc-11153301ba0c
 ```
 
 **Menjalankan:**
@@ -64,7 +64,7 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 
 | ID | Label | Evidence Mode | Status Otomasi | Hasil Uji | Catatan |
 |----|-------|--------------|----------------|-----------|---------|
-| BI-A-L01 | Informasi dalam percakapan yang didengar | AUDIO_GATED | **Otomatis penuh** ✓ | **LULUS** — diaudit 2026-09-28 | Orang tua membacakan teks percakapan. Tombol "Sudah dibacakan →" membuka soal. Item bank: 6 item (cek_awal 2, latihan 2, cek_ulang 2). Pengantar latihan penguatan (tiga bagian) ditambahkan commit 0b0fb2e. |
+| BI-A-L01 | Informasi dalam percakapan yang didengar | AUDIO_GATED | **Otomatis penuh** ✓ | **LULUS** — diaudit 2026-09-29 | Orang tua membacakan teks percakapan. Tombol "Sudah dibacakan →" membuka soal. Item bank: 5 item per fase (cek_awal 5, latihan 5, latihan_mandiri 5, cek_ulang 5) — kelas 1 dan kelas 2. Pengantar latihan penguatan (tiga bagian) ditambahkan commit 0b0fb2e. |
 | BI-A-L02 | Pesan cerita yang didengar | AUDIO_GATED | **Otomatis penuh** ✓ | UI tersedia, belum diaudit end-to-end | Prerequisite L01. Gate: cek ulang L01 gagal → L02 terkunci (diperbaiki commit 8354921). |
 | BI-A-R01 | Membaca kata sederhana dengan suara | COLLECT | **Hanya kumpulkan bukti** | UI stub tersedia | MediaRecorder untuk rekam suara. Penilaian kefasihan butuh manusia atau ASR. |
 | BI-A-R02 | Memahami isi bacaan | AUTO | **Otomatis penuh** ✓ | **LULUS** — end-to-end teruji | Cek_awal → latihan → cek_ulang → mastery decision. Smoke test: 1/2 cek_awal (Masih belajar) → 3/3 cek_ulang (Terlihat bisa) → mastery proven. |
@@ -227,11 +227,11 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 | Database (`child_states`) | RLS via join ke `children` | ✓ |
 | Storage (`media`) | RLS via `foldername → childId → parent_id` | ✓ (diperbaiki) |
 | localStorage | Key per child: `plps_bi_kelas1_state_{childId}` | ✓ |
-| IndexedDB | Key per mediaId (UUID), tidak per user | ⚠ shared per device — acceptable untuk 1 perangkat per keluarga |
+| IndexedDB | Namespace per userId: `plps_bi_kelas1_media_{userId}` | ✓ (diperbaiki commit d89b4b3) |
 
 ### Catatan pasca-audit
 
-**IndexedDB tidak diisolasi per user** — jika dua akun orang tua berbeda login di satu perangkat (browser yang sama), IndexedDB bisa dibaca keduanya. Ini acceptable untuk satu perangkat per keluarga; jika multi-user per device diperlukan, perlu namespace IndexedDB dengan userId.
+**IndexedDB kini diisolasi per user** — commit d89b4b3 menambahkan namespace `plps_bi_kelas1_media_{userId}`. Dua akun berbeda pada perangkat yang sama tidak akan tercampur medianya.
 
 **Tidak ada rate limiting** — Supabase Free tier punya batas; produksi perlu pantau usage.
 
@@ -466,19 +466,18 @@ Schema ini duplikasi-ready: mapel lain (MTK, IPAS, PPKn, Seni) tinggal isi field
 
 Jika tidak ada soal untuk kelas anak di phase tersebut, `renderNoItemsForKelas` menampilkan pesan eksplisit — tidak ada skor palsu, tidak ada error diam.
 
-### Gap konten kelas 2 (ditemukan smoke test 2026-09-29)
+### Status konten kelas 2 — RESOLVED 2026-09-29 (commit dbd6155)
 
 | Unit | Phase | Kelas 1 | Kelas 2 |
 |------|-------|---------|---------|
-| L01 | semua | ✓ 5 soal | ⚠ 0 soal |
-| L02 | cek_awal | ✓ 3 soal | ⚠ 1 soal (min 2 untuk valid) |
-| L02 | cek_ulang | ✓ 3 soal | ✓ 2 soal |
-| R02 | semua | ✓ ada | ⚠ 0 soal (FAM-C/D belum dibuat) |
-| R03 | semua | ✓ ada | ⚠ 0 soal |
+| L01 | cek_awal / latihan / latihan_mandiri / cek_ulang | ✓ 5 soal | ✓ 5 soal |
+| L02 | cek_awal / latihan / latihan_mandiri / cek_ulang | ✓ 3 soal | ✓ 3 soal |
+| R02 | cek_awal / latihan / latihan_mandiri / cek_ulang | ✓ ada | ✓ ada (FAM-B ditambah) |
+| R03 | cek_awal / latihan / latihan_mandiri / cek_ulang | ✓ ada | ✓ ada (FAM-B ditambah) |
 
-**Konsekuensi:** untuk V1, unit-unit otomatis hanya bisa digunakan penuh oleh anak kelas 1. Anak kelas 2 akan melihat pesan "Soal belum tersedia" di L01, R02, dan R03. Ini bukan bug — gate bekerja benar, kontennya yang belum ada.
+**Status:** gap konten kelas 2 sepenuhnya diselesaikan. 22 item baru ditambahkan (L01: 12 item, L02: 4 item, R02: 3 item, R03: 3 item). Kelas 1 dan kelas 2 kini setara dalam jumlah soal per fase.
 
-**Backlog konten kelas 2:** tambah item dengan `kelas_soal: 2` di L01 (semua phase), R02 FAM-C/D (semua phase), R03 (semua phase), dan L02 cek_awal (tambah 1 item lagi).
+**Backlog minor:** item bank L02/R02/R03 kelas 2 masih lebih tipis dibanding bank ideal untuk produksi skala besar — perlu diperluas sebelum deploy ke ribuan pengguna.
 
 ---
 
@@ -593,5 +592,60 @@ Audit dijalankan oleh ChatGPT via mode demo (`?demo=1&kelas=1` dan `?demo=1&kela
 | 2026-09-29 | 8f593dc | fix(ux): 6 perbaikan dari audit pengguna nyata (lihat Deliverable 9) |
 | 2026-09-29 | a4501b5 | feat(content): tambah 25 item kelas 2 untuk L01, L02, R02, R03 |
 | 2026-09-29 | 2f0169c | fix(ux): 5 perbaikan dari audit ChatGPT kelas 1 & 2 (lihat Deliverable 10) |
+| 2026-09-29 | d89b4b3 | feat(storage): namespace IndexedDB per userId — isolasi media antar akun |
+| 2026-09-29 | 032f794 | fix(ux): 2 perbaikan dari audit ChatGPT multi-anak (format kelas label + kelas gate) |
+| 2026-09-29 | 6aebe30 | feat(audit): mode ?audit=1 — bypass login dengan AUDIT_CHILDREN hardcode |
+| 2026-09-29 | 401a206 | fix(ui): format label kelas dari integer ke "Kelas 1 / Kelas 2" |
+| 2026-09-29 | 24ea2ba | fix(kelas-gate): getChildKelas() gagal parse localStorage — fallback ke 1 |
+| 2026-09-29 | dbd6155 | feat(content): perluas item bank kelas 2 — 22 item baru (L01×12, L02×4, R02×3, R03×3) |
+| 2026-09-29 | e484819 | fix(dashboard): badge 'perlu dinilai' tidak muncul untuk unit tanpa bukti nyata |
+| 2026-09-29 | 0f53ebf | fix(report): label mastery membedakan 'berhasil sejak cek awal' vs 'berhasil setelah berlatih' |
+| 2026-09-29 | dc75244 | feat(dashboard): laporan per anak di dashboard orang tua |
+| 2026-09-29 | 6390b68 | docs: revisi PLPS_Business_Journey_CP_V1.md V1.0 → V1.1 — sesuaikan dengan implementasi aktual |
+
+---
+
+## Deliverable 11 — Audit Multi-Anak & Perbaikan Sesi Terakhir (2026-09-29)
+
+### Metode audit
+Audit dijalankan oleh ChatGPT sebagai 1 orang tua dengan 2 anak (kelas 1 dan kelas 2). Mode: `?audit=1` (audit mode baru), lalu `?demo=1`. Skenario: child picker → L01 cek awal kelas 2 → latihan → cek ulang → laporan → dashboard orang tua.
+
+### Temuan dan status
+
+| ID | Layar/Alur | Temuan | Status |
+|----|-----------|--------|--------|
+| MA-1 | IndexedDB | Media dua akun bisa tercampur pada satu perangkat | **FIXED** commit d89b4b3 — namespace per userId |
+| MA-2 | L01 kelas 2 | Semua soal menampilkan "Soal belum tersedia" — 0 item kelas 2 di semua fase | **FIXED** commit dbd6155 — 22 item baru |
+| MA-3 | Dashboard orang tua | Badge "Perlu dinilai (N)" muncul meski tidak ada rekaman/foto nyata (hanya `{type:'skipped'}`) | **FIXED** commit e484819 |
+| MA-4 | Laporan unit | Label "Berhasil pada cek awal + cek ulang" muncul meski cek awal 0/5 (MASIH_BELAJAR) | **FIXED** commit 0f53ebf |
+| MA-5 | Dashboard orang tua | Tidak ada ringkasan per anak — orang tua tidak bisa lihat progress semua anak sekaligus | **FIXED** commit dc75244 |
+| MA-6 | App title / kelas gate | Label kelas ditampilkan sebagai integer ("1") bukan "Kelas 1" | **FIXED** commit 401a206 |
+| MA-7 | Kelas gate | `getChildKelas()` gagal parse saat format localStorage tidak sesuai — anak kelas 2 dapat soal kelas 1 | **FIXED** commit 24ea2ba |
+
+### Detail perbaikan
+
+**MA-3 — Badge "Perlu dinilai" false positive (`state.js`)**
+- `getPendingVerdict1` dan `getPendingVerdict2` sebelumnya menggunakan `.length > 0` pada array `collectEvidence`
+- Masalah: array mengandung `{type:'skipped'}` untuk task tanpa rekaman/foto — bukan bukti nyata
+- Fix: ganti ke `.some(e => e.type !== 'skipped')` — hanya kasus dengan rekaman atau foto yang memicu badge
+
+**MA-4 — Label laporan mastery (`app.js`)**
+- Dua tempat: `renderUnitReport` (laporan unit) dan `renderFullReport` (laporan keseluruhan)
+- Fix: tambahkan pengecekan `cekAwal?.outcome === 'TERLIHAT_BISA'` sebelum memilih varian label:
+  - Jika cek awal TERLIHAT_BISA → `✓ Berhasil — cek awal + cek ulang`
+  - Jika cek awal MASIH_BELAJAR → `✓ Berhasil pada cek ulang setelah berlatih`
+
+**MA-5 — Laporan per anak di dashboard (`app.js` + `styles.css`)**
+- `renderParentDashboard` diubah menjadi async function
+- Memuat daftar semua anak dari Supabase (atau AUDIT_CHILDREN/demo meta)
+- Menampilkan kartu ringkasan per anak: nama, kelas, jumlah unit berhasil / sudah dimulai / total
+- Tombol "Lihat laporan →" pada tiap kartu memanggil `switchChildReport(childId, nama, kelas)` yang set active child lalu navigate ke `#fullreport`
+- CSS baru: `.child-report-list`, `.child-report-row`, `.child-report-row--active`, `.crr-info`, `.crr-nama`, `.crr-kelas`, `.crr-progress`
+
+### Fitur audit mode (`?audit=1`)
+- Bypass login penuh — tidak perlu akun Google
+- Menggunakan `AUDIT_CHILDREN` array hardcode di `app.js` (2 anak: kelas 1 dan kelas 2)
+- State dibaca dari localStorage seperti biasa — dapat mewarisi state dari sesi audit sebelumnya
+- Tidak ada perbedaan kode alur unit dengan mode normal — cocok untuk regression test manual
 
 *Dokumen diperbarui 2026-09-29. App live di production.*
