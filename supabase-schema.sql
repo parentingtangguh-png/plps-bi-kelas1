@@ -4,7 +4,7 @@
 -- 1. Tabel daftar anak per akun orang tua
 create table if not exists public.children (
   id         uuid primary key default gen_random_uuid(),
-  parent_id  uuid references auth.users(id) on delete cascade not null,
+  parent_id  uuid references auth.users(id) on delete cascade not null default auth.uid(),
   nama       text not null,
   kelas      text not null,
   created_at timestamptz default now()
@@ -45,11 +45,36 @@ values (
 )
 on conflict (id) do nothing;
 
+-- Isolasi per pemilik: folder pertama di path = child_id, yang harus dimiliki user login
 create policy "media_upload" on storage.objects
-  for insert with check (bucket_id = 'media' and auth.uid() is not null);
+  for insert with check (
+    bucket_id = 'media'
+    and auth.uid() is not null
+    and exists (
+      select 1 from public.children c
+      where c.id::text = (storage.foldername(name))[1]
+        and c.parent_id = auth.uid()
+    )
+  );
 
 create policy "media_read" on storage.objects
-  for select using (bucket_id = 'media' and auth.uid() is not null);
+  for select using (
+    bucket_id = 'media'
+    and auth.uid() is not null
+    and exists (
+      select 1 from public.children c
+      where c.id::text = (storage.foldername(name))[1]
+        and c.parent_id = auth.uid()
+    )
+  );
 
 create policy "media_delete" on storage.objects
-  for delete using (bucket_id = 'media' and auth.uid() is not null);
+  for delete using (
+    bucket_id = 'media'
+    and auth.uid() is not null
+    and exists (
+      select 1 from public.children c
+      where c.id::text = (storage.foldername(name))[1]
+        and c.parent_id = auth.uid()
+    )
+  );

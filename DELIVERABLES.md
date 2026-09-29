@@ -150,27 +150,87 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 
 ### CONCERN — penting untuk kualitas produk
 
-**CONCERN-BI-01: Item bank tipis untuk L01/L02**
-- L01: 2 item cek_awal, 2 latihan, 2 cek_ulang — minimum; mastery evidence terbatas
-- Perlu diperluas ke minimal 5–8 item per fase
+**CONCERN-BI-01: Item bank tipis untuk L01/L02** — RESOLVED M-3
+- Sudah diperluas ke 5 item per fase (cek_awal, latihan, latihan_mandiri, cek_ulang)
 
-**CONCERN-BI-02: R03 menggunakan emoji sebagai "gambar"**
-- Emoji berbeda rendering per device/font; bukan gambar ilustrasi sungguhan
-- Untuk kelas 1: gambar bergambar nyata lebih sesuai perkembangan
-- Fix: ganti dengan gambar SVG atau foto berkualitas
+**CONCERN-BI-02: R03 menggunakan emoji sebagai "gambar"** — RESOLVED K-2
+- Semua panel R03 sudah diganti ke inline SVG
 
 **CONCERN-BI-03: Asumsi anak bisa membaca mandiri untuk R02/R03**
-- R02 menampilkan teks; jika anak belum bisa membaca mandiri, hasil tidak valid
-- Tidak ada pengecekan kemampuan baca sebelum unit ini dimulai
-- Fix: tambah warning di intro, atau prerequisite R01 mastery (tapi R01 COLLECT...)
+- `catatan_batas` sudah ada di cp.js; belum ada peringatan di UI intro R02
+- Diterima sebagai known limitation untuk MVP
 
 **CONCERN-BI-04: Cache buster manual (src/app.js?v=2)**
-- Setiap perubahan app.js perlu increment manual versi di index.html
-- Fix: gunakan hash-based cache busting atau build tool minimal
+- Masih manual; diterima untuk skala saat ini (vanilla, no build step)
 
-**CONCERN-BI-05: Tidak ada error boundary untuk state corrupt**
-- Jika localStorage state corrupt/invalid, app bisa crash
-- Fix: tambah try/catch + migrasi di state.js dengan fallback ke clearState
+**CONCERN-BI-05: Tidak ada error boundary untuk state corrupt** — RESOLVED 2026-09-29
+- `load()` di state.js kini validasi minimal: objek dengan field `units`
+- State corrupt atau tidak bisa di-parse → fallback ke `newState()` otomatis
+
+---
+
+## Deliverable 7 — Audit Keamanan & Isolasi (2026-09-29)
+
+### Temuan dan status
+
+| ID | Area | Temuan | Status |
+|----|------|--------|--------|
+| SEC-1 | Storage RLS | `media_upload/read/delete` hanya cek `auth.uid() is not null` — user A bisa akses media user B | **FIXED** |
+| SEC-2 | Schema | `parent_id` di tabel `children` tidak punya `DEFAULT auth.uid()` — file schema tidak bisa recreate DB | **FIXED** |
+| BUG-1 | State | `undoParentVerdict` tulis ke hardcoded `'plps_bi_kelas1_state'`, bukan key per-child; tidak sync Supabase | **FIXED** |
+| BUG-2 | State | `clearState` hanya hapus localStorage — data kembali dari Supabase saat login ulang | **FIXED** |
+| STAB-1 | State | State corrupt → app crash tanpa recovery | **FIXED** (CONCERN-BI-05) |
+
+### Detail perbaikan
+
+**SEC-1 — Storage RLS per pemilik (`supabase-schema.sql`)**
+- Sebelum: `auth.uid() is not null` — siapapun yang login bisa akses semua file
+- Sesudah: policy memverifikasi `(storage.foldername(name))[1]` (= childId dari path) dimiliki user yang sedang login via tabel `children`
+- Path format: `{childId}/{mediaId}` — childId adalah UUID unik per anak
+
+**SEC-2 — `DEFAULT auth.uid()` pada `parent_id`**
+- Ditambahkan ke DDL sehingga `addChild({ nama, kelas })` tanpa kirim `parent_id` tetap aman
+- Deployed DB sudah punya default ini (terbukti dari test PASS); file schema kini sinkron
+
+**BUG-1 — `undoParentVerdict`**
+- Diganti dari `localStorage.setItem(hardcoded_key, ...)` ke `saveState(s)` yang menggunakan key per-child dan sync ke Supabase
+
+**BUG-2 — `clearState` juga hapus dari Supabase**
+- Sekarang async; menghapus baris di `child_states` via Supabase setelah hapus localStorage
+- Teks dialog diperbaiki: "dari perangkat **dan akun** Anda"
+
+**STAB-1 — Error boundary state**
+- `load()` validasi: parsed harus objek dengan field `units` bertipe objek
+- Fallback ke `newState()` dengan log warning; tidak crash
+
+### Invariant yang diverifikasi
+
+| Invariant | Status setelah audit |
+|-----------|---------------------|
+| INV-01 `content_completed ≠ mastery_proven` | ✓ scoring.js tidak pernah set masteryProven dari progress saja |
+| INV-02 `payment_success → entitlement SAJA` | ✓ tidak ada payment state dalam kode |
+| INV-03 prerequisite dihormati | ✓ `getUnitStatusInfo` cek prerequisite sebelum unlock |
+| INV-04 `kelas anak ≠ kompetensi_state` | ✓ kelas hanya metadata profil |
+| INV-05 mastery hanya dari baseline + reassessment | ✓ AUTO: cek_awal + cek_ulang; COLLECT: dua verdik orang tua |
+| INV-06 next_target dari prerequisite chain | ✓ `findRootGap` hanya pilih dari chain |
+| INV-07 semua transition auditable | ✓ `progressLog` di setiap save function |
+| INV-08 normal flow tanpa operator manual | ✓ seluruh alur berjalan otomatis per anak |
+
+### Isolasi antar user
+
+| Lapisan | Mekanisme | Status |
+|---------|-----------|--------|
+| Database (`children`) | RLS: `parent_id = auth.uid()` | ✓ |
+| Database (`child_states`) | RLS via join ke `children` | ✓ |
+| Storage (`media`) | RLS via `foldername → childId → parent_id` | ✓ (diperbaiki) |
+| localStorage | Key per child: `plps_bi_kelas1_state_{childId}` | ✓ |
+| IndexedDB | Key per mediaId (UUID), tidak per user | ⚠ shared per device — acceptable untuk 1 perangkat per keluarga |
+
+### Catatan pasca-audit
+
+**IndexedDB tidak diisolasi per user** — jika dua akun orang tua berbeda login di satu perangkat (browser yang sama), IndexedDB bisa dibaca keduanya. Ini acceptable untuk satu perangkat per keluarga; jika multi-user per device diperlukan, perlu namespace IndexedDB dengan userId.
+
+**Tidak ada rate limiting** — Supabase Free tier punya batas; produksi perlu pantau usage.
 
 ---
 

@@ -25,7 +25,7 @@ import {
   scoreSession, decideMastery, findRootGap, getOutcomeLabel, OUTCOME,
 } from './scoring.js';
 import {
-  getState, saveProfile, getUnitState, saveCekAwal, saveLatihanResponses,
+  getState, saveState, saveProfile, getUnitState, saveCekAwal, saveLatihanResponses,
   saveCekUlang, saveMasteryDecision, saveCollectEvidence, saveCollectLatihanEvidence,
   saveCollectCekUlangEvidence, saveParentVerdict, saveParentVerdictCekUlang, closeVisit,
   getAllUnitOutcomes, getPendingVerdict1, getPendingVerdict2, getPendingParentReviews,
@@ -265,9 +265,9 @@ function renderHome() {
   });
 }
 
-window.showResetConfirm = function () {
-  if (confirm('Ini akan menghapus semua data anak ini di perangkat ini. Lanjutkan?')) {
-    clearState();
+window.showResetConfirm = async function () {
+  if (confirm('Ini akan menghapus semua data anak ini dari perangkat dan akun Anda. Lanjutkan?')) {
+    await clearState();
     navigate('#home');
   }
 };
@@ -1490,7 +1490,7 @@ window.undoParentVerdict = function(unitId, phase) {
     } else {
       s.units[unitId].parentVerdict = null;
     }
-    localStorage.setItem('plps_bi_kelas1_state', JSON.stringify(s));
+    saveState(s);
   }
   renderParentDashboard();
 };

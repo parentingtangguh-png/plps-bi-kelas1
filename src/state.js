@@ -165,8 +165,16 @@ export async function getMediaBlob(id) {
 function load() {
   try {
     const raw = localStorage.getItem(getStorageKey());
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Validasi minimal: harus objek dengan field units
+    if (typeof parsed !== 'object' || parsed === null || typeof parsed.units !== 'object') {
+      console.warn('State corrupt — reset ke state baru.');
+      return null;
+    }
+    return parsed;
   } catch {
+    console.warn('State tidak bisa di-parse — reset ke state baru.');
     return null;
   }
 }
@@ -178,6 +186,10 @@ function save(state) {
     console.warn('localStorage tidak tersedia.');
   }
   syncToSupabase(state).catch(() => {});
+}
+
+export function saveState(state) {
+  save(state);
 }
 
 export function getState() {
@@ -334,9 +346,18 @@ export function closeVisit(unitId) {
   save(s);
 }
 
-export function clearState() {
+export async function clearState() {
   const key = getStorageKey();
   try { localStorage.removeItem(key); } catch {}
+  // Hapus juga dari Supabase agar tidak kembali saat login ulang
+  const childId = getActiveChildId();
+  if (!childId) return;
+  try {
+    const { supabase } = await import('./supabase.js');
+    await supabase.from('child_states').delete().eq('child_id', childId);
+  } catch (e) {
+    console.warn('Gagal hapus state dari Supabase:', e);
+  }
 }
 
 function logEvent(state, eventType, unitId, data) {
