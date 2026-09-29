@@ -418,9 +418,9 @@ export function getPendingVerdict1(units) {
   return units.filter(u => {
     const us = s.units[u.id];
     if (!us) return false;
-    const hasEvidence = us.collectEvidence?.length > 0;
+    const hasRealEvidence = us.collectEvidence?.some(e => e.type !== 'skipped');
     const noVerdict = !us.parentVerdict;
-    return hasEvidence && noVerdict;
+    return hasRealEvidence && noVerdict;
   });
 }
 
@@ -432,9 +432,9 @@ export function getPendingVerdict2(units) {
   return units.filter(u => {
     const us = s.units[u.id];
     if (!us) return false;
-    const hasEvidence = us.collectCekUlangEvidence?.length > 0;
+    const hasRealEvidence = us.collectCekUlangEvidence?.some(e => e.type !== 'skipped');
     const noVerdict = !us.parentVerdictCekUlang;
-    return hasEvidence && noVerdict;
+    return hasRealEvidence && noVerdict;
   });
 }
 
