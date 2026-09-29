@@ -123,10 +123,26 @@ export async function saveMediaBlob(id, blob) {
       tx.oncomplete = resolve;
       tx.onerror = () => reject(tx.error);
     });
+    uploadMediaToStorage(id, blob).catch(() => {});
     return id;
   } catch (e) {
     console.warn('IndexedDB tidak tersedia — blob tidak tersimpan:', e);
     return null;
+  }
+}
+
+async function uploadMediaToStorage(id, blob) {
+  const childId = getActiveChildId();
+  if (!childId) return;
+  try {
+    const { supabase } = await import('./supabase.js');
+    const path = `${childId}/${id}`;
+    const { error } = await supabase.storage
+      .from('media')
+      .upload(path, blob, { contentType: blob.type, upsert: true });
+    if (error) console.warn('Storage upload gagal:', error);
+  } catch (e) {
+    console.warn('Storage upload error:', e);
   }
 }
 

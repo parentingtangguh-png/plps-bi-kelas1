@@ -126,17 +126,17 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 
 ### BLOCKER — tidak bisa diotomasi tanpa keputusan arsitektur
 
-**BLOCK-BI-01: 12 dari 16 unit adalah COLLECT — tidak ada mastery decision otomatis**
-- Unit R01 (membaca), S01–S08 (berbicara), W01–W03 (menulis) hanya mengumpulkan bukti
-- Sistem tidak bisa memutuskan TERLIHAT_BISA / MASIH_BELAJAR untuk unit-unit ini
-- Dampak: root gap pada sebagian besar anak tidak bisa otomatis maju ke mastery
-- Fix yang diperlukan: pilih satu — (a) ASR + rubrik otomatis, (b) reviewer manusia dalam loop, atau (c) redefinisi unit agar ada observable yang bisa di-proxy secara digital
+**BLOCK-BI-01: 12 dari 16 unit adalah COLLECT** — **RESOLVED (by design)**
+- Penilaian unit COLLECT adalah peran orang tua sebagai fasilitator
+- Sistem menyediakan rubrik, instruksi, dan tombol verdik ("Terlihat Bisa" / "Perlu Latihan") untuk memudahkan orang tua
+- Mastery decision direkam dari verdik orang tua (fase 1 + fase 2), bukan otomatis dari AI/ASR
+- Ini bukan kekurangan — ini desain yang sesuai dengan pendekatan pedagogis Fase A
 
-**BLOCK-BI-02: Rekaman suara dan foto tidak tersimpan persisten** — PARTIAL (2026-09-29)
-- IndexedDB sudah dipakai sebagai cache lokal blob audio/foto
-- Supabase Storage bucket `media` sudah dibuat dengan RLS
-- **Yang masih belum**: upload aktif dari IndexedDB ke Storage setelah rekam/foto
-- Fix tersisa: panggil `supabase.storage.from('media').upload(...)` setelah `saveMediaBlob`
+**BLOCK-BI-02: Rekaman suara dan foto tidak tersimpan persisten** — **RESOLVED (2026-09-29)**
+- IndexedDB sebagai cache lokal blob audio/foto ✓
+- Supabase Storage bucket `media` dengan RLS ✓
+- Upload otomatis ke Storage dipanggil fire-and-forget setelah `saveMediaBlob` ✓
+- Path di Storage: `{childId}/{mediaId}` — terpisah per anak
 
 **BLOCK-BI-03: ~~Audio TTS~~ — RESOLVED 2026-09-28**
 - TTS speechSynthesis dihapus sepenuhnya; diganti kotak baca-nyaring orang tua
