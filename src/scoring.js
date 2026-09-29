@@ -57,12 +57,16 @@ export function decideMastery(cekAwalResult, cekUlangResult) {
   if (cekUlangResult.outcome === OUTCOME.TERLIHAT_BISA) {
     return {
       masteryProven: true,
-      reason: `Cek ulang: ${cekUlangResult.correctItems}/${cekUlangResult.totalItems} benar (${Math.round(cekUlangResult.ratio * 100)}%) dengan soal berbeda dari cek awal.`,
+      reason: `Cek ulang: ${cekUlangResult.correctItems} dari ${cekUlangResult.totalItems} soal dijawab benar, dengan soal baru yang berbeda dari cek awal.`,
     };
   }
+  const pct = Math.round((cekUlangResult.ratio ?? 0) * 100);
+  const wrongFamily = cekUlangResult.anyFamilyZero
+    ? ' Ada jenis soal yang belum terjawab dengan benar.'
+    : '';
   return {
     masteryProven: false,
-    reason: `Cek ulang: ${cekUlangResult.correctItems}/${cekUlangResult.totalItems} benar (${Math.round((cekUlangResult.ratio ?? 0) * 100)}%). Belum mencapai 80% atau ada kelompok soal dengan 0 jawaban benar.`,
+    reason: `Cek ulang: ${cekUlangResult.correctItems} dari ${cekUlangResult.totalItems} soal dijawab benar (${pct}%).${wrongFamily} Anak perlu lebih banyak latihan sebelum cek ini dianggap berhasil.`,
   };
 }
 

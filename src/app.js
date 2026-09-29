@@ -253,6 +253,8 @@ window.showChildPicker = async function () {
 function renderHome() {
   const s = getState();
   const hasProfile = s.childName && s.kelas;
+  const kelasLabel = s.kelas ? `Kelas ${s.kelas}` : 'Kelas 1';
+  document.title = `PLPS — Bahasa Indonesia ${kelasLabel}`;
 
   const isDemo = new URLSearchParams(window.location.search).get('demo') === '1';
   app.innerHTML = `
@@ -260,7 +262,7 @@ function renderHome() {
       ${isDemo ? `<div class="demo-banner">🧪 MODE DEMO — data tidak disimpan ke server</div>` : ''}
       <div class="brand">
         <div class="brand-title">PLPS</div>
-        <div class="brand-sub">Bahasa Indonesia · Kelas 1</div>
+        <div class="brand-sub">Bahasa Indonesia · ${esc(kelasLabel)}</div>
       </div>
       ${hasProfile ? `
         <div class="profile-card">
@@ -600,7 +602,7 @@ function renderItemSession(unit, items, phase, responsesAcc, onDone) {
     <div class="view-check">
       <header class="check-header">
         <button class="btn-back" onclick="navigate('#map')">← Peta</button>
-        <div class="check-badge">Untuk anak · ${phaseLabel} · ${idx + 1} dari ${items.length}</div>
+        <div class="check-badge">Untuk anak · ${phaseLabel} · ${idx + 1} dari ${items.length} · Soal Kelas ${item.kelas_soal ?? ''}</div>
       </header>
       <h1 class="check-title">${esc(unit.label)}</h1>
 
@@ -679,8 +681,14 @@ window.selectOption = function(btn, unitId, itemIdx, selectedId, kunci, itemId, 
   const isLatihan = sess.phase === 'latihan' || sess.phase === 'latihan_pendalaman';
   const feedback = document.getElementById('feedback');
   if (feedback && isLatihan && item.umpan_balik_benar && item.umpan_balik_salah) {
-    feedback.textContent = isCorrect ? item.umpan_balik_benar : item.umpan_balik_salah;
+    const fbText = isCorrect ? item.umpan_balik_benar : item.umpan_balik_salah;
     feedback.className = `feedback ${isCorrect ? 'feedback-correct' : 'feedback-wrong'}`;
+    if (!isCorrect) {
+      feedback.innerHTML = `<span>${esc(fbText)}</span><button class="btn-lanjut-feedback" onclick="window._advanceFeedback()">Lanjut →</button>`;
+      window._advanceFeedback = () => renderItemSession(sess.unit, sess.items, sess.phase, newResponses, sess.onDone);
+      return;
+    }
+    feedback.textContent = fbText;
   } else if (feedback) {
     feedback.style.display = 'none';
   }
@@ -1667,6 +1675,10 @@ function renderUnitReport(unitId) {
 
       <div class="report-actions">
         ${!decision ? `<button class="btn-primary" onclick="navigate('#unit/${unit.id}')">Lanjutkan perjalanan</button>` : ''}
+        ${decision && !decision.masteryProven ? `
+          <p class="report-next-action">Anak perlu latihan lebih lanjut. Kembali ke unit ini kapan saja untuk mencoba latihan penguatan lagi.</p>
+          <button class="btn-primary" onclick="navigate('#unit/${unit.id}')">Coba latihan lagi →</button>
+        ` : ''}
         <button class="btn-ghost" onclick="navigate('#map')">Kembali ke peta</button>
         ${!us.visitClosed ? `
           <p class="close-visit-note">Tombol di bawah membawa Anda kembali ke peta. Unit ini bisa dibuka lagi kapan saja, dan semua hasil yang sudah tersimpan tidak hilang.</p>
