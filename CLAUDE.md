@@ -50,17 +50,23 @@ Atau gunakan launch.json di `.claude/launch.json` repo ini (nama konfigurasi: `p
 
 ## State
 
-Disimpan di `localStorage` — key: `plps_bi_kelas1_state`. Tidak ada server/database saat ini.
+- **Auth**: Supabase Auth + Google OAuth
+- **Database**: Supabase PostgreSQL — tabel `children` + `child_states`
+- **localStorage**: write-through cache per anak — key `plps_bi_kelas1_state_{childId}`
+- **Demo mode**: `?demo=1&kelas=1` atau `?demo=1&kelas=2` — bypass login, state lokal saja
+- Rekaman audio & foto: IndexedDB (lokal) + Supabase Storage bucket `media`
 
 ---
 
-## Pekerjaan yang belum selesai
+## Status saat ini (2026-09-29)
 
-Lihat bagian **Deliverable 5** di `DELIVERABLES.md` untuk daftar BLOCKER dan CONCERN terkini.
+Semua BLOCKER dan temuan kritis **sudah resolved**. Detail lengkap: lihat `DELIVERABLES.md`.
 
-**Temuan kritis terakhir (audit 2026-09-29):**
-- K-1: L02 FAM-B — 4 item "pesan cerita" terlalu abstrak untuk kelas 1 awal → perlu diganti
-- K-2: R03 — emoji perlu diganti gambar SVG
+**Backlog terbuka:**
+- U-4: L01 kelas 2 hanya 2 soal per cek — perlu tambah konten item (bukan bug, batas minimum scoring terpenuhi)
+- Kelas 2: item bank L01/R02/R03 ada tapi tipis; perlu diperluas sebelum produksi skala besar
+- IndexedDB tidak diisolasi per user (acceptable untuk 1 perangkat per keluarga)
+- Tidak ada rate limiting Supabase (pantau saat scale)
 
 ---
 
