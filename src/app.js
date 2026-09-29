@@ -1499,8 +1499,36 @@ window.collectNext = async function(unitId, taskIdx, phase) {
 // ─────────────────────────────────────────────────────
 // View: Dashboard Orang Tua
 // ─────────────────────────────────────────────────────
-function renderParentDashboard() {
+async function renderParentDashboard() {
+  app.innerHTML = `<div style="padding:48px 16px;text-align:center;color:#6b7280;">Memuat...</div>`;
+
   const s = getState();
+  const params = new URLSearchParams(window.location.search);
+  const isAudit = params.get('audit') === '1';
+  const isDemo  = params.get('demo')  === '1';
+
+  // Kumpulkan semua anak yang diketahui
+  let allChildren = [];
+  if (isAudit) {
+    allChildren = AUDIT_CHILDREN.map(c => ({ id: c.id, nama: c.nama, kelas: c.kelas }));
+  } else if (isDemo) {
+    const meta = getActiveChildMeta();
+    if (meta) allChildren = [{ id: meta.id, nama: meta.nama, kelas: meta.kelas }];
+  } else {
+    allChildren = await getChildren().catch(() => []);
+  }
+
+  // Baca ringkasan state per anak dari localStorage
+  const childSummaries = allChildren.map(c => {
+    let st = null;
+    try { st = JSON.parse(localStorage.getItem(`plps_bi_kelas1_state_${c.id}`) ?? 'null'); } catch {}
+    const mastered = UNITS.filter(u => st?.units?.[u.id]?.masteryDecision?.masteryProven).length;
+    const started  = UNITS.filter(u => st?.units?.[u.id]?.cekAwal?.outcome).length;
+    return { ...c, mastered, started, total: UNITS.length, hasState: !!st };
+  });
+
+  const activeChildId = getActiveChildId();
+
   const pendingV1 = getPendingVerdict1(UNITS);
   const pendingV2 = getPendingVerdict2(UNITS);
   const reviewed = UNITS.filter(u => {
@@ -1514,7 +1542,32 @@ function renderParentDashboard() {
         <button class="btn-back" onclick="navigate('#map')">← Peta</button>
         <div class="check-badge">Dashboard Orang Tua</div>
       </header>
-      <h1 class="parent-title">Penilaian Bukti</h1>
+
+      ${childSummaries.length > 1 ? `
+        <h2 class="parent-section-title" style="margin-top:16px;">Laporan per anak</h2>
+        <div class="child-report-list">
+          ${childSummaries.map(c => `
+            <div class="child-report-row ${c.id === activeChildId ? 'child-report-row--active' : ''}">
+              <div class="crr-info">
+                <div class="crr-nama">${esc(c.nama)}</div>
+                <div class="crr-kelas">${esc(formatKelas(c.kelas))}</div>
+              </div>
+              <div class="crr-progress">
+                ${c.hasState
+                  ? `${c.mastered}/${c.total} unit dikuasai${c.started > c.mastered ? ` · ${c.started} dimulai` : ''}`
+                  : 'Belum dimulai'}
+              </div>
+              <button class="btn-link" onclick="window.switchChildReport('${esc(c.id)}','${esc(c.nama)}','${esc(c.kelas)}')">
+                Lihat laporan →
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      <h2 class="parent-section-title" style="margin-top:${childSummaries.length > 1 ? '24px' : '16px'};">
+        Penilaian bukti — ${esc(s.childName || 'anak aktif')}
+      </h2>
       <p class="parent-desc">
         Anda menilai hasil rekaman atau tulisan ${esc(s.childName || 'anak')} berdasarkan panduan di bawah ini.
         Penilaian Anda dicatat sebagai bukti kemampuan.
@@ -1548,6 +1601,14 @@ function renderParentDashboard() {
     </div>
   `;
 }
+
+window.switchChildReport = function(childId, nama, kelas) {
+  try {
+    localStorage.setItem('plps_bi_kelas1_active_child', childId);
+    localStorage.setItem('plps_bi_kelas1_child_meta', JSON.stringify({ id: childId, nama, kelas }));
+  } catch {}
+  navigate('#fullreport');
+};
 
 function renderParentReviewCard(unit, us, verdikPhase, isDone) {
   const evidenceList = verdikPhase === 'cek_ulang'

@@ -393,6 +393,19 @@ button { cursor: pointer; font: inherit; border: none; }
 }
 .parent-section-title--done { color: var(--color-accent); }
 
+/* ── Child report list (multi-anak di dashboard) ── */
+.child-report-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.child-report-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--color-surface); border: 1.5px solid var(--color-border);
+  border-radius: var(--radius); padding: 12px 14px;
+}
+.child-report-row--active { border-color: var(--color-accent); }
+.crr-info { flex: 1; min-width: 0; }
+.crr-nama { font-weight: 700; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.crr-kelas { font-size: .78rem; color: var(--color-text-muted); margin-top: 2px; }
+.crr-progress { font-size: .8rem; color: var(--color-text-muted); white-space: nowrap; }
+
 /* ── Parent review card ── */
 .parent-review-card {
   background: var(--color-surface); border: 1.5px solid var(--color-warn);
