@@ -260,6 +260,7 @@ button { cursor: pointer; font: inherit; border: none; }
 .outcome-bukti_terkumpul_belum_dapat_dinilai_otomatis { background: var(--color-primary-light); color: #1e40af; }
 .outcome-tugas_gagal_berjalan { background: var(--color-error-light); color: #b91c1c; }
 .outcome-null { background: #f3f4f6; color: var(--color-text-muted); }
+.outcome-partial { background: #eff6ff; color: #1d4ed8; }
 .result-detail { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 16px; }
 .family-breakdown { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
 .family-row { display: flex; justify-content: space-between; font-size: .85rem; }

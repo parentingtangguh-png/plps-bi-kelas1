@@ -289,7 +289,7 @@ function renderHome() {
         </div>
       `}
       <footer class="home-footer">
-        Data tersimpan di akun Anda.<br/>
+        ${isDemo ? '' : 'Data tersimpan di akun Anda.<br/>'}
         <a href="#fullreport" class="link-small">Lihat semua laporan</a>
       </footer>
     </div>
@@ -709,13 +709,6 @@ function renderCekAwalResult(unit, us) {
       ${result.totalItems > 0 ? `
         <div class="result-detail">
           ${result.correctItems}/${result.totalItems} jawaban benar
-          ${result.familyBreakdown ? `
-            <div class="family-breakdown">
-              ${Object.entries(result.familyBreakdown).map(([fam, d]) =>
-                `<div class="family-row"><span>${fam}</span><span>${d.correct}/${d.total}</span></div>`
-              ).join('')}
-            </div>
-          ` : ''}
         </div>
       ` : ''}
 
@@ -1649,7 +1642,7 @@ function renderUnitReport(unitId) {
         ${decision ? `
           <div class="report-section mastery-section ${decision.masteryProven ? 'mastery-proven' : 'mastery-not-proven'}">
             <div class="mastery-badge">
-              ${decision.masteryProven ? '✓ Berhasil pada cek ini' : '○ Belum berhasil pada cek ulang'}
+              ${decision.masteryProven ? '✓ Berhasil pada cek awal + cek ulang' : '○ Belum berhasil pada cek ulang'}
             </div>
             <div class="mastery-reason">${esc(decision.reason)}</div>
             ${decision.masteryProven ? `
@@ -1705,16 +1698,35 @@ function renderFullReport() {
       <div class="full-report-table">
         ${UNITS.map(u => {
           const us = getUnitState(u.id);
-          const outcome = us.masteryDecision?.masteryProven ? OUTCOME.TERLIHAT_BISA
-            : us.masteryDecision && !us.masteryDecision.masteryProven ? OUTCOME.MASIH_BELAJAR
-            : us.cekAwal?.outcome ?? null;
+          const unitOutcomes = getAllUnitOutcomes();
+          const isLocked = u.prerequisite?.length > 0 &&
+            !u.prerequisite.every(id => unitOutcomes[id] === OUTCOME.TERLIHAT_BISA);
+          const hasCekAwal = !!us.cekAwal?.outcome;
+          const hasMastery = !!us.masteryDecision;
+
+          let statusLabel, statusClass;
+          if (us.masteryDecision?.masteryProven) {
+            statusLabel = '✓ Berhasil — cek awal + cek ulang';
+            statusClass = 'outcome-terlihat_bisa';
+          } else if (us.masteryDecision && !us.masteryDecision.masteryProven) {
+            statusLabel = 'Perlu latihan lanjutan';
+            statusClass = 'outcome-masih_belajar';
+          } else if (hasCekAwal) {
+            statusLabel = 'Cek awal selesai — belum cek ulang';
+            statusClass = 'outcome-partial';
+          } else if (isLocked) {
+            statusLabel = '🔒 Menunggu prasyarat';
+            statusClass = 'outcome-null';
+          } else {
+            statusLabel = 'Belum dimulai';
+            statusClass = 'outcome-null';
+          }
+
           return `
             <div class="full-report-row">
               <div class="fr-id">${esc(u.id)}</div>
               <div class="fr-label">${esc(u.label)}</div>
-              <div class="fr-outcome ${outcome ? 'outcome-' + outcome.toLowerCase() : 'outcome-null'}">
-                ${outcome ? getOutcomeLabel(outcome) : 'Belum diperiksa'}
-              </div>
+              <div class="fr-outcome ${statusClass}">${statusLabel}</div>
               <button class="btn-link" onclick="navigate('#unit/${u.id}')">→</button>
             </div>
           `;
@@ -1722,9 +1734,9 @@ function renderFullReport() {
       </div>
 
       <div class="report-batas">
-        "Dinilai bisa: cek awal + cek ulang" = orang tua menilai anak bisa pada kedua cek dengan bahan berbeda.
-        Ini bukan klaim kemampuan stabil — bukan pengganti asesmen formal.<br/>
-        "Berhasil pada cek ini" = hasil sesi tunggal — belum dikonfirmasi.
+        ✓ Berhasil — cek awal + cek ulang: anak berhasil pada dua cek dengan bahan berbeda.<br/>
+        Cek awal selesai — belum cek ulang: baru satu konfirmasi, lanjutkan cek ulang.<br/>
+        Ini bukan pengganti asesmen formal.
       </div>
     </div>
   `;

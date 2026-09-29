@@ -22,7 +22,7 @@ export const ELEMEN = {
   MENYIMAK: {
     id: 'L',
     label: 'Menyimak',
-    asal_cp: 'Memahami informasi dari percakapan nonsastra aural; memahami pesan teks sastra aural.',
+    asal_cp: 'Memahami informasi dari percakapan yang didengar; memahami isi cerita yang didengar.',
   },
   MEMBACA_MEMIRSA: {
     id: 'R',
@@ -97,7 +97,7 @@ export const UNITS = [
     tuntutan: 'Anak membaca teks pendek (3–5 kalimat) yang tampil di layar, lalu menjawab pertanyaan pilihan ganda tentang isi: siapa, apa, di mana, mengapa.',
     evidence_mode: EVIDENCE_MODE.AUTO,
     sumber_informasi: 'teks_dibaca',
-    catatan_batas: 'Asumsi: anak dapat membaca sendiri. Jika anak belum bisa membaca, orang tua perlu mengetahui ini sebelum sesi dimulai. Hasil tidak dapat mewakili kemampuan baca anak yang belum lancar.',
+    catatan_batas: 'Unit ini untuk anak yang sudah bisa membaca sendiri. Jika anak belum lancar membaca, lewati dulu unit ini dan kerjakan unit Menyimak (L01, L02) terlebih dahulu.',
     prerequisite: [],
     // R02 adalah unit paling bisa diotomasi penuh
   },
