@@ -159,9 +159,9 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 **CONCERN-BI-02: R03 menggunakan emoji sebagai "gambar"** — RESOLVED K-2
 - Semua panel R03 sudah diganti ke inline SVG
 
-**CONCERN-BI-03: Asumsi anak bisa membaca mandiri untuk R02/R03**
-- `catatan_batas` sudah ada di cp.js; belum ada peringatan di UI intro R02
-- Diterima sebagai known limitation untuk MVP
+**CONCERN-BI-03: Asumsi anak bisa membaca mandiri untuk R02/R03** — RESOLVED
+- `catatan_batas` sudah ada di cp.js dan dirender di UI intro unit (baris `${unit.catatan_batas ? ...}` di app.js)
+- Orang tua membaca peringatan sebelum tombol "Mulai cek awal" tersedia
 
 **CONCERN-BI-04: Cache buster manual (src/app.js?v=2)**
 - Masih manual; diterima untuk skala saat ini (vanilla, no build step)
@@ -385,11 +385,11 @@ Kriteria: kesesuaian usia 6–7 tahun kelas 1–2 SD, beban bahasa, tingkat abst
 - FAM-B (topik percakapan) → satu level lebih abstrak, tapi masih dalam jangkauan anak kelas 1 akhir
 - Tidak kritis; pantau distribusi skor FAM-A vs FAM-B untuk evidens.
 
-#### M-2 — Minor
+#### M-2 — ~~Minor~~ RESOLVED 2026-09-29
 
 **R02: asumsi anak bisa membaca mandiri tidak diverifikasi sebelum sesi**
-- Unit sudah memiliki `catatan_batas` di cp.js, tapi tidak ada pengecekan/peringatan di UI intro
-- Usulan: tambah satu kalimat di intro R02 yang meminta orang tua memastikan anak sudah bisa membaca mandiri.
+- RESOLVED — `catatan_batas` di cp.js sudah dirender di UI intro unit via `${unit.catatan_batas ? <div class="batas-note">...` (app.js)
+- Orang tua melihat peringatan sebelum tombol "Mulai cek awal" tersedia.
 
 #### K-3 — ~~Kritis~~ RESOLVED 2026-09-29
 
@@ -419,12 +419,11 @@ Kriteria: kesesuaian usia 6–7 tahun kelas 1–2 SD, beban bahasa, tingkat abst
 **S-units (S01–S08): rubrik_orang_tua sudah ada di cp.js tapi belum diaudit konsistensinya dengan item bank COLLECT_UNITS.js**
 - Belum ada task definition yang berpasangan dengan setiap rubrik untuk diverifikasi keselarasannya
 
-#### M-5 — Minor
+#### M-5 — ~~Minor~~ RESOLVED 2026-09-29
 
 **W03: batas minimum 20 karakter sangat rendah**
-- 2–3 kalimat bahasa Indonesia akan mengandung jauh lebih dari 20 karakter
-- Angka ini mungkin terlalu longgar untuk memastikan anak sungguh menulis 2 kalimat
-- Usulan: naikkan ke 30–40 karakter, atau validasi jumlah spasi/kata
+- RESOLVED — `min_panjang` di COLLECT_UNITS.js dinaikkan dari 20 → 40 karakter (cek_awal, latihan, cek_ulang)
+- 40 karakter ≈ 1 kalimat pendek bahasa Indonesia; 2 kalimat akan selalu melewati batas ini.
 
 ---
 
@@ -486,5 +485,6 @@ Jika tidak ada soal untuk kelas anak di phase tersebut, `renderNoItemsForKelas` 
 | 2026-09-29 | 4a1e53b | audit(L01/L02): perbaiki validitas klaim bukti menyimak — tambah sumber_informasi, instruksi_fasilitator, label L02 |
 | 2026-09-29 | 060efa4 | feat(items): tambah kompetensi_id, kelas_soal, tingkat_kompleksitas, cara_penyajian ke semua item (L01, L02, R02, R03) |
 | 2026-09-29 | 983fcdb | feat(kelas-gate): isolasi soal per kelas — filter getItemsByPhase(phase, kelas) di semua 5 titik pemanggilan |
+| 2026-09-29 | (pending) | fix(W03): min_panjang 20 → 40 karakter; M-2 dikonfirmasi resolved (catatan_batas sudah dirender) |
 
 *Dokumen diperbarui 2026-09-29. App live di production.*

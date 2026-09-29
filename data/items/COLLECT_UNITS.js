@@ -379,7 +379,7 @@ export const COLLECT_PHASES = {
     cek_awal: [{
       id: 'W03-CA-1',
       instruksi: 'Tulis 2 sampai 3 kalimat tentang hari ini atau kegiatanmu.',
-      min_panjang: 20,
+      min_panjang: 40,
       needsText: true,
     }],
     latihan: [{
@@ -391,13 +391,13 @@ export const COLLECT_PHASES = {
         penguatan:  ['Apakah ada minimal 2 kalimat tentang makanan kesukaannya?', 'Apakah setiap kalimat diakhiri tanda titik?'],
         pendalaman: ['Apakah ada minimal 3 kalimat tentang makanan kesukaannya?', 'Apakah ada kata penghubung (karena, tetapi, atau dan) di salah satu kalimat?'],
       },
-      min_panjang: 20,
+      min_panjang: 40,
       needsText: true,
     }],
     cek_ulang: [{
       id: 'W03-CU-1',
       instruksi: 'Tulis 2 sampai 3 kalimat tentang hewan yang kamu suka.',
-      min_panjang: 20,
+      min_panjang: 40,
       needsText: true,
     }],
   },
