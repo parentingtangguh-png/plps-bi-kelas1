@@ -1,5 +1,5 @@
 # MVP 2 PLPS — Deliverables
-Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-29 (diperbarui)
+Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-30 (diperbarui)
 
 > **Status: SELESAI & LIVE** — https://plps-bi-kelas1.parentingtangguh.workers.dev
 > Audit terakhir selesai 2026-09-29. Siap dikembangkan ke mapel lain Fase A.
@@ -15,11 +15,11 @@ Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-29 (diperbarui)
 
 ```
 Lokasi   : D:\ribuan_pengguna\CLAUDE\plps-bi-kelas1\
-Commit   : 6390b68
+Commit   : 360224a
 Branch   : master
 Remote   : https://github.com/parentingtangguh-png/plps-bi-kelas1.git
 Deploy   : https://plps-bi-kelas1.parentingtangguh.workers.dev
-Version  : 0172f32c-a640-489a-92bc-11153301ba0c
+Version  : bf79ff49-d7d4-48a4-b6b5-db9429f70c32
 ```
 
 **Menjalankan:**
@@ -602,6 +602,7 @@ Audit dijalankan oleh ChatGPT via mode demo (`?demo=1&kelas=1` dan `?demo=1&kela
 | 2026-09-29 | 0f53ebf | fix(report): label mastery membedakan 'berhasil sejak cek awal' vs 'berhasil setelah berlatih' |
 | 2026-09-29 | dc75244 | feat(dashboard): laporan per anak di dashboard orang tua |
 | 2026-09-29 | 6390b68 | docs: revisi PLPS_Business_Journey_CP_V1.md V1.0 → V1.1 — sesuaikan dengan implementasi aktual |
+| 2026-09-30 | 360224a | feat(report): banner offer program berbayar saat mastery gagal — coming-soon stub, btn-ghost untuk coba lagi |
 
 ---
 
@@ -648,4 +649,28 @@ Audit dijalankan oleh ChatGPT sebagai 1 orang tua dengan 2 anak (kelas 1 dan kel
 - State dibaca dari localStorage seperti biasa — dapat mewarisi state dari sesi audit sebelumnya
 - Tidak ada perbedaan kode alur unit dengan mode normal — cocok untuk regression test manual
 
-*Dokumen diperbarui 2026-09-29. App live di production.*
+*Dokumen diperbarui 2026-09-30. App live di production.*
+
+---
+
+## Deliverable 12 — Banner Offer Program Berbayar (2026-09-30)
+
+### Fitur
+
+Setelah anak gagal cek ulang (`masteryProven === false`), laporan unit menampilkan banner tawaran program berbayar.
+
+**Kondisi tampil:** `decision && !decision.masteryProven` — hanya setelah cek ulang selesai dengan hasil Masih Belajar.
+
+**Komponen:**
+
+| Komponen | Detail |
+|----------|--------|
+| Banner `.offer-banner` | Background kuning (#fff8e1), border amber, muncul setelah "Catatan batas sistem" |
+| Teks | "Bantu {nama anak} melewati ini dengan program yang lebih terstruktur — kesempatan menjadi juara semakin terbuka." |
+| Tombol "Lihat program →" | Mengarah ke `#coming-soon` |
+| Halaman `#coming-soon` | Stub: menyebut nama anak, CTA tinggalkan kontak, tombol kembali ke peta |
+| "Coba latihan lagi" | Diturunkan dari `btn-primary` ke `btn-ghost` — program berbayar menjadi pilihan utama |
+
+**Invariant dijaga:**
+- INV-01: banner tidak mengubah `masteryProven` — hanya mengubah tampilan laporan
+- INV-02: `#coming-soon` adalah stub UI murni, tidak ada perubahan commercial/academic state
