@@ -1,5 +1,5 @@
 # MVP 2 PLPS — Deliverables
-Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-30 (diperbarui)
+Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-30 — platform multi-mapel (diperbarui)
 
 > **Status: SELESAI & LIVE** — https://plps-bi-kelas1.parentingtangguh.workers.dev
 > Audit terakhir selesai 2026-09-29. Siap dikembangkan ke mapel lain Fase A.
@@ -603,6 +603,7 @@ Audit dijalankan oleh ChatGPT via mode demo (`?demo=1&kelas=1` dan `?demo=1&kela
 | 2026-09-29 | dc75244 | feat(dashboard): laporan per anak di dashboard orang tua |
 | 2026-09-29 | 6390b68 | docs: revisi PLPS_Business_Journey_CP_V1.md V1.0 → V1.1 — sesuaikan dengan implementasi aktual |
 | 2026-09-30 | 360224a | feat(report): banner offer program berbayar saat mastery gagal — coming-soon stub, btn-ghost untuk coba lagi |
+| 2026-09-30 | 280d87e | feat(platform): fondasi multi-mapel — kolom mapel di child_states, MAPEL='bi' di state.js |
 
 ---
 
@@ -650,6 +651,44 @@ Audit dijalankan oleh ChatGPT sebagai 1 orang tua dengan 2 anak (kelas 1 dan kel
 - Tidak ada perbedaan kode alur unit dengan mode normal — cocok untuk regression test manual
 
 *Dokumen diperbarui 2026-09-30. App live di production.*
+
+---
+
+## Deliverable 13 — Fondasi Platform Multi-Mapel (2026-09-30)
+
+### Arsitektur ekspansi
+
+Mapel baru cukup mengganti 5 komponen — semua engine, auth, state management, dan UI shell diwarisi tanpa modifikasi.
+
+| Komponen | BI (existing) | Mapel baru |
+|----------|--------------|-----------|
+| `data/cp.js` | ELEMEN + UNITS BI | Ganti seluruh file |
+| `data/items/` | L01, L02, R02, R03, COLLECT_UNITS | Item bank baru |
+| `src/state.js` baris `MAPEL` | `'bi'` | Ganti ke `'mtk'`, `'ipa'`, dst |
+| `index.html` `<title>` | PLPS — Bahasa Indonesia Kelas 1 | Ganti judul |
+| Deploy config | `plps-bi-kelas1` | Project name baru |
+| `scoring.js`, `auth.js`, `children.js`, `state.js` (logic), `styles.css`, `app.js` (shell) | **Tidak diubah** | Diwarisi langsung |
+
+### Perubahan Supabase (sudah dijalankan 2026-09-30)
+
+Tabel `child_states` kini menggunakan composite primary key `(child_id, mapel)`:
+
+```sql
+-- Sebelum: child_id uuid PRIMARY KEY
+-- Sesudah: PRIMARY KEY (child_id, mapel)
+-- Baris existing: mapel DEFAULT 'bi' — backward compatible
+```
+
+Semua call Supabase di `state.js` sudah filter/upsert dengan `mapel = MAPEL`.
+
+### Cara membuat repo mapel baru
+
+1. Fork repo ini → `plps-{mapel}-kelas1`
+2. Ganti `data/cp.js` — tulis ELEMEN + UNITS sesuai CP mapel target
+3. Buat `data/items/` — item bank baru
+4. Di `src/state.js` baris 1: ubah `const MAPEL = 'bi'` → `const MAPEL = '{mapel}'`
+5. Di `index.html`: ubah `<title>`
+6. Deploy ke Cloudflare project baru
 
 ---
 
