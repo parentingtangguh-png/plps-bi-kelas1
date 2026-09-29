@@ -1749,7 +1749,11 @@ function renderUnitReport(unitId) {
         ${decision ? `
           <div class="report-section mastery-section ${decision.masteryProven ? 'mastery-proven' : 'mastery-not-proven'}">
             <div class="mastery-badge">
-              ${decision.masteryProven ? '✓ Berhasil pada cek awal + cek ulang' : '○ Belum berhasil pada cek ulang'}
+              ${decision.masteryProven
+                ? (cekAwal?.outcome === 'TERLIHAT_BISA'
+                    ? '✓ Berhasil pada cek awal + cek ulang'
+                    : '✓ Berhasil pada cek ulang setelah berlatih')
+                : '○ Belum berhasil pada cek ulang'}
             </div>
             <div class="mastery-reason">${esc(decision.reason)}</div>
             ${decision.masteryProven ? `
@@ -1817,7 +1821,9 @@ function renderFullReport() {
 
           let statusLabel, statusClass;
           if (us.masteryDecision?.masteryProven) {
-            statusLabel = '✓ Berhasil — cek awal + cek ulang';
+            statusLabel = us.cekAwal?.outcome === 'TERLIHAT_BISA'
+              ? '✓ Berhasil — cek awal + cek ulang'
+              : '✓ Berhasil pada cek ulang setelah berlatih';
             statusClass = 'outcome-terlihat_bisa';
           } else if (us.masteryDecision && !us.masteryDecision.masteryProven) {
             statusLabel = 'Perlu latihan lanjutan';
@@ -1845,7 +1851,8 @@ function renderFullReport() {
       </div>
 
       <div class="report-batas">
-        ✓ Berhasil — cek awal + cek ulang: anak berhasil pada dua cek dengan bahan berbeda.<br/>
+        ✓ Berhasil — cek awal + cek ulang: berhasil sejak cek awal dan dikonfirmasi cek ulang.<br/>
+        ✓ Berhasil pada cek ulang setelah berlatih: belum berhasil di cek awal, berhasil setelah latihan.<br/>
         Cek awal selesai — belum cek ulang: baru satu konfirmasi, lanjutkan cek ulang.<br/>
         Ini bukan pengganti asesmen formal.
       </div>
