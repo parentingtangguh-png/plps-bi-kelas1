@@ -132,20 +132,21 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 - Dampak: root gap pada sebagian besar anak tidak bisa otomatis maju ke mastery
 - Fix yang diperlukan: pilih satu — (a) ASR + rubrik otomatis, (b) reviewer manusia dalam loop, atau (c) redefinisi unit agar ada observable yang bisa di-proxy secara digital
 
-**BLOCK-BI-02: Rekaman suara dan foto tidak tersimpan persisten**
-- MediaRecorder menghasilkan blob di memori; setelah reload hilang
-- Upload foto W02 belum ada endpoint tujuan
-- Untuk produk: butuh upload ke object storage dan simpan URL di state
+**BLOCK-BI-02: Rekaman suara dan foto tidak tersimpan persisten** — PARTIAL (2026-09-29)
+- IndexedDB sudah dipakai sebagai cache lokal blob audio/foto
+- Supabase Storage bucket `media` sudah dibuat dengan RLS
+- **Yang masih belum**: upload aktif dari IndexedDB ke Storage setelah rekam/foto
+- Fix tersisa: panggil `supabase.storage.from('media').upload(...)` setelah `saveMediaBlob`
 
 **BLOCK-BI-03: ~~Audio TTS~~ — RESOLVED 2026-09-28**
 - TTS speechSynthesis dihapus sepenuhnya; diganti kotak baca-nyaring orang tua
 - Orang tua membacakan teks yang ditampilkan di layar — tidak ada ketergantungan browser TTS
 - Commit: 81c0ac3, fe209f3, 977d0c3
 
-**BLOCK-BI-04: Tidak ada multi-child / multi-session support**
-- State tersimpan per browser localStorage sebagai satu profil
-- Jika ada dua anak, state tercampur
-- Fix: profile management dengan ID, atau cloud sync
+**BLOCK-BI-04: Tidak ada multi-child / multi-session support** — **RESOLVED 2026-09-29**
+- Satu akun Google orang tua dapat mengelola banyak anak
+- State tersimpan terpisah per anak di Supabase + localStorage cache
+- Child picker muncul setelah login; "Pilih anak lain" tersedia di home
 
 ### CONCERN — penting untuk kualitas produk
 
@@ -175,10 +176,77 @@ State disimpan di `localStorage` (key: `plps_bi_kelas1_state`).
 
 ---
 
+## Deliverable 6 — Akun & Multi-Child (selesai 2026-09-29)
+
+### Arsitektur
+
+| Komponen | Implementasi |
+|----------|-------------|
+| Auth | Supabase Auth + Google OAuth (satu klik, tanpa ketik password) |
+| Database | Supabase PostgreSQL — tabel `children` + `child_states` |
+| Storage | Supabase Storage bucket `media` (siap pakai, belum digunakan aktif) |
+| State sync | localStorage sebagai write-through cache; fire-and-forget upsert ke `child_states` |
+| Offline | Backlog — localStorage tetap berfungsi saat offline, sync otomatis saat online |
+
+### File baru
+
+| File | Fungsi |
+|------|--------|
+| `src/supabase.js` | Supabase client (ESM dari cdn.jsdelivr.net) |
+| `src/auth.js` | Google OAuth, session helper, sign-out |
+| `src/children.js` | CRUD daftar anak per akun |
+| `supabase-schema.sql` | DDL untuk dijalankan di Supabase SQL Editor |
+
+### File dimodifikasi
+
+| File | Perubahan |
+|------|-----------|
+| `src/state.js` | Per-child localStorage key; `setActiveChild`, `loadStateFromSupabase`, `syncToSupabase` |
+| `src/app.js` | Auth guard async di `load`; `renderAuthScreen`, `renderChildPicker`; "Pilih anak lain" |
+| `styles.css` | Style layar auth (btn-google) dan child picker |
+
+### Alur pengguna baru
+
+```
+Buka app
+  → belum login → layar "Masuk dengan Google"
+  → login → layar "Pilih anak / Tambah anak baru"
+  → pilih anak → peta kompetensi (alur lama tidak berubah)
+  → "Pilih anak lain" → kembali ke child picker
+```
+
+### Status pengujian (2026-09-29)
+
+| Item | Metode uji | Hasil |
+|------|-----------|-------|
+| Auth screen muncul jika belum login | UI live (Claude) | **PASS** |
+| Klik Google → redirect ke accounts.google.com dengan Supabase callback URL | UI live (Claude) | **PASS** |
+| Setelah OAuth → kembali ke plps-bi-kelas1 (bukan petakompetensianak) | UI production (Teguh) | **PASS** |
+| Child picker: "Halo, Parenting Tangguh" + form tambah anak | UI production (Teguh) | **PASS** |
+| Home setelah child dipilih: profil + navigasi | State injection (Claude) | **PASS** |
+| Peta: banner L01, L02 terkunci prasyarat | State injection (Claude) | **PASS** |
+| L01 cek awal 5 soal lengkap: scoring 3/5 → Masih belajar | UI live (Claude) | **PASS** |
+| Breakdown FAM-A/FAM-B + rekomendasi latihan | UI live (Claude) | **PASS** |
+| Laporan keseluruhan 16 unit dengan status | UI live (Claude) | **PASS** |
+
+### BLOCKER yang diselesaikan sesi ini
+
+- **BLOCK-BI-02** (rekaman tidak persisten) — **PARTIAL RESOLVED**: IndexedDB sudah ada di kode; Supabase Storage bucket sudah dibuat. Upload aktif ke Storage belum diimplementasikan (backlog).
+- **BLOCK-BI-04** (tidak ada multi-child) — **RESOLVED**: satu akun orang tua dapat mengelola banyak anak, state tersimpan terpisah per anak.
+
+### Bug lama ditemukan & diperbaiki
+
+- `data/items/L01.js` dan `L02.js`: array ditutup prematur (`];` di tengah) saat ekspansi item bank di commit 4dad145 — menyebabkan SyntaxError. **Fixed commit e8588da.**
+
+---
+
 ## Changelog
 
 | Tanggal | Commit | Perubahan |
 |---------|--------|-----------|
+| 2026-09-29 | 3cc91e7 | feat(auth): akun Google + multi-child via Supabase |
+| 2026-09-29 | e8588da | fix(items): syntax error L01/L02 — array ditutup prematur |
+| 2026-09-29 | 05676d7 | fix(auth): redirectTo pakai origin saja — hindari trailing slash mismatch |
 | 2026-09-27 | d62accf | Implementasi awal MVP 2 |
 | 2026-09-28 | 75fb1de | Fix tombol Konfirmasi disabled visual (abu-abu) |
 | 2026-09-28 | c061052 | Fix rubrik selalu muncul dari task definition (bukan evidence) |
