@@ -256,10 +256,16 @@ window.showChildPicker = async function () {
 // ─────────────────────────────────────────────────────
 // View: Home
 // ─────────────────────────────────────────────────────
+// Format kelas: angka (demo) → "Kelas 1", string "Kelas 1 SD" → tetap, null → "Kelas 1"
+function formatKelas(k) {
+  if (!k && k !== 0) return 'Kelas 1';
+  return /^\d+$/.test(String(k)) ? `Kelas ${k}` : String(k);
+}
+
 function renderHome() {
   const s = getState();
   const hasProfile = s.childName && s.kelas;
-  const kelasLabel = s.kelas ?? 'Kelas 1';
+  const kelasLabel = formatKelas(s.kelas);
   document.title = `PLPS — Bahasa Indonesia ${kelasLabel}`;
 
   const isDemo = new URLSearchParams(window.location.search).get('demo') === '1';
@@ -274,7 +280,7 @@ function renderHome() {
         <div class="profile-card">
           <div class="profile-label">Anak</div>
           <div class="profile-name">${esc(s.childName)}</div>
-          <div class="profile-kelas">${esc(s.kelas)}</div>
+          <div class="profile-kelas">${esc(formatKelas(s.kelas))}</div>
         </div>
         <button class="btn-primary" onclick="navigate('#map')">Lihat Peta Unit</button>
         <button class="btn-secondary" onclick="navigate('#parent')">Dashboard Orang Tua</button>
