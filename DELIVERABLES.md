@@ -480,6 +480,57 @@ Jika tidak ada soal untuk kelas anak di phase tersebut, `renderNoItemsForKelas` 
 
 **Backlog konten kelas 2:** tambah item dengan `kelas_soal: 2` di L01 (semua phase), R02 FAM-C/D (semua phase), R03 (semua phase), dan L02 cek_awal (tambah 1 item lagi).
 
+---
+
+## Deliverable 9 — Audit Pengguna & Perbaikan UX (2026-09-29)
+
+### Metode audit
+Audit dijalankan oleh Claude AI via mode demo (`?demo=1&kelas=1`) sebagai simulasi orang tua anak kelas 1. Skenario: onboarding → peta → L01 cek awal + cek ulang → R02 cek awal → laporan keseluruhan.
+
+### Temuan dan status
+
+| ID | Temuan auditor | Status |
+|----|---------------|--------|
+| A | Status laporan meratakan bukti berbeda kekuatan — L01 (cek awal+ulang) dan R02 (cek awal saja) sama-sama "Berhasil pada cek ini" | **FIXED** |
+| B | "Belum dimulai" dan "terkunci" tidak dibedakan di laporan keseluruhan | **FIXED** |
+| C | FAM-A/FAM-B muncul di hasil sesi — kode teknis tidak bermakna bagi orang tua | **FIXED** |
+| D | Banner demo "data tidak disimpan" bertentangan dengan "Data tersimpan di akun Anda" | **FIXED** |
+| E | Peringatan R02 pakai kata "Asumsi", tidak ada petunjuk tindakan jika anak belum bisa baca | **FIXED** |
+| F | "percakapan nonsastra aural" di deskripsi elemen peta terlalu teknis | **FIXED** |
+
+### Detail perbaikan (commit 8f593dc)
+
+**A — Laporan keseluruhan: status spesifik per unit**
+- `✓ Berhasil — cek awal + cek ulang` (hijau) — mastery proven
+- `Cek awal selesai — belum cek ulang` (biru) — bukti parsial
+- `🔒 Menunggu prasyarat` — dibedakan dari "Belum dimulai"
+- `Belum dimulai` — unit tersedia tapi belum disentuh
+
+**B — Badge mastery di laporan unit**
+- Sebelum: "Berhasil pada cek ini" (ambigu — bisa cek awal saja)
+- Sesudah: "Berhasil pada cek awal + cek ulang"
+
+**C — Hasil sesi**
+- FAM-A/FAM-B dihapus dari tampilan; hanya tampilkan "X/Y jawaban benar"
+
+**D — Home mode demo**
+- "Data tersimpan di akun Anda" disembunyikan saat `?demo=1` aktif
+
+**E — R02 catatan_batas**
+- Sebelum: "Asumsi: anak dapat membaca sendiri..."
+- Sesudah: "Unit ini untuk anak yang sudah bisa membaca sendiri. Jika belum lancar, lewati dulu — kerjakan L01/L02 terlebih dahulu."
+
+**F — Deskripsi elemen Menyimak di peta**
+- Sebelum: "percakapan nonsastra aural; teks sastra aural"
+- Sesudah: "percakapan yang didengar; isi cerita yang didengar"
+
+### Yang diapresiasi auditor (tidak diubah)
+- Titik mulai L01 tampil menonjol di peta dengan kotak hijau
+- Peringatan "Hadapkan layar ke Anda saja" ditempatkan tepat sebelum teks percakapan
+
+### Skor UX auditor: 6/10 → target perbaikan berikutnya
+Skor tertahan karena laporan tidak membedakan kekuatan bukti. Setelah fix A–F, hambatan utama yang tersisa adalah konten kelas 2 (L01, R02, R03 menampilkan "Soal belum tersedia" untuk anak kelas 2).
+
 | 2026-09-29 | 348fefd | Tambah CLAUDE.md + catatan orientasi repo di DELIVERABLES.md |
 | 2026-09-29 | 4dad145 | K-1 RESOLVED: L02 FAM-B → pertanyaan konkret. K-2 RESOLVED: R03 emoji → SVG. M-3 RESOLVED: L01/L02 item bank diperluas ke 5 item per fase |
 | 2026-09-29 | 9598a86 | K-3 RESOLVED: L02-CA-B1 "musim dingin" → lebah-belalang + hujan deras. K-4 RESOLVED: L02-LT-A1 "paling sedikit" → angka konkret |
@@ -489,5 +540,7 @@ Jika tidak ada soal untuk kelas anak di phase tersebut, `renderNoItemsForKelas` 
 | 2026-09-29 | 060efa4 | feat(items): tambah kompetensi_id, kelas_soal, tingkat_kompleksitas, cara_penyajian ke semua item (L01, L02, R02, R03) |
 | 2026-09-29 | 983fcdb | feat(kelas-gate): isolasi soal per kelas — filter getItemsByPhase(phase, kelas) di semua 5 titik pemanggilan |
 | 2026-09-29 | 475db38 | fix(W03): min_panjang 20 → 40 karakter; M-2 dikonfirmasi resolved (catatan_batas sudah dirender) |
+| 2026-09-29 | c975521 | feat(demo): mode demo ?demo=1&kelas=1 untuk audit tanpa login — banner kuning, state lokal |
+| 2026-09-29 | 8f593dc | fix(ux): 6 perbaikan dari audit pengguna nyata (lihat Deliverable 9) |
 
 *Dokumen diperbarui 2026-09-29. App live di production.*
