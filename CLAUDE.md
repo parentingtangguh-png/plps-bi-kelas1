@@ -46,6 +46,14 @@ npx serve D:/ribuan_pengguna/CLAUDE/plps-bi-kelas1 -p 3100
 
 Atau gunakan launch.json di `.claude/launch.json` repo ini (nama konfigurasi: `plps-bi-kelas1`).
 
+## Deploy
+
+```bash
+npx wrangler deploy
+```
+
+Project sudah migrasi dari Cloudflare Pages ke Workers — gunakan `wrangler deploy`, bukan `wrangler pages deploy`.
+
 ---
 
 ## State
