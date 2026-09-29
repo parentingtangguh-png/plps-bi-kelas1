@@ -179,6 +179,11 @@ button { cursor: pointer; font: inherit; border: none; }
 .read-aloud-label {
   font-size: .8rem; color: #92400e; font-weight: 600; margin-bottom: 6px;
 }
+.demo-banner {
+  background: #fef9c3; color: #713f12; font-size: .8rem; font-weight: 600;
+  text-align: center; padding: 6px 12px; border-radius: 6px;
+  border: 1px solid #fde047; margin-bottom: 12px;
+}
 .fasilitator-note {
   font-size: .78rem; color: #92400e; background: #fef3c7;
   border-left: 3px solid #f59e0b; border-radius: 4px;

@@ -62,8 +62,39 @@ window.addEventListener('hashchange', () => {
   if (getActiveChildId()) route();
 });
 
+// ─────────────────────────────────────────────────────
+// Demo mode — ?demo=1&kelas=1 (atau kelas=2)
+// Menyuntikkan profil anak uji ke localStorage tanpa login.
+// Hanya untuk audit/review — tidak menyentuh Supabase.
+// ─────────────────────────────────────────────────────
+function activateDemoMode() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('demo') !== '1') return false;
+  const kelas = Number(params.get('kelas') ?? 1) || 1;
+  const demoChildId = `demo-child-kelas${kelas}`;
+  const demoMeta = { id: demoChildId, nama: `Anak Demo Kelas ${kelas}`, kelas };
+  try {
+    localStorage.setItem('plps_bi_kelas1_active_child', demoChildId);
+    localStorage.setItem('plps_bi_kelas1_child_meta', JSON.stringify(demoMeta));
+    const stateKey = `plps_bi_kelas1_state_${demoChildId}`;
+    if (!localStorage.getItem(stateKey)) {
+      localStorage.setItem(stateKey, JSON.stringify({
+        childName: demoMeta.nama, kelas, createdAt: new Date().toISOString(),
+        units: {}, progressLog: [],
+      }));
+    }
+  } catch { return false; }
+  return true;
+}
+
 window.addEventListener('load', async () => {
   app.innerHTML = `<div style="padding:48px 16px;text-align:center;color:#6b7280;">Memuat...</div>`;
+
+  if (activateDemoMode()) {
+    if (!window.location.hash || window.location.hash === '#') window.location.hash = '#home';
+    route();
+    return;
+  }
 
   // Supabase handles OAuth code exchange automatically on load
   const session = await getSession();
@@ -223,8 +254,10 @@ function renderHome() {
   const s = getState();
   const hasProfile = s.childName && s.kelas;
 
+  const isDemo = new URLSearchParams(window.location.search).get('demo') === '1';
   app.innerHTML = `
     <div class="view-home">
+      ${isDemo ? `<div class="demo-banner">🧪 MODE DEMO — data tidak disimpan ke server</div>` : ''}
       <div class="brand">
         <div class="brand-title">PLPS</div>
         <div class="brand-sub">Bahasa Indonesia · Kelas 1</div>
