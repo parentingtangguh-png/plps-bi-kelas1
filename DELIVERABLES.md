@@ -1,6 +1,9 @@
 # MVP 2 PLPS — Deliverables
 Bahasa Indonesia Kelas 1 · CP Fase A · 2026-09-29 (diperbarui)
 
+> **Status: SELESAI & LIVE** — https://plps-bi-kelas1.parentingtangguh.workers.dev
+> Audit terakhir selesai 2026-09-29. Siap dikembangkan ke mapel lain Fase A.
+
 > **Catatan orientasi untuk Claude:** Dokumen ini ada di repo `plps-bi-kelas1`
 > (`D:\ribuan_pengguna\CLAUDE\plps-bi-kelas1`). Ini repo yang aktif dikerjakan.
 > Repo `plps` (`D:\ribuan_pengguna\CLAUDE\plps`) adalah repo berbeda (Numerasi/Literasi
@@ -426,5 +429,7 @@ Kriteria: kesesuaian usia 6–7 tahun kelas 1–2 SD, beban bahasa, tingkat abst
 | 2026-09-29 | 348fefd | Tambah CLAUDE.md + catatan orientasi repo di DELIVERABLES.md |
 | 2026-09-29 | 4dad145 | K-1 RESOLVED: L02 FAM-B → pertanyaan konkret. K-2 RESOLVED: R03 emoji → SVG. M-3 RESOLVED: L01/L02 item bank diperluas ke 5 item per fase |
 | 2026-09-29 | 9598a86 | K-3 RESOLVED: L02-CA-B1 "musim dingin" → lebah-belalang + hujan deras. K-4 RESOLVED: L02-LT-A1 "paling sedikit" → angka konkret |
+| 2026-09-29 | 78fd180 | fix(storage): upload media blob ke Supabase Storage setelah simpan ke IndexedDB |
+| 2026-09-29 | c096106 | audit: keamanan, isolasi user, bug state, error boundary — semua perbaikan |
 
-*Dokumen diperbarui 2026-09-29. Semua temuan audit sesi ini sudah resolved.*
+*Dokumen diperbarui 2026-09-29. Semua deliverable selesai. App live di production.*
