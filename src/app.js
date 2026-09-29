@@ -195,6 +195,7 @@ function renderChildPicker(session, children) {
             <select id="newChildKelas" required>
               <option value="">Pilih kelas</option>
               <option value="Kelas 1 SD">Kelas 1 SD</option>
+              <option value="Kelas 2 SD">Kelas 2 SD</option>
             </select>
           </label>
           <button type="submit" class="btn-primary">Tambah &amp; Mulai →</button>
@@ -284,6 +285,7 @@ function renderHome() {
               <select id="kelas" required>
                 <option value="">Pilih kelas</option>
                 <option value="Kelas 1 SD">Kelas 1 SD</option>
+                <option value="Kelas 2 SD">Kelas 2 SD</option>
               </select>
             </label>
             <button type="submit" class="btn-primary">Mulai →</button>
