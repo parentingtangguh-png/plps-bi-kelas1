@@ -273,7 +273,7 @@ function renderHome() {
         </div>
         <button class="btn-primary" onclick="navigate('#map')">Lihat Peta Unit</button>
         <button class="btn-secondary" onclick="navigate('#parent')">Dashboard Orang Tua</button>
-        <button class="btn-ghost btn-small" onclick="showChildPicker()">Daftarkan anak lagi</button>
+        <button class="btn-ghost btn-small" onclick="showChildPicker()">Pilih / tambah anak</button>
       ` : `
         <div class="onboarding">
           <p class="onboarding-desc">Petakan kemampuan Bahasa Indonesia anak. Tidak perlu akun — data tersimpan di perangkat ini.</p>
