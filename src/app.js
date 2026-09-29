@@ -45,10 +45,15 @@ const ITEM_BANKS = {
 function isCollectUnit(unitId) { return !!COLLECT_PHASES[unitId]; }
 
 // Kelas anak aktif (1 atau 2). null jika belum login/belum set.
+// meta.kelas bisa berupa angka (demo mode) atau string "Kelas 1 SD" (login nyata).
 function getChildKelas() {
   const meta = getActiveChildMeta();
   const k = meta?.kelas;
-  return (k != null && k !== '') ? Number(k) : null;
+  if (k == null || k === '') return null;
+  const n = Number(k);
+  if (!isNaN(n)) return n;
+  const match = String(k).match(/\d+/);
+  return match ? Number(match[0]) : null;
 }
 
 // ─────────────────────────────────────────────────────
