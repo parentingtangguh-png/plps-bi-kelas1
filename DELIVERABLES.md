@@ -654,6 +654,149 @@ Audit dijalankan oleh ChatGPT sebagai 1 orang tua dengan 2 anak (kelas 1 dan kel
 
 ---
 
+## Panduan Penyusunan Soal — Single Source of Truth
+
+Panduan ini berlaku untuk semua mapel dan semua fase. Tulis di sini sebelum membuat item bank baru, dan perbarui jika ada temuan dari audit.
+
+---
+
+### 1. Sumber CP
+
+CP diambil dari `cp-data.json` di root repo — kutipan resmi KepKaBSKAP Nomor 046/H/KR/2025. Jangan parafrase CP secara bebas; gunakan tuntutan yang tertulis di sana sebagai dasar, lalu terjemahkan ke tuntutan operasional unit.
+
+CP Fase A berlaku untuk kelas 1–2 tanpa pemilahan resmi per kelas. Pemilahan kelas 1 vs kelas 2 adalah **keputusan rancangan**, bukan ketetapan kurikulum.
+
+---
+
+### 2. Dari CP ke Unit Operasional
+
+CP adalah pernyataan normatif ("peserta didik mampu…"). Unit operasional adalah tugas konkret yang bisa dikerjakan anak dalam satu sesi dengan orang tua.
+
+**Langkah:**
+1. Baca CP elemen — identifikasi tuntutan yang bisa dibuktikan secara digital
+2. Kelompokkan tuntutan ke dalam unit (satu unit = satu kompetensi yang kohesif)
+3. Tentukan evidence mode per unit:
+   - **AUTO**: tuntutan bisa dijawab dengan pilihan ganda (pemahaman, identifikasi, urutan, penghitungan)
+   - **AUDIO_GATED**: AUTO tapi memerlukan stimulus yang dibacakan orang tua dahulu
+   - **COLLECT**: tuntutan memerlukan observasi cara anak (bicara keras, menulis, mengukur fisik) — tidak bisa dinilai dari pilihan jawaban
+4. Tentukan prerequisite chain — unit mana yang harus dikuasai sebelum unit berikutnya dibuka
+
+**Prinsip:** Lebih baik sedikit unit yang valid daripada banyak unit yang melampaui batas digital assessment.
+
+---
+
+### 3. Pembagian Kelas 1 vs Kelas 2
+
+CP Fase A tidak memilah kelas 1 dan 2 secara eksplisit. Gunakan panduan ini:
+
+| Kriteria | Kelas 1 | Kelas 2 |
+|----------|---------|---------|
+| Tuntutan kognitif | Tersurat, konkret, satu langkah | Tersirat, abstrak, multi-langkah |
+| Jenis pertanyaan | Siapa, apa, di mana, berapa | Mengapa, bagaimana, apa yang terjadi jika, urutkan |
+| Konteks soal | Situasi familiar (rumah, sekolah, keluarga) | Situasi yang lebih beragam; perlu inferensi ringan |
+| Distractor | Jelas salah atau tidak relevan | Plausibel tapi salah; butuh pertimbangan lebih |
+| Panjang stimulus | Lebih pendek, kalimat sederhana | Sedikit lebih panjang, kalimat majemuk sederhana |
+| Kosakata | Kosakata sehari-hari kelas 1 | Boleh ada 1–2 kata yang perlu dipahami dari konteks |
+
+**Uji kelayakan kelas 1:** Bisa dijawab anak 6–7 tahun yang sudah bisa membaca dasar, tanpa penjelasan tambahan dari orang tua.
+
+**Uji kelayakan kelas 2:** Memerlukan sedikit lebih banyak penalaran, tapi masih dalam jangkauan anak 7–8 tahun tanpa bantuan.
+
+**Yang tidak boleh masuk soal kelas 1:**
+- Kuantifier abstrak ("paling sedikit", "at least", "tidak lebih dari")
+- Konteks yang tidak ada referensinya di Indonesia (musim dingin, salju, dll.)
+- Kata-kata yang tidak dikenal anak usia 6–7 tahun
+- Pertanyaan yang memerlukan pengetahuan di luar teks/stimulus
+
+---
+
+### 4. Struktur Family per Unit
+
+Setiap unit AUTO dibagi menjadi **family** — kelompok kompetensi yang diukur. Scoring engine memeriksa: jika ada family yang 0 benar, unit dianggap belum berhasil meski total skor tinggi.
+
+**Panduan jumlah family:**
+- 2 family: cukup untuk sebagian besar unit
+- 3–4 family: unit dengan tuntutan CP yang luas (mis. R02: tersurat + urutan + tujuan + hubungan konteks)
+- Jangan buat family hanya untuk variasi soal — family harus mencerminkan sub-kompetensi yang berbeda
+
+**Penamaan family:** FAM-A, FAM-B, FAM-C, dst. — dengan `kompetensi_id` yang deskriptif (mis. `bilangan_membandingkan`, `pola_melanjutkan`).
+
+---
+
+### 5. Jumlah Soal per Fase
+
+| Fase | Minimum | Target ideal | Catatan |
+|------|---------|-------------|---------|
+| cek_awal | 2 | 3–5 | Minimal 1 soal per family |
+| latihan | 3 | 5 | Boleh lebih mudah; ada feedback per soal |
+| latihan_mandiri | 3 | 5 | Tanpa feedback; mendekati tingkat cek_ulang |
+| cek_ulang | 2 | 3–5 | Soal baru — konteks berbeda dari cek_awal |
+
+Soal cek_ulang **wajib berbeda** dari cek_awal: stimulus berbeda, konteks berbeda, angka/tokoh berbeda. Tuntutan kognitif boleh setara.
+
+---
+
+### 6. Format Item Wajib
+
+```js
+{
+  id: 'XX-CA-A1',           // {unit}-{phase_abbr}-{family}{nomor}
+  family: 'FAM-A',
+  phase: 'cek_awal',        // cek_awal | latihan | latihan_mandiri | cek_ulang
+  kompetensi_id: 'string',  // snake_case, deskriptif
+  kelas_soal: 1,            // 1 atau 2
+  tingkat_kompleksitas: 'rendah', // rendah | sedang
+  cara_penyajian: 'visual_diamati', // teks_didengar | teks_dibaca | visual_diamati | angka_dihitung
+  soal: 'Teks pertanyaan.',
+  opsi: [
+    { id: 'a', teks: 'Opsi A' },
+    { id: 'b', teks: 'Opsi B' },
+    { id: 'c', teks: 'Opsi C' },
+  ],
+  kunci: 'b',
+  // Opsional per jenis unit:
+  audio_script: '…',        // AUDIO_GATED: teks yang dibacakan orang tua
+  audio_label: '…',         // AUDIO_GATED: label stimulus (mis. "Percakapan ibu dan anak")
+  svg: '…',                 // unit visual: inline SVG panel
+}
+```
+
+**Phase abbreviation:** `CA` = cek_awal, `LT` = latihan, `LM` = latihan_mandiri, `CU` = cek_ulang.
+
+---
+
+### 7. Distractor
+
+Distractor (opsi salah) harus:
+- Plausibel — terdengar masuk akal tanpa membaca stimulus dengan teliti
+- Tidak menjebak karena kosakata sulit
+- Tidak semua distractor boleh "jelas salah" — minimal satu distractor yang memerlukan pertimbangan
+
+Distractor yang baik mengukur apakah anak benar-benar memahami stimulus, bukan hanya menghafal kata yang sama muncul di soal dan opsi (*keyword matching*).
+
+---
+
+### 8. Audit Sebelum Commit
+
+Sebelum commit item bank baru, periksa:
+- [ ] Setiap family punya minimal 1 soal di setiap fase
+- [ ] Soal cek_ulang berbeda stimulus dari cek_awal
+- [ ] Tidak ada konteks yang tidak relevan untuk anak Indonesia
+- [ ] Tidak ada kuantifier abstrak di soal kelas 1
+- [ ] Kunci jawaban tidak bisa ditebak dari panjang opsi atau pola posisi
+- [ ] Semua item punya semua field wajib (lint manual atau grep)
+
+---
+
+### 9. Batas yang Tidak Boleh Dilangkahi
+
+- **Jangan AUTO-kan kompetensi COLLECT** — membaca keras, menulis tangan, mengukur fisik tidak bisa dibuktikan dari pilihan jawaban
+- **Jangan buat soal yang mengukur lebih dari satu kompetensi sekaligus** dalam satu item — satu soal = satu tuntutan
+- **Jangan menyalin stimulus yang sama** antara cek_awal dan cek_ulang — bahkan jika soalnya berbeda
+- **Jangan turunkan threshold** untuk membuat lebih banyak anak "berhasil" — threshold adalah kontrak dengan orang tua
+
+---
+
 ## Deliverable 13 — Fondasi Platform Multi-Mapel (2026-09-30)
 
 ### Arsitektur ekspansi
