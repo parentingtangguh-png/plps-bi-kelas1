@@ -485,6 +485,6 @@ Jika tidak ada soal untuk kelas anak di phase tersebut, `renderNoItemsForKelas` 
 | 2026-09-29 | 4a1e53b | audit(L01/L02): perbaiki validitas klaim bukti menyimak — tambah sumber_informasi, instruksi_fasilitator, label L02 |
 | 2026-09-29 | 060efa4 | feat(items): tambah kompetensi_id, kelas_soal, tingkat_kompleksitas, cara_penyajian ke semua item (L01, L02, R02, R03) |
 | 2026-09-29 | 983fcdb | feat(kelas-gate): isolasi soal per kelas — filter getItemsByPhase(phase, kelas) di semua 5 titik pemanggilan |
-| 2026-09-29 | (pending) | fix(W03): min_panjang 20 → 40 karakter; M-2 dikonfirmasi resolved (catatan_batas sudah dirender) |
+| 2026-09-29 | 475db38 | fix(W03): min_panjang 20 → 40 karakter; M-2 dikonfirmasi resolved (catatan_batas sudah dirender) |
 
 *Dokumen diperbarui 2026-09-29. App live di production.*
