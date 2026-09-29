@@ -254,7 +254,7 @@ window.showChildPicker = async function () {
 function renderHome() {
   const s = getState();
   const hasProfile = s.childName && s.kelas;
-  const kelasLabel = s.kelas ? `Kelas ${s.kelas}` : 'Kelas 1';
+  const kelasLabel = s.kelas ?? 'Kelas 1';
   document.title = `PLPS — Bahasa Indonesia ${kelasLabel}`;
 
   const isDemo = new URLSearchParams(window.location.search).get('demo') === '1';
