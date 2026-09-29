@@ -414,10 +414,13 @@ Kriteria: kesesuaian usia 6–7 tahun kelas 1–2 SD, beban bahasa, tingkat abst
 - L01: cek_awal 5 item, latihan 5 item, latihan_mandiri 5 item, cek_ulang 5 item.
 - L02: cek_awal 5 item, latihan 5 item, latihan_mandiri 5 item, cek_ulang 5 item.
 
-#### M-4 — Minor
+#### M-4 — ~~Minor~~ RESOLVED 2026-09-29
 
-**S-units (S01–S08): rubrik_orang_tua sudah ada di cp.js tapi belum diaudit konsistensinya dengan item bank COLLECT_UNITS.js**
-- Belum ada task definition yang berpasangan dengan setiap rubrik untuk diverifikasi keselarasannya
+**S-units (S01–S08): audit konsistensi rubrik cp.js vs COLLECT_UNITS.js**
+- RESOLVED — audit manual semua 8 S-units: rubrik selaras.
+- Cek_awal/cek_ulang: rubrik satu kalimat di `cp.js` (`unit.rubrik_orang_tua`) dirender di kartu review orang tua (Dashboard).
+- Latihan: rubrik dua dimensi (penguatan/pendalaman) di `COLLECT_UNITS.js` dirender saat konfirmasi latihan.
+- Tidak ada inkonsistensi antara tuntutan cp.js dan kriteria rubrik task-level.
 
 #### M-5 — ~~Minor~~ RESOLVED 2026-09-29
 
