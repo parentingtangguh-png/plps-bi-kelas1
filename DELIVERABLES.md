@@ -531,6 +531,55 @@ Audit dijalankan oleh Claude AI via mode demo (`?demo=1&kelas=1`) sebagai simula
 ### Skor UX auditor: 6/10 → target perbaikan berikutnya
 Skor tertahan karena laporan tidak membedakan kekuatan bukti. Setelah fix A–F, hambatan utama yang tersisa adalah konten kelas 2 (L01, R02, R03 menampilkan "Soal belum tersedia" untuk anak kelas 2).
 
+---
+
+## Deliverable 10 — Audit ChatGPT Kelas 1 & 2 + Perbaikan UX (2026-09-29)
+
+### Metode audit
+Audit dijalankan oleh ChatGPT via mode demo (`?demo=1&kelas=1` dan `?demo=1&kelas=2`), berperan sebagai orang tua dengan dua anak. Skenario lengkap: home → peta → L01 cek awal + latihan + cek ulang → R02 → unit terkunci → laporan keseluruhan.
+
+### Skor
+| Kelas | Skor | Catatan |
+|-------|------|---------|
+| Kelas 1 | 6/10 | Alur lengkap bisa diselesaikan; latihan tidak memberi kesempatan coba ulang setelah salah |
+| Kelas 2 | 5/10 | Identitas app masih sebut "Kelas 1"; hanya 2 soal per cek |
+
+### Temuan dan status
+
+| ID | Kelas | Layar/Alur | Temuan | Status |
+|----|-------|-----------|--------|--------|
+| U-1 | 1 & 2 | Latihan penguatan | Jawaban salah → layar auto-advance sebelum orang tua selesai baca umpan balik | **FIXED** |
+| U-2 | 2 | Home / judul halaman | Brand-sub dan `<title>` hardcode "Kelas 1" meski profil kelas 2 | **FIXED** |
+| U-3 | 1 & 2 | Laporan unit | Reason pakai "80%" dan "kelompok soal"; tidak ada tindakan konkret setelah gagal | **FIXED** |
+| U-4 | 2 | L01 cek awal/ulang | Hanya 2 soal per cek — basis tipis untuk kesimpulan | **BACKLOG** — 2 soal memenuhi minimum scoring; perlu penambahan konten |
+| U-5 | 1 & 2 | Layar soal | Tidak ada indikator kelas pada header soal | **FIXED** |
+| U-6 | 1 & 2 | Menyimak | "Sudah dibacakan" bisa diklik tanpa verifikasi anak tidak melihat teks | **BY DESIGN** — tidak bisa diverifikasi sistem; instruksi fasilitator sudah ada |
+
+### Detail perbaikan (commit 2f0169c)
+
+**U-1 — Tombol "Lanjut →" setelah jawaban salah di latihan**
+- Sebelum: `setTimeout(1800ms)` auto-advance tanpa peduli benar/salah
+- Sesudah: jawaban salah di latihan → tampilkan feedback + tombol "Lanjut →"; orang tua harus klik sebelum lanjut. Jawaban benar tetap auto-advance.
+
+**U-2 — Identitas kelas dinamis**
+- `document.title` dan `brand-sub` kini menggunakan `s.kelas` dari state anak aktif
+- Kelas 2: judul "PLPS — Bahasa Indonesia Kelas 2", brand "Bahasa Indonesia · Kelas 2"
+
+**U-3 — Reason plain-language + tombol tindakan**
+- `scoring.js` reason lama: `"Belum mencapai 80% atau ada kelompok soal dengan 0 jawaban benar"`
+- Reason baru: `"X dari Y soal dijawab benar (Z%). Ada jenis soal yang belum terjawab dengan benar. Anak perlu lebih banyak latihan sebelum cek ini dianggap berhasil."`
+- Laporan unit: setelah `masteryProven: false`, tampilkan penjelasan + tombol "Coba latihan lagi →"
+
+**U-5 — Badge kelas di header soal**
+- Header soal: `"Untuk anak · Cek awal · 1 dari 2 · Soal Kelas 2"` (kelas muncul per soal)
+
+### Yang diapresiasi auditor (tidak diubah)
+- Titik mulai L01 menonjol di peta
+- Instruksi fasilitator muncul tepat sebelum teks percakapan
+- Cek ulang memakai bahan berbeda dari cek awal
+- Laporan keseluruhan membedakan 4 status berbeda (terkunci / belum dimulai / cek awal / perlu latihan)
+- State kelas 1 dan kelas 2 tidak saling mencemari
+
 | 2026-09-29 | 348fefd | Tambah CLAUDE.md + catatan orientasi repo di DELIVERABLES.md |
 | 2026-09-29 | 4dad145 | K-1 RESOLVED: L02 FAM-B → pertanyaan konkret. K-2 RESOLVED: R03 emoji → SVG. M-3 RESOLVED: L01/L02 item bank diperluas ke 5 item per fase |
 | 2026-09-29 | 9598a86 | K-3 RESOLVED: L02-CA-B1 "musim dingin" → lebah-belalang + hujan deras. K-4 RESOLVED: L02-LT-A1 "paling sedikit" → angka konkret |
@@ -542,5 +591,7 @@ Skor tertahan karena laporan tidak membedakan kekuatan bukti. Setelah fix A–F,
 | 2026-09-29 | 475db38 | fix(W03): min_panjang 20 → 40 karakter; M-2 dikonfirmasi resolved (catatan_batas sudah dirender) |
 | 2026-09-29 | c975521 | feat(demo): mode demo ?demo=1&kelas=1 untuk audit tanpa login — banner kuning, state lokal |
 | 2026-09-29 | 8f593dc | fix(ux): 6 perbaikan dari audit pengguna nyata (lihat Deliverable 9) |
+| 2026-09-29 | a4501b5 | feat(content): tambah 25 item kelas 2 untuk L01, L02, R02, R03 |
+| 2026-09-29 | 2f0169c | fix(ux): 5 perbaikan dari audit ChatGPT kelas 1 & 2 (lihat Deliverable 10) |
 
 *Dokumen diperbarui 2026-09-29. App live di production.*
