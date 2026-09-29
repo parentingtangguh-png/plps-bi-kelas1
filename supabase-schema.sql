@@ -17,11 +17,16 @@ create policy "children_owner" on public.children
   using  (auth.uid() = parent_id)
   with check (auth.uid() = parent_id);
 
--- 2. Tabel state asesmen per anak (satu baris per anak)
+-- 2. Tabel state asesmen per anak per mapel
+-- Primary key: (child_id, mapel) — satu baris per anak per mata pelajaran.
+-- Nilai mapel: 'bi', 'mtk', 'ipa', dst.
+-- Baris existing tanpa kolom mapel diisi DEFAULT 'bi' oleh migrasi di bawah.
 create table if not exists public.child_states (
-  child_id   uuid primary key references public.children(id) on delete cascade,
+  child_id   uuid references public.children(id) on delete cascade not null,
+  mapel      text not null default 'bi',
   state_json jsonb not null default '{}',
-  updated_at timestamptz default now()
+  updated_at timestamptz default now(),
+  primary key (child_id, mapel)
 );
 
 alter table public.child_states enable row level security;
@@ -36,6 +41,23 @@ create policy "child_states_owner" on public.child_states
     select 1 from public.children c
     where c.id = child_states.child_id and c.parent_id = auth.uid()
   ));
+
+-- 2m. MIGRASI — jalankan sekali pada DB yang sudah live (skip jika fresh install)
+-- Tambah kolom mapel, pindah primary key, isi baris lama dengan 'bi'.
+-- Aman dijalankan berulang karena ada pengecekan IF EXISTS / DO NOTHING.
+do $$
+begin
+  -- Tambah kolom jika belum ada
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema='public' and table_name='child_states' and column_name='mapel'
+  ) then
+    alter table public.child_states add column mapel text not null default 'bi';
+    -- Ganti PK lama (child_id saja) ke composite (child_id, mapel)
+    alter table public.child_states drop constraint child_states_pkey;
+    alter table public.child_states add primary key (child_id, mapel);
+  end if;
+end $$;
 
 -- 2b. Grant akses ke role authenticated (diperlukan agar PostgREST bisa query)
 grant select, insert, update, delete on public.children    to authenticated;

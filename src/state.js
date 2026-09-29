@@ -27,6 +27,7 @@
  *   mediaId: key ke IndexedDB untuk blob audio/foto
  */
 
+const MAPEL = 'bi';
 const STORAGE_KEY = 'plps_bi_kelas1_state';
 const ACTIVE_CHILD_KEY = 'plps_bi_kelas1_active_child';
 const CHILD_META_KEY   = 'plps_bi_kelas1_child_meta';
@@ -66,6 +67,7 @@ export async function loadStateFromSupabase(childId) {
       .from('child_states')
       .select('state_json')
       .eq('child_id', childId)
+      .eq('mapel', MAPEL)
       .single();
     if (error && error.code !== 'PGRST116') throw error;
     if (data?.state_json) {
@@ -83,7 +85,7 @@ async function syncToSupabase(state) {
     const { supabase } = await import('./supabase.js');
     const { error } = await supabase
       .from('child_states')
-      .upsert({ child_id: childId, state_json: state, updated_at: new Date().toISOString() });
+      .upsert({ child_id: childId, mapel: MAPEL, state_json: state, updated_at: new Date().toISOString() });
     if (error) console.warn('Supabase sync error:', error);
   } catch (e) {
     console.warn('Supabase sync gagal:', e);
@@ -377,7 +379,7 @@ export async function clearState() {
   if (!childId) return;
   try {
     const { supabase } = await import('./supabase.js');
-    await supabase.from('child_states').delete().eq('child_id', childId);
+    await supabase.from('child_states').delete().eq('child_id', childId).eq('mapel', MAPEL);
   } catch (e) {
     console.warn('Gagal hapus state dari Supabase:', e);
   }
