@@ -423,6 +423,179 @@ export const ITEMS = [
     kunci: 'b',
     instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
   },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — CEK AWAL (2 soal)
+  // Percakapan lebih panjang; informasi tersebar di beberapa giliran bicara.
+  // ═══════════════════════════════════════════
+  {
+    id: 'L01-CA-A4',
+    family: 'FAM-A',
+    phase: 'cek_awal',
+    kompetensi_id: 'informasi_tersurat_percakapan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_didengar',
+    audio_script: 'Ibu: Nak, besok kamu ikut lomba apa di sekolah? Anak: Lomba menggambar, Bu. Tapi hadiahnya cuma buku, bukan mainan. Ibu: Tidak apa-apa. Yang penting kamu berani tampil. Anak: Iya Bu, aku akan bawa pensil warna baru.',
+    audio_label: 'Percakapan ibu dan anak tentang lomba',
+    soal: 'Apa yang akan dibawa anak ke lomba besok?',
+    opsi: [
+      { id: 'a', teks: 'Buku gambar baru' },
+      { id: 'b', teks: 'Pensil warna baru' },
+      { id: 'c', teks: 'Cat air dan kuas' },
+    ],
+    kunci: 'b',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama. Soal akan muncul setelah selesai.',
+  },
+  {
+    id: 'L01-CA-B4',
+    family: 'FAM-B',
+    phase: 'cek_awal',
+    kompetensi_id: 'topik_percakapan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_didengar',
+    audio_script: 'Ayah: Kamu tidak mau makan ya? Anak: Perut saya agak sakit, Yah. Ayah: Sudah berapa lama? Anak: Dari tadi pagi. Ayah: Coba istirahat dulu, nanti sore kita ke dokter kalau belum membaik.',
+    audio_label: 'Percakapan ayah dan anak',
+    soal: 'Apa yang sedang dibicarakan ayah dan anak?',
+    opsi: [
+      { id: 'a', teks: 'Rencana pergi ke sekolah' },
+      { id: 'b', teks: 'Kondisi kesehatan anak yang sakit perut' },
+      { id: 'c', teks: 'Menu makan siang keluarga' },
+    ],
+    kunci: 'b',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama. Soal akan muncul setelah selesai.',
+  },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — LATIHAN (2 soal)
+  // ═══════════════════════════════════════════
+  {
+    id: 'L01-LT-A4',
+    family: 'FAM-A',
+    phase: 'latihan',
+    kompetensi_id: 'informasi_tersurat_percakapan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_didengar',
+    audio_script: 'Guru: Anak-anak, laporan kebun sekolah sudah selesai belum? Murid 1: Sudah, Bu. Kami tanam tomat dan cabai. Murid 2: Saya menyiram setiap hari, Bu. Guru: Bagus sekali. Minggu depan kita panen.',
+    audio_label: 'Percakapan guru dan murid di kebun sekolah',
+    soal: 'Tanaman apa yang ditanam murid-murid di kebun sekolah?',
+    opsi: [
+      { id: 'a', teks: 'Bayam dan kangkung' },
+      { id: 'b', teks: 'Tomat dan cabai' },
+      { id: 'c', teks: 'Wortel dan kentang' },
+    ],
+    kunci: 'b',
+    umpan_balik_benar: 'Tepat! Murid menyebutkan tomat dan cabai.',
+    umpan_balik_salah: 'Dengarkan lagi. Murid menyebutkan dua jenis tanaman yang mereka tanam.',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+  {
+    id: 'L01-LT-B4',
+    family: 'FAM-B',
+    phase: 'latihan',
+    kompetensi_id: 'topik_percakapan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_didengar',
+    audio_script: 'Kakak: Kamu kenapa sedih? Adik: Teman saya bilang gambar saya jelek. Kakak: Hmm, itu tidak menyenangkan. Kamu sudah coba omong ke gurumu? Adik: Belum. Kakak: Coba cerita ke Bu Guru besok, ya.',
+    audio_label: 'Percakapan kakak dan adik',
+    soal: 'Tentang apa percakapan kakak dan adik?',
+    opsi: [
+      { id: 'a', teks: 'Rencana mengikuti lomba menggambar' },
+      { id: 'b', teks: 'Adik yang sedih karena diejek teman' },
+      { id: 'c', teks: 'Cara meminta maaf kepada guru' },
+    ],
+    kunci: 'b',
+    umpan_balik_benar: 'Betul! Adik sedih karena teman mengejek gambarnya, dan kakak memberi saran.',
+    umpan_balik_salah: 'Simak kembali. Apa yang membuat adik sedih dalam percakapan itu?',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — LATIHAN MANDIRI (2 soal)
+  // ═══════════════════════════════════════════
+  {
+    id: 'L01-LM-A4',
+    family: 'FAM-A',
+    phase: 'latihan_mandiri',
+    kompetensi_id: 'informasi_tersurat_percakapan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_didengar',
+    audio_script: 'Kepala Sekolah: Anak-anak, ada kabar gembira. Bulan depan sekolah kita dapat bantuan buku dan komputer baru. Murid: Komputer berapa unit, Pak? Kepala Sekolah: Lima unit untuk ruang komputer. Murid: Apakah kita akan belajar mengetik, Pak? Kepala Sekolah: Ya, mulai semester depan.',
+    audio_label: 'Pengumuman kepala sekolah',
+    soal: 'Berapa unit komputer baru yang akan diterima sekolah?',
+    opsi: [
+      { id: 'a', teks: 'Tiga unit' },
+      { id: 'b', teks: 'Sepuluh unit' },
+      { id: 'c', teks: 'Lima unit' },
+    ],
+    kunci: 'c',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+  {
+    id: 'L01-LM-B3',
+    family: 'FAM-B',
+    phase: 'latihan_mandiri',
+    kompetensi_id: 'topik_percakapan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'tinggi',
+    cara_penyajian: 'teks_didengar',
+    audio_script: 'Ibu: Kamu kenapa belum belajar? Anak: Nanti saja Bu, kan masih lama ulangannya. Ibu: Masih tiga hari lagi. Kalau belajar sedikit tiap hari lebih mudah dari pada belajar semua di hari terakhir. Anak: Iya Bu, saya mulai sekarang.',
+    audio_label: 'Percakapan ibu dan anak tentang belajar',
+    soal: 'Apa inti dari percakapan ibu dan anak?',
+    opsi: [
+      { id: 'a', teks: 'Ibu meminta anak segera tidur' },
+      { id: 'b', teks: 'Ibu mengingatkan anak pentingnya belajar lebih awal' },
+      { id: 'c', teks: 'Anak minta izin main dulu sebelum belajar' },
+    ],
+    kunci: 'b',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — CEK ULANG (2 soal)
+  // ═══════════════════════════════════════════
+  {
+    id: 'L01-CU-A4',
+    family: 'FAM-A',
+    phase: 'cek_ulang',
+    kompetensi_id: 'informasi_tersurat_percakapan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_didengar',
+    audio_script: 'Petugas: Selamat datang di perpustakaan kota. Ada yang bisa saya bantu? Pengunjung: Saya mau pinjam buku tentang hewan. Petugas: Silakan ke rak B nomor dua. Ada dua puluh judul di sana. Pengunjung: Boleh pinjam berapa buku sekaligus? Petugas: Maksimal tiga buku, dikembalikan dalam dua minggu.',
+    audio_label: 'Percakapan di perpustakaan kota',
+    soal: 'Berapa buku yang boleh dipinjam sekaligus?',
+    opsi: [
+      { id: 'a', teks: 'Dua buku' },
+      { id: 'b', teks: 'Lima buku' },
+      { id: 'c', teks: 'Tiga buku' },
+    ],
+    kunci: 'c',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
+  {
+    id: 'L01-CU-B3',
+    family: 'FAM-B',
+    phase: 'cek_ulang',
+    kompetensi_id: 'topik_percakapan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_didengar',
+    audio_script: 'Wali Kelas: Orang tua Rafi, nilai ulangan Rafi bulan ini turun. Ayah: Aduh, apa yang terjadi, Bu? Wali Kelas: Rafi sering tidak mengerjakan PR. Tapi ia aktif bertanya di kelas. Ayah: Terima kasih Bu, nanti saya bicara dengan Rafi di rumah.',
+    audio_label: 'Percakapan wali kelas dan ayah Rafi',
+    soal: 'Apa yang sedang dibicarakan wali kelas dan ayah Rafi?',
+    opsi: [
+      { id: 'a', teks: 'Rencana karyawisata sekolah' },
+      { id: 'b', teks: 'Prestasi Rafi yang meningkat di semester ini' },
+      { id: 'c', teks: 'Nilai Rafi yang turun karena tidak mengerjakan PR' },
+    ],
+    kunci: 'c',
+    instruksi_anak: 'Dengarkan percakapan ini dengan seksama.',
+  },
 ];
 
 export function getItemsByPhase(phase, kelas) {

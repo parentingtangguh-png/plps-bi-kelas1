@@ -55,6 +55,25 @@ export const ITEMS = [
     kunci: 'b',
     instruksi_anak: 'Dengarkan cerita ini baik-baik. Soal akan muncul setelah cerita selesai.',
   },
+  {
+    id: 'L02-CA-A4',
+    family: 'FAM-A',
+    phase: 'cek_awal',
+    kompetensi_id: 'informasi_tersurat_cerita',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_didengar',
+    audio_script: 'Seorang anak bernama Dani ingin membeli es krim. Ia menabung selama dua minggu. Setiap hari ia menyisihkan uang jajannya. Ketika uangnya cukup, ia membeli es krim rasa cokelat dan stroberi untuk dimakan bersama adiknya.',
+    audio_label: 'Cerita: Dani Menabung',
+    soal: 'Rasa es krim apa yang dibeli Dani?',
+    opsi: [
+      { id: 'a', teks: 'Vanila dan cokelat' },
+      { id: 'b', teks: 'Cokelat dan stroberi' },
+      { id: 'c', teks: 'Stroberi dan mangga' },
+    ],
+    kunci: 'b',
+    instruksi_anak: 'Dengarkan cerita ini baik-baik. Soal akan muncul setelah cerita selesai.',
+  },
 
   {
     id: 'L02-CA-A2',

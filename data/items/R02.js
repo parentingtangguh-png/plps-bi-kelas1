@@ -227,6 +227,163 @@ export const ITEMS = [
     ],
     kunci: 'c',
   },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — CEK AWAL (2 soal)
+  // Teks lebih panjang (5–6 kalimat); pertanyaan meliputi FAM-A dan FAM-C.
+  // ═══════════════════════════════════════════
+  {
+    id: 'R02-CA-A2',
+    family: 'FAM-A',
+    phase: 'cek_awal',
+    kompetensi_id: 'informasi_tersurat_bacaan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Pak Hasan adalah seorang peternak sapi di desa. Setiap pagi ia memberi makan sapi-sapinya dengan rumput segar. Ia juga memandikan sapinya dua kali seminggu. Hasil susu sapinya dijual ke koperasi desa. Uang itu dipakai untuk biaya sekolah anak-anaknya.',
+    soal: 'Apa yang dilakukan Pak Hasan dengan uang hasil penjualan susu sapi?',
+    opsi: [
+      { id: 'a', teks: 'Membeli sapi baru' },
+      { id: 'b', teks: 'Membiayai sekolah anak-anaknya' },
+      { id: 'c', teks: 'Memperluas kandang sapi' },
+    ],
+    kunci: 'b',
+  },
+  {
+    id: 'R02-CA-C1',
+    family: 'FAM-C',
+    phase: 'cek_awal',
+    kompetensi_id: 'tujuan_teks',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Cuci tangan sebelum makan adalah kebiasaan yang baik. Kuman di tangan bisa berpindah ke makanan. Jika kuman masuk ke perut, kita bisa sakit. Gunakan sabun dan air mengalir untuk cuci tangan. Gosok tangan selama dua puluh detik agar bersih.',
+    soal: 'Mengapa kita harus mencuci tangan sebelum makan?',
+    opsi: [
+      { id: 'a', teks: 'Supaya tangan tidak bau' },
+      { id: 'b', teks: 'Supaya kuman di tangan tidak masuk ke makanan dan membuat sakit' },
+      { id: 'c', teks: 'Supaya makanan terasa lebih enak' },
+    ],
+    kunci: 'b',
+  },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — LATIHAN (2 soal)
+  // ═══════════════════════════════════════════
+  {
+    id: 'R02-LT-A4',
+    family: 'FAM-A',
+    phase: 'latihan',
+    kompetensi_id: 'informasi_tersurat_bacaan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Perpustakaan sekolah buka setiap hari Senin sampai Jumat. Siswa boleh meminjam dua buku sekaligus. Buku harus dikembalikan dalam satu minggu. Jika terlambat, ada denda lima ratus rupiah per hari. Siswa juga boleh membaca di ruang baca yang nyaman.',
+    soal: 'Berapa lama siswa boleh meminjam buku?',
+    opsi: [
+      { id: 'a', teks: 'Dua minggu' },
+      { id: 'b', teks: 'Satu minggu' },
+      { id: 'c', teks: 'Tiga hari' },
+    ],
+    kunci: 'b',
+    umpan_balik_benar: 'Tepat! Teks menyebutkan buku harus dikembalikan dalam satu minggu.',
+    umpan_balik_salah: 'Baca kembali kalimat ketiga. Di sana tertulis berapa lama waktu peminjaman.',
+  },
+  {
+    id: 'R02-LT-C1',
+    family: 'FAM-C',
+    phase: 'latihan',
+    kompetensi_id: 'tujuan_teks',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Helm adalah pelindung kepala saat bersepeda atau naik motor. Ketika jatuh, helm mencegah kepala terluka parah. Tanpa helm, cedera kepala bisa sangat berbahaya. Oleh karena itu, selalu pakai helm setiap kali berkendara.',
+    soal: 'Apa tujuan utama teks ini ditulis?',
+    opsi: [
+      { id: 'a', teks: 'Menjelaskan cara membuat helm yang bagus' },
+      { id: 'b', teks: 'Mendorong pembaca untuk selalu memakai helm saat berkendara' },
+      { id: 'c', teks: 'Menceritakan pengalaman jatuh dari sepeda' },
+    ],
+    kunci: 'b',
+    umpan_balik_benar: 'Betul! Teks berisi alasan memakai helm dan mengajak pembaca untuk melakukannya.',
+    umpan_balik_salah: 'Baca kembali kalimat terakhir. Kata "oleh karena itu" menunjukkan kesimpulan dan tujuan teks.',
+  },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — LATIHAN MANDIRI (2 soal)
+  // ═══════════════════════════════════════════
+  {
+    id: 'R02-LM-A4',
+    family: 'FAM-A',
+    phase: 'latihan_mandiri',
+    kompetensi_id: 'informasi_tersurat_bacaan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Festival Budaya Nusantara diadakan setiap tahun di kota kami. Tahun ini, ada tiga puluh kelompok seni dari berbagai daerah. Mereka menampilkan tari, musik, dan pameran kerajinan. Pengunjung bisa mencoba membatik dan memainkan alat musik tradisional. Festival ini dibuka untuk umum dan tidak dipungut biaya masuk.',
+    soal: 'Berapa kelompok seni yang tampil di Festival Budaya Nusantara tahun ini?',
+    opsi: [
+      { id: 'a', teks: 'Dua puluh kelompok' },
+      { id: 'b', teks: 'Tiga puluh kelompok' },
+      { id: 'c', teks: 'Lima belas kelompok' },
+    ],
+    kunci: 'b',
+  },
+  {
+    id: 'R02-LM-C1',
+    family: 'FAM-C',
+    phase: 'latihan_mandiri',
+    kompetensi_id: 'tujuan_teks',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'tinggi',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Anak-anak perlu tidur cukup setiap malam. Anak usia sekolah sebaiknya tidur sembilan sampai sebelas jam. Kurang tidur membuat anak sulit berkonsentrasi di kelas. Tidur cukup juga membantu tubuh tumbuh dan melawan penyakit. Matikan gadget setidaknya satu jam sebelum tidur agar tidur lebih nyenyak.',
+    soal: 'Mengapa penulis menyebutkan cara mematikan gadget di akhir teks?',
+    opsi: [
+      { id: 'a', teks: 'Supaya anak tidak main gadget sama sekali' },
+      { id: 'b', teks: 'Sebagai saran praktis agar anak bisa tidur lebih nyenyak' },
+      { id: 'c', teks: 'Karena gadget merusak mata anak' },
+    ],
+    kunci: 'b',
+  },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — CEK ULANG (2 soal)
+  // ═══════════════════════════════════════════
+  {
+    id: 'R02-CU-A4',
+    family: 'FAM-A',
+    phase: 'cek_ulang',
+    kompetensi_id: 'informasi_tersurat_bacaan',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Koperasi siswa di sekolah Bima menjual alat tulis dan makanan ringan. Setiap kelas memiliki dua perwakilan pengurus koperasi. Keuntungan koperasi dipakai untuk membeli buku-buku baru bagi perpustakaan. Tahun ini koperasi berhasil menyumbang lima puluh buku cerita.',
+    soal: 'Untuk apa keuntungan koperasi siswa digunakan?',
+    opsi: [
+      { id: 'a', teks: 'Untuk membeli seragam baru' },
+      { id: 'b', teks: 'Untuk membeli buku-buku baru bagi perpustakaan' },
+      { id: 'c', teks: 'Untuk biaya piknik kelas' },
+    ],
+    kunci: 'b',
+  },
+  {
+    id: 'R02-CU-C1',
+    family: 'FAM-C',
+    phase: 'cek_ulang',
+    kompetensi_id: 'tujuan_teks',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'teks_dibaca',
+    stimulus: 'Sampah plastik sangat berbahaya bagi lingkungan. Plastik membutuhkan ratusan tahun untuk terurai. Hewan laut bisa mati karena menelan plastik. Kita bisa membantu dengan membawa tas belanja sendiri dan mengurangi penggunaan sedotan plastik. Setiap tindakan kecil kita punya dampak besar bagi bumi.',
+    soal: 'Apa tujuan utama teks ini?',
+    opsi: [
+      { id: 'a', teks: 'Menjelaskan jenis-jenis sampah plastik' },
+      { id: 'b', teks: 'Mengajak pembaca untuk mengurangi penggunaan plastik demi lingkungan' },
+      { id: 'c', teks: 'Menceritakan hewan laut yang terancam punah' },
+    ],
+    kunci: 'b',
+  },
 ];
 
 export const PHASE_ORDER = ['cek_awal', 'latihan', 'latihan_mandiri', 'cek_ulang'];

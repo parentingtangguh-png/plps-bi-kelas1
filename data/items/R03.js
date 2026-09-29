@@ -418,6 +418,104 @@ const SVG = {
     <path d="M36 32 Q40 36 44 32" fill="none" stroke="#4E342E" stroke-width="1.5" stroke-linecap="round"/>
     <path d="M54 34 Q58 38 62 34" fill="none" stroke="#4E342E" stroke-width="1.5" stroke-linecap="round"/>
   </svg>`,
+
+  // ── Kelas 2: Anak demam dan sembuh ──────────────────────────────────────────
+  anak_demam: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="80" height="80" fill="#FFF3E0"/>
+    <rect x="10" y="36" width="60" height="30" rx="4" fill="#FFCCBC"/>
+    <rect x="18" y="36" width="44" height="8" rx="2" fill="#FFAB91"/>
+    <circle cx="40" cy="26" r="12" fill="#FFCC80"/>
+    <ellipse cx="40" cy="28" rx="4" ry="2" fill="#EF9A9A" opacity="0.7"/>
+    <path d="M34 30 Q38 33 42 30" fill="none" stroke="#BF360C" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="38" y1="14" x2="40" y2="10" stroke="#FF7043" stroke-width="2" stroke-linecap="round"/>
+    <line x1="42" y1="14" x2="44" y2="10" stroke="#FF7043" stroke-width="2" stroke-linecap="round"/>
+  </svg>`,
+
+  minum_obat: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="80" height="80" fill="#E8F5E9"/>
+    <rect x="28" y="28" width="24" height="36" rx="6" fill="#EF9A9A"/>
+    <rect x="28" y="28" width="24" height="12" rx="3" fill="#EF5350"/>
+    <circle cx="40" cy="44" r="5" fill="#FFF9C4"/>
+    <circle cx="40" cy="20" r="12" fill="#FFCC80"/>
+    <path d="M35 24 Q40 27 45 24" fill="none" stroke="#4E342E" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="40" y1="32" x2="60" y2="30" stroke="#9E9E9E" stroke-width="1.5" stroke-dasharray="3,2"/>
+    <circle cx="63" cy="30" r="5" fill="#EF5350"/>
+  </svg>`,
+
+  anak_istirahat: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="80" height="80" fill="#E3F2FD"/>
+    <rect x="5" y="42" width="70" height="26" rx="4" fill="#90CAF9"/>
+    <rect x="5" y="42" width="18" height="26" rx="4" fill="#BBDEFB"/>
+    <circle cx="32" cy="40" r="10" fill="#FFCC80"/>
+    <path d="M27 44 Q32 47 37 44" fill="none" stroke="#4E342E" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="22" y1="20" x2="58" y2="20" stroke="#B0BEC5" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <text x="50" y="36" font-size="18" text-anchor="middle" fill="#90CAF9">z</text>
+    <text x="60" y="26" font-size="14" text-anchor="middle" fill="#B0BEC5">z</text>
+  </svg>`,
+
+  anak_sembuh: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="80" height="80" fill="#F1F8E9"/>
+    <circle cx="40" cy="32" r="14" fill="#FFCC80"/>
+    <path d="M33 38 Q40 43 47 38" fill="none" stroke="#388E3C" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="34" cy="30" r="2" fill="#4E342E"/>
+    <circle cx="46" cy="30" r="2" fill="#4E342E"/>
+    <line x1="22" y1="46" x2="16" y2="66" stroke="#FFCC80" stroke-width="6" stroke-linecap="round"/>
+    <line x1="58" y1="46" x2="64" y2="66" stroke="#FFCC80" stroke-width="6" stroke-linecap="round"/>
+    <rect x="26" y="44" width="28" height="26" rx="6" fill="#A5D6A7"/>
+    <path d="M55 20 L60 12 L65 20" fill="#FDD835"/>
+    <circle cx="60" cy="12" r="6" fill="#FDD835"/>
+  </svg>`,
+
+  // ── Kelas 2: Cuaca dan pelangi ───────────────────────────────────────────────
+  cuaca_cerah: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="80" height="80" fill="#E3F2FD"/>
+    <circle cx="40" cy="30" r="18" fill="#FDD835"/>
+    <line x1="40" y1="6"  x2="40" y2="0"  stroke="#FDD835" stroke-width="3" stroke-linecap="round"/>
+    <line x1="40" y1="60" x2="40" y2="54" stroke="#FDD835" stroke-width="3" stroke-linecap="round"/>
+    <line x1="14" y1="30" x2="8"  y2="30" stroke="#FDD835" stroke-width="3" stroke-linecap="round"/>
+    <line x1="66" y1="30" x2="72" y2="30" stroke="#FDD835" stroke-width="3" stroke-linecap="round"/>
+    <line x1="22" y1="14" x2="17" y2="9"  stroke="#FDD835" stroke-width="3" stroke-linecap="round"/>
+    <line x1="58" y1="46" x2="63" y2="51" stroke="#FDD835" stroke-width="3" stroke-linecap="round"/>
+    <rect x="0" y="62" width="80" height="18" fill="#C8E6C9"/>
+  </svg>`,
+
+  awan_gelap: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="80" height="80" fill="#CFD8DC"/>
+    <ellipse cx="40" cy="28" rx="30" ry="16" fill="#546E7A"/>
+    <ellipse cx="20" cy="34" rx="18" ry="12" fill="#546E7A"/>
+    <ellipse cx="60" cy="34" rx="18" ry="12" fill="#546E7A"/>
+    <circle cx="34" cy="22" r="4" fill="#FFEE58" opacity="0.6"/>
+    <path d="M32 22 L38 14 L35 20 L42 12" fill="none" stroke="#FFEE58" stroke-width="2" stroke-linecap="round"/>
+    <rect x="0" y="62" width="80" height="18" fill="#A5D6A7"/>
+  </svg>`,
+
+  hujan_lebat: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="80" height="80" fill="#90A4AE"/>
+    <ellipse cx="40" cy="20" rx="32" ry="14" fill="#455A64"/>
+    <ellipse cx="20" cy="24" rx="18" ry="10" fill="#455A64"/>
+    <ellipse cx="60" cy="24" rx="18" ry="10" fill="#455A64"/>
+    <line x1="15" y1="38" x2="11" y2="52" stroke="#90CAF9" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="28" y1="38" x2="24" y2="52" stroke="#90CAF9" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="41" y1="38" x2="37" y2="52" stroke="#90CAF9" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="54" y1="38" x2="50" y2="52" stroke="#90CAF9" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="67" y1="38" x2="63" y2="52" stroke="#90CAF9" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="21" y1="52" x2="17" y2="66" stroke="#64B5F6" stroke-width="2" stroke-linecap="round"/>
+    <line x1="47" y1="52" x2="43" y2="66" stroke="#64B5F6" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="40" cy="70" rx="34" ry="7" fill="#42A5F5" opacity="0.5"/>
+  </svg>`,
+
+  pelangi: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="80" height="80" fill="#E3F2FD"/>
+    <path d="M5 70 Q40 10 75 70" fill="none" stroke="#E53935" stroke-width="4"/>
+    <path d="M9 70 Q40 16 71 70" fill="none" stroke="#FB8C00" stroke-width="4"/>
+    <path d="M13 70 Q40 22 67 70" fill="none" stroke="#FDD835" stroke-width="4"/>
+    <path d="M17 70 Q40 28 63 70" fill="none" stroke="#43A047" stroke-width="4"/>
+    <path d="M21 70 Q40 34 59 70" fill="none" stroke="#1E88E5" stroke-width="4"/>
+    <path d="M25 70 Q40 40 55 70" fill="none" stroke="#8E24AA" stroke-width="4"/>
+    <ellipse cx="12" cy="24" rx="12" ry="9" fill="white" opacity="0.8"/>
+    <ellipse cx="68" cy="22" rx="12" ry="9" fill="white" opacity="0.8"/>
+    <rect x="0" y="68" width="80" height="12" fill="#C8E6C9"/>
+  </svg>`,
 };
 
 export const ITEMS = [
@@ -673,6 +771,203 @@ export const ITEMS = [
       { id: 'c', teks: 'Berdoa' },
     ],
     kunci: 'c',
+  },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — CEK AWAL (2 soal)
+  // Rangkaian 4 panel; pertanyaan melibatkan sebab-akibat lebih dari satu langkah.
+  // ═══════════════════════════════════════════
+  {
+    id: 'R03-CA-A2',
+    family: 'FAM-A',
+    phase: 'cek_awal',
+    kompetensi_id: 'urutan_kejadian_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.cuaca_cerah,   deskripsi: 'Cuaca cerah dan matahari bersinar' },
+      { svg: SVG.awan_gelap,    deskripsi: 'Awan gelap berdatangan dan ada kilat' },
+      { svg: SVG.hujan_lebat,   deskripsi: 'Hujan lebat turun, ada genangan air' },
+      { svg: SVG.pelangi,       deskripsi: 'Hujan berhenti dan muncul pelangi indah' },
+    ],
+    soal: 'Apa yang terjadi setelah hujan lebat berhenti?',
+    opsi: [
+      { id: 'a', teks: 'Langit tetap gelap dan berawan' },
+      { id: 'b', teks: 'Muncul pelangi yang indah' },
+      { id: 'c', teks: 'Turun hujan salju' },
+    ],
+    kunci: 'b',
+  },
+  {
+    id: 'R03-CA-B2',
+    family: 'FAM-B',
+    phase: 'cek_awal',
+    kompetensi_id: 'sebab_akibat_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.anak_demam,     deskripsi: 'Anak berbaring di kasur dengan pipi merah' },
+      { svg: SVG.minum_obat,     deskripsi: 'Anak minum obat dari botol merah' },
+      { svg: SVG.anak_istirahat, deskripsi: 'Anak tidur nyenyak di kasur' },
+      { svg: SVG.anak_sembuh,    deskripsi: 'Anak tersenyum ceria dan berdiri sehat' },
+    ],
+    soal: 'Mengapa anak di gambar terakhir bisa tersenyum sehat?',
+    opsi: [
+      { id: 'a', teks: 'Karena anak mendapat mainan baru' },
+      { id: 'b', teks: 'Karena anak minum obat dan beristirahat' },
+      { id: 'c', teks: 'Karena anak pergi berlibur' },
+    ],
+    kunci: 'b',
+  },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — LATIHAN (2 soal)
+  // ═══════════════════════════════════════════
+  {
+    id: 'R03-LT-A3',
+    family: 'FAM-A',
+    phase: 'latihan',
+    kompetensi_id: 'urutan_kejadian_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.anak_demam,     deskripsi: 'Anak berbaring sakit di kasur' },
+      { svg: SVG.minum_obat,     deskripsi: 'Anak diberi obat oleh orang tua' },
+      { svg: SVG.anak_istirahat, deskripsi: 'Anak tidur dan beristirahat' },
+      { svg: SVG.anak_sembuh,    deskripsi: 'Anak sehat kembali dan berdiri ceria' },
+    ],
+    soal: 'Urutan kejadian yang benar adalah ...',
+    opsi: [
+      { id: 'a', teks: 'Anak sembuh → minum obat → istirahat → sakit' },
+      { id: 'b', teks: 'Anak sakit → minum obat → istirahat → sembuh' },
+      { id: 'c', teks: 'Anak istirahat → sakit → sembuh → minum obat' },
+    ],
+    kunci: 'b',
+    umpan_balik_benar: 'Tepat! Anak sakit dahulu, lalu minum obat, istirahat, kemudian sembuh.',
+    umpan_balik_salah: 'Perhatikan lagi urutan gambar dari kiri ke kanan.',
+  },
+  {
+    id: 'R03-LT-B2',
+    family: 'FAM-B',
+    phase: 'latihan',
+    kompetensi_id: 'sebab_akibat_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.cuaca_cerah,   deskripsi: 'Pagi cerah, matahari bersinar terang' },
+      { svg: SVG.awan_gelap,    deskripsi: 'Tiba-tiba awan gelap menutupi langit' },
+      { svg: SVG.hujan_lebat,   deskripsi: 'Hujan deras turun' },
+      { svg: SVG.pelangi,       deskripsi: 'Hujan berhenti dan muncul pelangi' },
+    ],
+    soal: 'Mengapa muncul genangan air pada gambar ketiga?',
+    opsi: [
+      { id: 'a', teks: 'Karena ada pipa air yang bocor' },
+      { id: 'b', teks: 'Karena hujan lebat turun' },
+      { id: 'c', teks: 'Karena banjir kiriman dari desa lain' },
+    ],
+    kunci: 'b',
+    umpan_balik_benar: 'Betul! Gambar ketiga menunjukkan hujan lebat yang menyebabkan genangan.',
+    umpan_balik_salah: 'Lihat gambar ketiga. Apa yang turun dari langit dan menyebabkan genangan?',
+  },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — LATIHAN MANDIRI (2 soal)
+  // ═══════════════════════════════════════════
+  {
+    id: 'R03-LM-A3',
+    family: 'FAM-A',
+    phase: 'latihan_mandiri',
+    kompetensi_id: 'urutan_kejadian_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.cuaca_cerah,   deskripsi: 'Langit biru cerah' },
+      { svg: SVG.awan_gelap,    deskripsi: 'Awan gelap datang bersama kilat' },
+      { svg: SVG.hujan_lebat,   deskripsi: 'Hujan lebat dengan genangan' },
+      { svg: SVG.pelangi,       deskripsi: 'Pelangi muncul setelah hujan' },
+    ],
+    soal: 'Gambar mana yang terjadi setelah awan gelap datang?',
+    opsi: [
+      { id: 'a', teks: 'Pelangi muncul di langit cerah' },
+      { id: 'b', teks: 'Hujan lebat turun' },
+      { id: 'c', teks: 'Matahari semakin terik' },
+    ],
+    kunci: 'b',
+  },
+  {
+    id: 'R03-LM-B2',
+    family: 'FAM-B',
+    phase: 'latihan_mandiri',
+    kompetensi_id: 'sebab_akibat_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'tinggi',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.anak_demam,     deskripsi: 'Anak sakit demam' },
+      { svg: SVG.minum_obat,     deskripsi: 'Anak minum obat' },
+      { svg: SVG.anak_istirahat, deskripsi: 'Anak istirahat tidur' },
+      { svg: SVG.anak_sembuh,    deskripsi: 'Anak sembuh dan sehat' },
+    ],
+    soal: 'Apa yang menjadi penyebab anak di gambar bisa cepat sembuh?',
+    opsi: [
+      { id: 'a', teks: 'Anak bermain bersama teman-temannya' },
+      { id: 'b', teks: 'Anak minum obat dan beristirahat dengan cukup' },
+      { id: 'c', teks: 'Anak makan banyak permen' },
+    ],
+    kunci: 'b',
+  },
+
+  // ═══════════════════════════════════════════
+  // KELAS 2 — CEK ULANG (2 soal)
+  // ═══════════════════════════════════════════
+  {
+    id: 'R03-CU-A3',
+    family: 'FAM-A',
+    phase: 'cek_ulang',
+    kompetensi_id: 'urutan_kejadian_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.anak_demam,     deskripsi: 'Anak berbaring sakit' },
+      { svg: SVG.minum_obat,     deskripsi: 'Anak minum obat' },
+      { svg: SVG.anak_istirahat, deskripsi: 'Anak beristirahat' },
+      { svg: SVG.anak_sembuh,    deskripsi: 'Anak sehat dan ceria' },
+    ],
+    soal: 'Apa yang dilakukan anak pada gambar kedua?',
+    opsi: [
+      { id: 'a', teks: 'Tidur beristirahat' },
+      { id: 'b', teks: 'Minum obat' },
+      { id: 'c', teks: 'Bermain di luar' },
+    ],
+    kunci: 'b',
+  },
+  {
+    id: 'R03-CU-B2',
+    family: 'FAM-B',
+    phase: 'cek_ulang',
+    kompetensi_id: 'sebab_akibat_visual',
+    kelas_soal: 2,
+    tingkat_kompleksitas: 'sedang',
+    cara_penyajian: 'visual_diamati',
+    panels: [
+      { svg: SVG.cuaca_cerah,   deskripsi: 'Pagi cerah' },
+      { svg: SVG.awan_gelap,    deskripsi: 'Awan gelap datang' },
+      { svg: SVG.hujan_lebat,   deskripsi: 'Hujan lebat' },
+      { svg: SVG.pelangi,       deskripsi: 'Pelangi muncul' },
+    ],
+    soal: 'Mengapa bisa muncul pelangi pada gambar terakhir?',
+    opsi: [
+      { id: 'a', teks: 'Karena hari sangat panas tanpa awan' },
+      { id: 'b', teks: 'Karena hujan baru saja berhenti dan sinar matahari kembali' },
+      { id: 'c', teks: 'Karena ada lampu berwarna di langit' },
+    ],
+    kunci: 'b',
   },
 ];
 
